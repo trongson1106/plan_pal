@@ -9,7 +9,7 @@ except ImportError:
     pass
 
 from data.safety import EMERGENCY_911, CRISIS_988
-from api.api import classify
+from api import classify
 from coverage import COVERAGE
 
 app = Flask(__name__)
