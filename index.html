@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlanPal</title>
+<meta name="description" content="Tell us what's going on. We'll tell you who to see and what your UBC AMS/GSS health plan pays.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* =====================================================================
+     Design system: calm surface, loud numbers.
+     All sizes are in rem so the "Larger text" button scales everything.
+     1rem = 16px at standard size.
+     ===================================================================== */
+  :root {
+    --bg: #FAF8F5;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #5F6368;
+    --accent: #0B5D4B;
+    --accent-pressed: #08463A;
+    --tint: #E3F2EC;
+    --divider: #ECE8E3;
+    --disabled: #B9C7C2;
+    --safety: #B00020;
+  }
+  html { font-size: 100%; }
+  html.large { font-size: 125%; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 1.125rem; line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 30rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+  h1, h2, h3 { margin: 0; line-height: 1.25; }
+  p { margin: 0; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .muted { color: var(--muted); font-size: 1rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ===== Header + tabs ===== */
+  .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 1rem; }
+  .chip-btn { white-space: nowrap; }
+  .brand { font-size: 1.75rem; font-weight: 700; }
+  .top-actions { display: flex; gap: 0.5rem; }
+  .chip-btn {
+    min-height: 3rem; min-width: 3rem; padding: 0 0.875rem; border-radius: 0.875rem;
+    border: 1.5px solid var(--divider); background: var(--card); font-size: 1rem; font-weight: 500;
+  }
+  .chip-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--tint); }
+  .plan-line { font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .tabs { display: flex; background: #EFEBE6; border-radius: 0.875rem; padding: 0.25rem; margin-bottom: 2rem; }
+  .tab {
+    flex: 1; min-height: 3rem; border: 0; border-radius: 0.75rem; background: transparent;
+    font-size: 1rem; font-weight: 700; color: var(--muted);
+  }
+  .tab[aria-current="page"] { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(26,26,26,0.08); }
+
+  /* ===== Cards, sections ===== */
+  .card { background: var(--card); border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 2px 8px rgba(26,26,26,0.05); }
+  .card + .card { margin-top: 1rem; }
+  .section { border-top: 1px solid var(--divider); margin-top: 1.5rem; padding-top: 1.5rem; }
+  .view-title { font-size: 1.375rem; font-weight: 700; margin-bottom: 0.5rem; outline: none; }
+  .view-sub { font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+  /* ===== Form controls ===== */
+  .field-label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
+  textarea {
+    width: 100%; min-height: 7.5rem; padding: 1rem; resize: vertical; background: #fff;
+    border: 1.5px solid var(--divider); border-radius: 0.875rem; outline: none;
+  }
+  textarea::placeholder { color: var(--muted); }
+  textarea:focus, select:focus, input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  select {
+    width: 100%; min-height: 3rem; padding: 0 1rem; background: #fff;
+    border: 1.5px solid var(--divider); border-radius: 0.875rem; outline: none;
+  }
+  .check { display: flex; align-items: center; gap: 0.5rem; min-height: 3rem; font-size: 1rem; color: var(--muted); cursor: pointer; }
+  .check input { width: 1.375rem; height: 1.375rem; margin: 0; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .primary {
+    width: 100%; min-height: 3.5rem; border: 0; border-radius: 0.875rem; background: var(--accent); color: #fff;
+    font-size: 1.125rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.5rem 1rem; transition: background-color 150ms;
+  }
+  .primary:active:not(:disabled) { background: var(--accent-pressed); }
+  .primary:disabled { background: var(--disabled); cursor: not-allowed; }
+  .link-btn { background: none; border: 0; padding: 0; min-height: 3rem; color: var(--accent); font-weight: 700; font-size: 1rem; text-decoration: underline; text-underline-offset: 3px; }
+  .spinner { width: 1.125rem; height: 1.125rem; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== Onboarding ===== */
+  fieldset { border: 0; padding: 0; margin: 0 0 2rem; }
+  legend { font-weight: 700; padding: 0; margin-bottom: 0.5rem; }
+  .option {
+    display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; padding: 0.75rem 1rem; margin-top: 0.5rem;
+    background: #fff; border: 1.5px solid var(--divider); border-radius: 0.875rem; cursor: pointer;
+  }
+  .option input { width: 1.375rem; height: 1.375rem; margin: 0; accent-color: var(--accent); flex-shrink: 0; }
+  .option:has(input:checked) { border-color: var(--accent); background: var(--tint); }
+  .option.disabled { color: var(--muted); cursor: not-allowed; background: transparent; }
+  .option small { display: block; font-size: 0.875rem; color: var(--muted); }
+
+  /* ===== Result card ===== */
+  .result h2 { font-size: 1.375rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .eyebrow { font-size: 0.875rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+  .why { font-size: 1rem; color: var(--muted); }
+  .hero-label { font-size: 1rem; color: var(--muted); }
+  .hero { font-size: 2.5rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin: 0.25rem 0; }
+  .hero-unit { font-size: 1.125rem; font-weight: 500; letter-spacing: 0; color: var(--muted); }
+  .hero-note { font-size: 1rem; color: var(--muted); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .row .label { font-size: 1rem; color: var(--muted); }
+  .row .amt { font-weight: 700; }
+  .bar-label { font-weight: 700; margin-bottom: 0.5rem; }
+  .bar { height: 0.625rem; background: var(--divider); border-radius: 999px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  .note { font-size: 1rem; color: var(--muted); margin-top: 0.5rem; }
+  .tip { background: var(--tint); border-radius: 0.875rem; padding: 1rem; }
+  .tip-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+  .tip-text { font-size: 1rem; }
+  .tip .call { margin-top: 1rem; background: #fff; }
+  .check-note { font-size: 0.9375rem; color: var(--muted); margin-top: 1rem; padding-left: 0.75rem; border-left: 3px solid var(--divider); }
+  .call {
+    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0 1rem;
+    border-radius: 0.875rem; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 700; font-size: 1rem; text-decoration: none; background: transparent;
+  }
+  .clinic { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; }
+  .clinic + .clinic { border-top: 1px solid var(--divider); }
+  .clinic-name { font-weight: 700; }
+  .clinic-addr { font-size: 1rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .pill { display: inline-block; border-radius: 999px; padding: 0.25rem 0.625rem; background: var(--tint); color: var(--accent); font-size: 0.8125rem; font-weight: 700; }
+  .pill.grey { background: #F1EFEC; color: var(--muted); }
+  .say-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+  .copy { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 3rem; padding: 0 0.5rem; background: none; border: 0; color: var(--accent); font-weight: 700; font-size: 1rem; }
+  .disclaimer { font-size: 0.875rem; color: var(--muted); margin-top: 1.5rem; }
+  svg.icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+
+  /* ===== Reminder card ===== */
+  .reminder { margin-top: 2rem; }
+  .reminder h2 { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .countdown { font-size: 2rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; margin: 0.5rem 0 0.25rem; }
+  .unused { list-style: none; padding: 0; margin: 1rem 0 0; }
+  .unused li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-top: 1px solid var(--divider); font-size: 1rem; }
+  .unused li span:last-child { font-weight: 700; white-space: nowrap; }
+
+  /* ===== Coverage screen ===== */
+  .cov h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .cov-plain { font-size: 1rem; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
+  .stat { background: var(--bg); border-radius: 0.875rem; padding: 0.75rem 1rem; }
+  .stat-label { font-size: 0.875rem; color: var(--muted); }
+  .stat-value { font-size: 1.25rem; font-weight: 700; }
+  .used-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
+  .used-row label { font-size: 1rem; font-weight: 500; }
+  .money-input { position: relative; width: 8rem; flex-shrink: 0; }
+  .money-input span { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .money-input input {
+    width: 100%; min-height: 3rem; padding: 0 0.75rem 0 1.75rem; background: #fff; text-align: right;
+    border: 1.5px solid var(--divider); border-radius: 0.875rem; outline: none;
+  }
+  .left-line { font-size: 1rem; font-weight: 700; color: var(--accent); margin-top: 0.5rem; }
+  .banner { background: var(--tint); border-radius: 0.875rem; padding: 1rem; margin-bottom: 1rem; font-size: 1rem; }
+
+  /* ===== Safety screen ===== */
+  .safety { position: fixed; inset: 0; z-index: 100; overflow-y: auto; background: var(--safety); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: 3rem 1.5rem; }
+  .safety-inner { max-width: 30rem; width: 100%; margin: 0 auto; }
+  .safety h2 { font-size: 2rem; font-weight: 700; line-height: 1.2; margin: 1rem 0; outline: none; }
+  .safety p { margin: 0 0 1.5rem; }
+  .safety-btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 4rem; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 1.25rem; font-weight: 700; text-decoration: none; margin-bottom: 1rem; }
+  .safety-btn.main { background: #fff; color: var(--safety); }
+  .safety-btn.secondary { background: transparent; color: #fff; border: 2px solid #fff; }
+  .safety :focus-visible { outline-color: #fff; }
+  .back { display: inline-flex; align-items: center; min-height: 3rem; margin-top: 1rem; background: none; border: 0; padding: 0; color: #fff; font-size: 1rem; text-decoration: underline; }
+
+  /* ===== Additions: language picker, speak, examples, places ===== */
+  .plan-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+  .lang-pick { position: relative; }
+  .lang-pick select {
+    width: auto; min-height: 2.75rem; padding: 0 2rem 0 0.875rem; font-size: 1rem; font-weight: 500;
+    background: var(--card); border: 1.5px solid var(--divider); border-radius: 0.875rem;
+    appearance: none; -webkit-appearance: none;
+  }
+  .lang-pick::after { content: ""; position: absolute; right: 0.875rem; top: 50%; width: 0.45rem; height: 0.45rem;
+    border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+  .input-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.5rem; }
+  .speak-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem; min-height: 3rem; padding: 0 1rem;
+    border-radius: 0.875rem; border: 1.5px solid var(--accent); background: var(--card); color: var(--accent);
+    font-weight: 700; font-size: 1rem; transition: background-color 150ms;
+  }
+  .speak-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .speak-status { font-size: 0.9375rem; color: var(--muted); margin-top: 0.5rem; min-height: 0; }
+  .examples-label { font-size: 0.9375rem; color: var(--muted); margin: 1rem 0 0.5rem; }
+  .examples { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .ex-chip {
+    min-height: 2.75rem; padding: 0.375rem 0.875rem; border-radius: 999px; border: 1.5px solid var(--divider);
+    background: var(--card); font-size: 0.9375rem; text-align: left; line-height: 1.35;
+  }
+  .ex-chip:active { background: var(--tint); }
+  .place { padding: 1rem 0; }
+  .place + .place { border-top: 1px solid var(--divider); }
+  .place-name { font-weight: 700; }
+  .place-addr { font-size: 0.9375rem; color: var(--muted); margin: 0.125rem 0 0.5rem; }
+  .place-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.75rem; }
+  .place-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .place-actions .call { min-height: 2.75rem; }
+  .call.solid { background: var(--accent); color: #fff; }
+  details.places { margin-top: 1rem; border-top: 1px solid var(--divider); padding-top: 0.5rem; }
+  details.places summary { min-height: 3rem; display: flex; align-items: center; font-weight: 700; font-size: 1rem; color: var(--accent); cursor: pointer; list-style: none; }
+  details.places summary::-webkit-details-marker { display: none; }
+  details.places summary::after { content: "+"; margin-left: auto; font-size: 1.25rem; }
+  details.places[open] summary::after { content: "−"; }
+</style>
+
+</head>
+<body>
+
+<div id="app">
+  <div class="wrap">
+
+    <!-- ================= SETUP ================= -->
+    <section id="view-onboarding" aria-labelledby="ob-title">
+      <p class="brand">PlanPal</p>
+      <p class="muted" style="margin:0.5rem 0 2rem" data-i18n="ob_tagline"></p>
+      <h1 class="view-title" id="ob-title" tabindex="-1" data-i18n="ob_title"></h1>
+      <p class="view-sub" data-i18n="ob_sub"></p>
+
+      <form id="ob-form" novalidate>
+        <fieldset>
+          <legend><label for="ob-language" data-i18n="ob_q_lang"></label></legend>
+          <select id="ob-language" name="language"></select>
+          <p class="note" data-i18n="ob_lang_note"></p>
+        </fieldset>
+
+        <fieldset>
+          <legend data-i18n="ob_q_plan"></legend>
+          <label class="option"><input type="radio" name="plan" value="AMS/GSS" checked>
+            <span><span data-i18n="ob_plan_ams"></span><small data-i18n="ob_plan_ams_sub"></small></span></label>
+          <label class="option disabled"><input type="radio" name="plan" value="other" disabled>
+            <span><span data-i18n="ob_plan_other"></span><small data-i18n="ob_coming_soon"></small></span></label>
+        </fieldset>
+
+        <fieldset>
+          <legend data-i18n="ob_q_usage"></legend>
+          <label class="option"><input type="radio" name="usage" value="no"><span data-i18n="ob_no"></span></label>
+          <label class="option"><input type="radio" name="usage" value="yes"><span><span data-i18n="ob_yes"></span><small data-i18n="ob_yes_sub"></small></span></label>
+          <label class="option"><input type="radio" name="usage" value="unsure" checked><span data-i18n="ob_unsure"></span></label>
+        </fieldset>
+
+        <button class="primary" type="submit" data-i18n="ob_start"></button>
+      </form>
+    </section>
+
+    <!-- ================= MAIN APP ================= -->
+    <div id="main" hidden>
+      <header class="topbar">
+        <p class="brand">PlanPal</p>
+        <div class="top-actions">
+          <button class="chip-btn" id="btn-large" type="button" aria-pressed="false" data-i18n="top_larger"></button>
+          <button class="chip-btn" id="btn-settings" type="button" data-i18n="top_settings"></button>
+        </div>
+      </header>
+      <div class="plan-line">
+        <span data-i18n="plan_line"></span>
+        <span class="lang-pick">
+          <label class="sr-only" for="top-language" data-i18n="top_language"></label>
+          <select id="top-language"></select>
+        </span>
+      </div>
+
+      <nav class="tabs" data-i18n-aria="tabs_label">
+        <button class="tab" type="button" data-view="ask" aria-current="page" data-i18n="tab_ask"></button>
+        <button class="tab" type="button" data-view="coverage" data-i18n="tab_coverage"></button>
+      </nav>
+
+      <!-- ---------- ASK ---------- -->
+      <section id="view-ask" aria-labelledby="ask-title">
+        <h1 class="view-title" id="ask-title" tabindex="-1" data-i18n="ask_title"></h1>
+        <p class="view-sub" data-i18n="ask_sub"></p>
+
+        <label class="sr-only" for="message" data-i18n="ask_label"></label>
+        <textarea id="message" dir="auto" data-i18n-placeholder="ask_placeholder"></textarea>
+
+        <div class="input-tools">
+          <button class="speak-btn" id="speak" type="button" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
+            <span id="speak-label"></span>
+          </button>
+          <label class="check">
+            <input type="checkbox" id="remember"> <span data-i18n="remember"></span>
+          </label>
+        </div>
+        <p class="speak-status" id="speak-status" aria-live="polite" hidden></p>
+
+        <p class="examples-label" data-i18n="ask_try"></p>
+        <div class="examples">
+          <button class="ex-chip" type="button" data-example="ex_ankle"></button>
+          <button class="ex-chip" type="button" data-example="ex_stress"></button>
+          <button class="ex-chip" type="button" data-example="ex_teeth"></button>
+          <button class="ex-chip" type="button" data-example="ex_eyes"></button>
+        </div>
+
+        <button class="primary" id="ask" type="button" style="margin-top:1.5rem" disabled></button>
+
+        <section class="card result" id="result" aria-live="polite" style="margin-top:2rem" hidden></section>
+
+        <section class="card reminder" id="reminder" aria-labelledby="reminder-title"></section>
+      </section>
+
+      <!-- ---------- COVERAGE ---------- -->
+      <section id="view-coverage" aria-labelledby="cov-title" hidden>
+        <h1 class="view-title" id="cov-title" tabindex="-1" data-i18n="cov_title"></h1>
+        <p class="view-sub" id="cov-sub"></p>
+        <div id="cov-banner"></div>
+        <div id="cov-list"></div>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= SAFETY SCREEN ================= -->
+<div class="safety" id="safety" role="alertdialog" aria-modal="true" aria-labelledby="safety-heading" hidden>
+  <div class="safety-inner">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:2rem;height:2rem"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+    <h2 id="safety-heading" tabindex="-1"></h2>
+    <div id="safety-actions"></div>
+    <button class="back" id="safety-back" type="button" data-i18n="s_back"></button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   TRANSLATIONS
+   Menus, buttons and plan descriptions. Answers from the server come back in
+   whatever language the student picked; this table only covers the page.
+   Every key in "en" must exist in every other language (the test checks).
+   Placeholders like {date} are filled in by the code.
+   ========================================================================= */
+const I18N = {
+  en: {
+    ob_tagline: "Your UBC health plan, in plain language. Three quick questions and you're in.",
+    ob_title: "Let's set you up",
+    ob_sub: "Takes about 30 seconds.",
+    ob_q_lang: "1. Which language do you prefer?",
+    ob_lang_note: "Answers will come back in this language.",
+    ob_q_plan: "2. Which plan are you on?",
+    ob_plan_ams: "AMS/GSS Student Health Plan",
+    ob_plan_ams_sub: "Every UBC student is enrolled by default",
+    ob_plan_other: "A different plan",
+    ob_coming_soon: "Coming soon",
+    ob_q_usage: "3. Have you used your plan since September 1?",
+    ob_no: "No, not yet",
+    ob_yes: "Yes",
+    ob_yes_sub: "We'll ask roughly how much, so we can show what's left",
+    ob_unsure: "Not sure",
+    ob_start: "Get started",
+    lang_auto: "Match the language I type in",
+    top_larger: "Larger text",
+    top_settings: "Settings",
+    top_language: "Language",
+    plan_line: "AMS/GSS plan",
+    tabs_label: "Sections",
+    tab_ask: "Ask",
+    tab_coverage: "My coverage",
+    ask_title: "What's going on?",
+    ask_sub: "Type or speak, in any language. We'll tell you who to see and what your plan pays.",
+    ask_label: "Describe what's going on",
+    ask_placeholder: "e.g. I hurt my ankle playing soccer",
+    ask_try: "Or tap one:",
+    ex_ankle: "I sprained my ankle playing soccer",
+    ex_stress: "I'm really stressed about exams",
+    ex_teeth: "I need a dental cleaning",
+    ex_eyes: "My eyes get blurry when I read",
+    speak: "Speak",
+    speak_stop: "Stop",
+    speak_listening: "Listening in {lang}. Tap Stop when you're done.",
+    speak_denied: "Your microphone is blocked. Allow it in your browser settings, or use the microphone on your keyboard.",
+    speak_unsupported: "This browser can't listen. Use the microphone on your keyboard instead.",
+    speak_nothing: "Didn't catch that. Try again.",
+    remember: "Remember me on this device",
+    ask_btn: "Ask",
+    ask_loading: "Checking your plan...",
+    ask_waking: "Waking up the server, this can take up to a minute...",
+    res_who: "Who to see",
+    res_unsure: "Not sure yet",
+    res_hmm: "Hmm",
+    res_cost_you: "What it costs you",
+    res_msp: "Covered by MSP, not your student plan.",
+    res_pays_back: "Your plan pays back up to",
+    unit_visit: "per visit",
+    unit_session: "per session",
+    res_rest: "You pay the rest of the bill.",
+    res_plan_pays: "Your plan pays",
+    unit_cost: "of the cost",
+    res_left_of: "{left} left of {total} this year",
+    res_yearly_max: "Yearly maximum",
+    res_add_used: "Add what you've used to see what's left",
+    res_resets: "Unused money resets {date} ({days} left).",
+    days_one: "1 day",
+    days_many: "{n} days",
+    res_confirm: "We're still confirming this amount. Double-check it in the Pacific Blue Cross app.",
+    res_cheaper: "Cheaper option",
+    res_where: "Where to go",
+    res_nurse_title: "Not sure how serious it is?",
+    res_nurse_text: "Call 811 to talk to a nurse at HealthLink BC. It's free and open 24/7.",
+    res_call_811: "Call 811",
+    res_places: "Places near UBC",
+    res_places_note: "Call ahead to confirm they bill Pacific Blue Cross directly.",
+    res_direct: "Direct billing",
+    res_on_campus: "On campus",
+    res_call: "Call",
+    res_directions: "Directions",
+    res_say: "What to say when you book (in English)",
+    copy: "Copy",
+    copied: "Copied",
+    copy_failed: "Copy failed",
+    copy_label: "Copy what to say",
+    disclaimer: "This is not medical advice. If symptoms are severe or getting worse, see a doctor.",
+    err_server: "Couldn't reach the server. Try again.",
+    rem_title: "Use it before {date}",
+    rem_until: "until your plan resets on {date}. Unused money doesn't carry over.",
+    rem_not_yet: "You haven't used these yet:",
+    rem_unused: "{amt} unused",
+    rem_not_used: "Not used yet",
+    rem_two: "(2 a year)",
+    rem_all: "You've started using every benefit we track.",
+    cov_title: "Your coverage, in plain language",
+    cov_sub: "AMS/GSS plan year: Sep 1 to Aug 31. Resets in {days}.",
+    cov_banner: "Add roughly what you've claimed since Sep 1 and we'll show what's left. Leave it at $0 if you haven't used something.",
+    cov_you_pay: "You pay",
+    cov_per_visit: "Per visit",
+    cov_per_session: "Per session",
+    cov_plan_pays: "Plan pays",
+    cov_network: "{p}% at a network dentist",
+    cov_per_year: "Per year",
+    cov_up_to: "up to {amt}",
+    cov_used: "Used since Sep 1",
+    cov_left: "{amt} left this year",
+    cov_had_one: "I've had one since Sep 1",
+    cov_confirm: "We're still confirming this. Double-check it in the Pacific Blue Cross app.",
+    s911_title: "This sounds like an emergency.",
+    s911_call: "Call 911",
+    s911_note: "If you can, ask someone nearby to stay with you.",
+    s988_title: "You don't have to go through this alone.",
+    s988_call: "Call or text 988",
+    s988_text: "Text 988",
+    s988_note: "988 is free, 24/7, anywhere in Canada.",
+    s_back: "I'm safe — go back",
+    cat: {
+      physio: { title: "Physiotherapy", who: "Physiotherapist",
+        plain: "The plan pays up to $40 per visit, up to $400 a year. You pay the rest of the bill." },
+      massage: { title: "Massage therapy", who: "Registered massage therapist",
+        plain: "The plan pays up to $35 per visit, up to $400 a year. You pay the rest of the bill." },
+      counselling: { title: "Counselling / psychology", who: "Counsellor or psychologist",
+        plain: "Fully covered up to $300 per session and $1,250 a year (roughly 8 or more sessions).",
+        where: "UBC Counselling Services offers a few free sessions first." },
+      dental_cleaning: { title: "Dental cleaning", who: "Dentist (cleaning)",
+        plain: "The plan pays 70% of a cleaning. At a network dentist it pays 100%, so you pay $0. Up to 2 cleanings a year.",
+        where: "Alumo network dentists. Ask the clinic if they're in the network.",
+        shared: "Shared with other dental work." },
+      eye_exam: { title: "Eye exam", who: "Optometrist (eye exam)",
+        plain: "Vision care is covered by the plan. Check the exact amount in the Pacific Blue Cross app.",
+        where: "The optometrist in the AMS Nest offers a discount on contacts." },
+      prescription: { title: "Prescriptions", who: "Pharmacist",
+        plain: "The plan covers most of the cost of prescriptions. At a network pharmacy (for example Rexall) you pay less.",
+        where: "Network pharmacies such as Rexall." },
+      doctor_visit: { title: "Doctor visit", who: "Doctor (family doctor or walk-in)",
+        plain: "A visit with a family doctor or at UBC Student Health is covered by provincial MSP, so it costs you nothing.",
+        where: "UBC Student Health Service" },
+    },
+  },
+
+  "zh-Hans": {
+    ob_tagline: "用简单易懂的话了解你的UBC健康保险。回答三个小问题就可以开始。",
+    ob_title: "先简单设置一下",
+    ob_sub: "大约30秒。",
+    ob_q_lang: "1. 你想用哪种语言？",
+    ob_lang_note: "回答会使用这种语言。",
+    ob_q_plan: "2. 你参加的是哪个保险计划？",
+    ob_plan_ams: "AMS/GSS 学生健康保险计划",
+    ob_plan_ams_sub: "所有UBC学生默认自动参保",
+    ob_plan_other: "其他保险计划",
+    ob_coming_soon: "即将推出",
+    ob_q_usage: "3. 自9月1日以来，你用过保险吗？",
+    ob_no: "还没有",
+    ob_yes: "用过",
+    ob_yes_sub: "我们会问大概用了多少，好告诉你还剩多少",
+    ob_unsure: "不确定",
+    ob_start: "开始",
+    lang_auto: "跟随我输入的语言",
+    top_larger: "放大字体",
+    top_settings: "设置",
+    top_language: "语言",
+    plan_line: "AMS/GSS 保险计划",
+    tabs_label: "栏目",
+    tab_ask: "提问",
+    tab_coverage: "我的保障",
+    ask_title: "遇到什么情况了？",
+    ask_sub: "可以用任何语言输入或说话。我们会告诉你该看谁，以及保险能报销多少。",
+    ask_label: "描述一下你的情况",
+    ask_placeholder: "例如：踢足球时扭伤了脚踝",
+    ask_try: "或者点一个：",
+    ex_ankle: "踢足球时扭伤了脚踝",
+    ex_stress: "考试压力很大",
+    ex_teeth: "我需要洗牙",
+    ex_eyes: "看书时眼睛模糊",
+    speak: "说话",
+    speak_stop: "停止",
+    speak_listening: "正在用{lang}听你说。说完请点“停止”。",
+    speak_denied: "麦克风被禁用了。请在浏览器设置中允许，或者使用键盘上的麦克风。",
+    speak_unsupported: "这个浏览器不支持语音输入。请使用键盘上的麦克风。",
+    speak_nothing: "没听清楚，请再试一次。",
+    remember: "在这台设备上记住我",
+    ask_btn: "提问",
+    ask_loading: "正在查询你的保险...",
+    ask_waking: "正在唤醒服务器，可能需要一分钟左右...",
+    res_who: "该看谁",
+    res_unsure: "还不确定",
+    res_hmm: "嗯",
+    res_cost_you: "你需要付多少",
+    res_msp: "由MSP（省医疗保险）承担，不占用学生保险。",
+    res_pays_back: "保险最多报销",
+    unit_visit: "每次",
+    unit_session: "每次",
+    res_rest: "剩下的费用由你支付。",
+    res_plan_pays: "保险报销",
+    unit_cost: "的费用",
+    res_left_of: "今年还剩 {left}（共 {total}）",
+    res_yearly_max: "每年上限",
+    res_add_used: "填写已用金额，查看还剩多少",
+    res_resets: "未用完的额度将于{date}清零（还有{days}）。",
+    days_one: "1天",
+    days_many: "{n}天",
+    res_confirm: "这个金额我们还在核实。请在Pacific Blue Cross应用里再确认一下。",
+    res_cheaper: "更省钱的选择",
+    res_where: "去哪里",
+    res_nurse_title: "不确定严不严重？",
+    res_nurse_text: "拨打811，可以和HealthLink BC的护士通话。免费，24小时开放。",
+    res_call_811: "拨打811",
+    res_places: "UBC附近的地方",
+    res_places_note: "去之前请先打电话，确认他们是否直接向Pacific Blue Cross收费。",
+    res_direct: "直接结算",
+    res_on_campus: "校内",
+    res_call: "打电话",
+    res_directions: "路线",
+    res_say: "预约时可以这样说（英文）",
+    copy: "复制",
+    copied: "已复制",
+    copy_failed: "复制失败",
+    copy_label: "复制这段话",
+    disclaimer: "这不是医疗建议。如果症状严重或正在加重，请去看医生。",
+    err_server: "无法连接服务器，请再试一次。",
+    rem_title: "{date}前用掉",
+    rem_until: "后保险额度重置（{date}）。没用完的额度不能留到下一年。",
+    rem_not_yet: "你还没用过这些：",
+    rem_unused: "{amt} 未使用",
+    rem_not_used: "还没用过",
+    rem_two: "（每年2次）",
+    rem_all: "我们追踪的每项福利你都已经开始使用了。",
+    cov_title: "你的保障，一看就懂",
+    cov_sub: "AMS/GSS保险年度：9月1日至8月31日。还有{days}重置。",
+    cov_banner: "填写自9月1日以来大概报销了多少，我们会显示还剩多少。没用过的项目保持$0就好。",
+    cov_you_pay: "你付",
+    cov_per_visit: "每次",
+    cov_per_session: "每次",
+    cov_plan_pays: "保险报销",
+    cov_network: "网络内牙医报销{p}%",
+    cov_per_year: "每年",
+    cov_up_to: "最多{amt}",
+    cov_used: "9月1日以来已用",
+    cov_left: "今年还剩{amt}",
+    cov_had_one: "9月1日以来已经检查过",
+    cov_confirm: "这项我们还在核实。请在Pacific Blue Cross应用里再确认一下。",
+    s911_title: "这听起来是紧急情况。",
+    s911_call: "拨打911",
+    s911_note: "如果可以，请让身边的人陪着你。",
+    s988_title: "你不必独自面对这一切。",
+    s988_call: "拨打或发短信到988",
+    s988_text: "发短信到988",
+    s988_note: "988免费、24小时开放，加拿大全境可用。",
+    s_back: "我很安全，返回",
+    cat: {
+      physio: { title: "物理治疗", who: "物理治疗师",
+        plain: "保险每次最多报销$40，每年最多$400。剩下的费用由你支付。" },
+      massage: { title: "按摩治疗", who: "注册按摩治疗师",
+        plain: "保险每次最多报销$35，每年最多$400。剩下的费用由你支付。" },
+      counselling: { title: "心理咨询", who: "心理咨询师或心理学家",
+        plain: "每次最多$300、每年最多$1,250，全额报销（大约8次或更多）。",
+        where: "UBC心理咨询服务（Counselling Services）会先提供几次免费咨询。" },
+      dental_cleaning: { title: "洗牙", who: "牙医（洗牙）",
+        plain: "洗牙费用保险报销70%。在网络内牙医处报销100%，你不用付钱。每年最多2次。",
+        where: "Alumo网络内的牙医。请向诊所确认他们是否在网络内。",
+        shared: "与其他牙科项目共用额度。" },
+      eye_exam: { title: "眼科检查", who: "验光师（眼科检查）",
+        plain: "保险包括视力保健。具体金额请在Pacific Blue Cross应用里查看。",
+        where: "AMS Nest里的验光师提供隐形眼镜折扣。" },
+      prescription: { title: "处方药", who: "药剂师",
+        plain: "保险报销大部分处方药费用。在网络内药房（例如Rexall）你付得更少。",
+        where: "网络内药房，例如Rexall。" },
+      doctor_visit: { title: "看医生", who: "医生（家庭医生或免预约诊所）",
+        plain: "看家庭医生或去UBC学生健康服务中心，费用由省医疗保险MSP承担，你不用付钱。",
+        where: "UBC学生健康服务中心（Student Health Service）" },
+    },
+  },
+
+  "zh-Hant": {
+    ob_tagline: "用簡單易懂的話了解你的UBC健康保險。回答三個小問題就可以開始。",
+    ob_title: "先簡單設定一下",
+    ob_sub: "大約30秒。",
+    ob_q_lang: "1. 你想用哪種語言？",
+    ob_lang_note: "回答會使用這種語言。",
+    ob_q_plan: "2. 你參加的是哪個保險計劃？",
+    ob_plan_ams: "AMS/GSS 學生健康保險計劃",
+    ob_plan_ams_sub: "所有UBC學生預設自動參保",
+    ob_plan_other: "其他保險計劃",
+    ob_coming_soon: "即將推出",
+    ob_q_usage: "3. 自9月1日以來，你用過保險嗎？",
+    ob_no: "還沒有",
+    ob_yes: "用過",
+    ob_yes_sub: "我們會問大概用了多少，好告訴你還剩多少",
+    ob_unsure: "不確定",
+    ob_start: "開始",
+    lang_auto: "跟隨我輸入的語言",
+    top_larger: "放大字體",
+    top_settings: "設定",
+    top_language: "語言",
+    plan_line: "AMS/GSS 保險計劃",
+    tabs_label: "欄目",
+    tab_ask: "提問",
+    tab_coverage: "我的保障",
+    ask_title: "遇到什麼情況了？",
+    ask_sub: "可以用任何語言輸入或說話。我們會告訴你該看誰，以及保險能報銷多少。",
+    ask_label: "描述一下你的情況",
+    ask_placeholder: "例如：踢足球時扭傷了腳踝",
+    ask_try: "或者點一個：",
+    ex_ankle: "踢足球時扭傷了腳踝",
+    ex_stress: "考試壓力很大",
+    ex_teeth: "我需要洗牙",
+    ex_eyes: "看書時眼睛模糊",
+    speak: "說話",
+    speak_stop: "停止",
+    speak_listening: "正在用{lang}聽你說。說完請按「停止」。",
+    speak_denied: "麥克風被停用了。請在瀏覽器設定中允許，或者使用鍵盤上的麥克風。",
+    speak_unsupported: "這個瀏覽器不支援語音輸入。請使用鍵盤上的麥克風。",
+    speak_nothing: "沒聽清楚，請再試一次。",
+    remember: "在這部裝置上記住我",
+    ask_btn: "提問",
+    ask_loading: "正在查詢你的保險...",
+    ask_waking: "正在喚醒伺服器，可能需要一分鐘左右...",
+    res_who: "該看誰",
+    res_unsure: "還不確定",
+    res_hmm: "嗯",
+    res_cost_you: "你需要付多少",
+    res_msp: "由MSP（省醫療保險）承擔，不佔用學生保險。",
+    res_pays_back: "保險最多報銷",
+    unit_visit: "每次",
+    unit_session: "每次",
+    res_rest: "剩下的費用由你支付。",
+    res_plan_pays: "保險報銷",
+    unit_cost: "的費用",
+    res_left_of: "今年還剩 {left}（共 {total}）",
+    res_yearly_max: "每年上限",
+    res_add_used: "填寫已用金額，查看還剩多少",
+    res_resets: "未用完的額度將於{date}清零（還有{days}）。",
+    days_one: "1天",
+    days_many: "{n}天",
+    res_confirm: "這個金額我們還在核實。請在Pacific Blue Cross應用程式裡再確認一下。",
+    res_cheaper: "更省錢的選擇",
+    res_where: "去哪裡",
+    res_nurse_title: "不確定嚴不嚴重？",
+    res_nurse_text: "撥打811，可以和HealthLink BC的護士通話。免費，24小時開放。",
+    res_call_811: "撥打811",
+    res_places: "UBC附近的地方",
+    res_places_note: "去之前請先打電話，確認他們是否直接向Pacific Blue Cross收費。",
+    res_direct: "直接結算",
+    res_on_campus: "校內",
+    res_call: "打電話",
+    res_directions: "路線",
+    res_say: "預約時可以這樣說（英文）",
+    copy: "複製",
+    copied: "已複製",
+    copy_failed: "複製失敗",
+    copy_label: "複製這段話",
+    disclaimer: "這不是醫療建議。如果症狀嚴重或正在加重，請去看醫生。",
+    err_server: "無法連接伺服器，請再試一次。",
+    rem_title: "{date}前用掉",
+    rem_until: "後保險額度重置（{date}）。沒用完的額度不能留到下一年。",
+    rem_not_yet: "你還沒用過這些：",
+    rem_unused: "{amt} 未使用",
+    rem_not_used: "還沒用過",
+    rem_two: "（每年2次）",
+    rem_all: "我們追蹤的每項福利你都已經開始使用了。",
+    cov_title: "你的保障，一看就懂",
+    cov_sub: "AMS/GSS保險年度：9月1日至8月31日。還有{days}重置。",
+    cov_banner: "填寫自9月1日以來大概報銷了多少，我們會顯示還剩多少。沒用過的項目保持$0就好。",
+    cov_you_pay: "你付",
+    cov_per_visit: "每次",
+    cov_per_session: "每次",
+    cov_plan_pays: "保險報銷",
+    cov_network: "網絡內牙醫報銷{p}%",
+    cov_per_year: "每年",
+    cov_up_to: "最多{amt}",
+    cov_used: "9月1日以來已用",
+    cov_left: "今年還剩{amt}",
+    cov_had_one: "9月1日以來已經檢查過",
+    cov_confirm: "這項我們還在核實。請在Pacific Blue Cross應用程式裡再確認一下。",
+    s911_title: "這聽起來是緊急情況。",
+    s911_call: "撥打911",
+    s911_note: "如果可以，請讓身邊的人陪著你。",
+    s988_title: "你不必獨自面對這一切。",
+    s988_call: "撥打或傳短訊到988",
+    s988_text: "傳短訊到988",
+    s988_note: "988免費、24小時開放，加拿大全境可用。",
+    s_back: "我很安全，返回",
+    cat: {
+      physio: { title: "物理治療", who: "物理治療師",
+        plain: "保險每次最多報銷$40，每年最多$400。剩下的費用由你支付。" },
+      massage: { title: "按摩治療", who: "註冊按摩治療師",
+        plain: "保險每次最多報銷$35，每年最多$400。剩下的費用由你支付。" },
+      counselling: { title: "心理諮詢", who: "心理諮詢師或心理學家",
+        plain: "每次最多$300、每年最多$1,250，全額報銷（大約8次或更多）。",
+        where: "UBC心理諮詢服務（Counselling Services）會先提供幾次免費諮詢。" },
+      dental_cleaning: { title: "洗牙", who: "牙醫（洗牙）",
+        plain: "洗牙費用保險報銷70%。在網絡內牙醫處報銷100%，你不用付錢。每年最多2次。",
+        where: "Alumo網絡內的牙醫。請向診所確認他們是否在網絡內。",
+        shared: "與其他牙科項目共用額度。" },
+      eye_exam: { title: "眼科檢查", who: "驗光師（眼科檢查）",
+        plain: "保險包括視力保健。具體金額請在Pacific Blue Cross應用程式裡查看。",
+        where: "AMS Nest裡的驗光師提供隱形眼鏡折扣。" },
+      prescription: { title: "處方藥", who: "藥劑師",
+        plain: "保險報銷大部分處方藥費用。在網絡內藥房（例如Rexall）你付得更少。",
+        where: "網絡內藥房，例如Rexall。" },
+      doctor_visit: { title: "看醫生", who: "醫生（家庭醫生或免預約診所）",
+        plain: "看家庭醫生或去UBC學生健康服務中心，費用由省醫療保險MSP承擔，你不用付錢。",
+        where: "UBC學生健康服務中心（Student Health Service）" },
+    },
+  },
+
+  pa: {
+    ob_tagline: "ਤੁਹਾਡਾ UBC ਹੈਲਥ ਪਲਾਨ, ਸੌਖੀ ਭਾਸ਼ਾ ਵਿੱਚ। ਤਿੰਨ ਛੋਟੇ ਸਵਾਲ ਅਤੇ ਤੁਸੀਂ ਸ਼ੁਰੂ ਕਰ ਸਕਦੇ ਹੋ।",
+    ob_title: "ਆਓ ਸ਼ੁਰੂ ਕਰੀਏ",
+    ob_sub: "ਲਗਭਗ 30 ਸਕਿੰਟ ਲੱਗਣਗੇ।",
+    ob_q_lang: "1. ਤੁਸੀਂ ਕਿਹੜੀ ਭਾਸ਼ਾ ਪਸੰਦ ਕਰਦੇ ਹੋ?",
+    ob_lang_note: "ਜਵਾਬ ਇਸੇ ਭਾਸ਼ਾ ਵਿੱਚ ਆਉਣਗੇ।",
+    ob_q_plan: "2. ਤੁਸੀਂ ਕਿਹੜੇ ਪਲਾਨ ਵਿੱਚ ਹੋ?",
+    ob_plan_ams: "AMS/GSS ਸਟੂਡੈਂਟ ਹੈਲਥ ਪਲਾਨ",
+    ob_plan_ams_sub: "UBC ਦਾ ਹਰ ਵਿਦਿਆਰਥੀ ਆਪਣੇ-ਆਪ ਇਸ ਵਿੱਚ ਦਾਖ਼ਲ ਹੁੰਦਾ ਹੈ",
+    ob_plan_other: "ਕੋਈ ਹੋਰ ਪਲਾਨ",
+    ob_coming_soon: "ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+    ob_q_usage: "3. ਕੀ ਤੁਸੀਂ 1 ਸਤੰਬਰ ਤੋਂ ਬਾਅਦ ਆਪਣਾ ਪਲਾਨ ਵਰਤਿਆ ਹੈ?",
+    ob_no: "ਨਹੀਂ, ਹਾਲੇ ਨਹੀਂ",
+    ob_yes: "ਹਾਂ",
+    ob_yes_sub: "ਅਸੀਂ ਪੁੱਛਾਂਗੇ ਕਿ ਲਗਭਗ ਕਿੰਨਾ ਵਰਤਿਆ, ਤਾਂ ਜੋ ਦੱਸ ਸਕੀਏ ਕਿ ਕਿੰਨਾ ਬਾਕੀ ਹੈ",
+    ob_unsure: "ਪੱਕਾ ਨਹੀਂ ਪਤਾ",
+    ob_start: "ਸ਼ੁਰੂ ਕਰੋ",
+    lang_auto: "ਜਿਸ ਭਾਸ਼ਾ ਵਿੱਚ ਮੈਂ ਲਿਖਾਂ, ਉਸੇ ਵਿੱਚ",
+    top_larger: "ਵੱਡੇ ਅੱਖਰ",
+    top_settings: "ਸੈਟਿੰਗਾਂ",
+    top_language: "ਭਾਸ਼ਾ",
+    plan_line: "AMS/GSS ਪਲਾਨ",
+    tabs_label: "ਸੈਕਸ਼ਨ",
+    tab_ask: "ਪੁੱਛੋ",
+    tab_coverage: "ਮੇਰੀ ਕਵਰੇਜ",
+    ask_title: "ਕੀ ਹੋਇਆ ਹੈ?",
+    ask_sub: "ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ ਲਿਖੋ ਜਾਂ ਬੋਲੋ। ਅਸੀਂ ਦੱਸਾਂਗੇ ਕਿ ਕਿਸ ਕੋਲ ਜਾਣਾ ਹੈ ਅਤੇ ਤੁਹਾਡਾ ਪਲਾਨ ਕਿੰਨਾ ਦਿੰਦਾ ਹੈ।",
+    ask_label: "ਦੱਸੋ ਕੀ ਹੋਇਆ ਹੈ",
+    ask_placeholder: "ਜਿਵੇਂ: ਫੁੱਟਬਾਲ ਖੇਡਦਿਆਂ ਮੇਰੇ ਗਿੱਟੇ 'ਤੇ ਸੱਟ ਲੱਗ ਗਈ",
+    ask_try: "ਜਾਂ ਇਹਨਾਂ ਵਿੱਚੋਂ ਇੱਕ ਚੁਣੋ:",
+    ex_ankle: "ਫੁੱਟਬਾਲ ਖੇਡਦਿਆਂ ਮੇਰਾ ਗਿੱਟਾ ਮੁੜ ਗਿਆ",
+    ex_stress: "ਮੈਨੂੰ ਇਮਤਿਹਾਨਾਂ ਦਾ ਬਹੁਤ ਤਣਾਅ ਹੈ",
+    ex_teeth: "ਮੈਨੂੰ ਦੰਦਾਂ ਦੀ ਸਫ਼ਾਈ ਕਰਵਾਉਣੀ ਹੈ",
+    ex_eyes: "ਪੜ੍ਹਦੇ ਸਮੇਂ ਮੈਨੂੰ ਧੁੰਦਲਾ ਦਿਸਦਾ ਹੈ",
+    speak: "ਬੋਲੋ",
+    speak_stop: "ਰੋਕੋ",
+    speak_listening: "{lang} ਵਿੱਚ ਸੁਣ ਰਹੇ ਹਾਂ। ਬੋਲਣਾ ਪੂਰਾ ਹੋਣ 'ਤੇ 'ਰੋਕੋ' ਦਬਾਓ।",
+    speak_denied: "ਤੁਹਾਡਾ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਬੰਦ ਹੈ। ਬ੍ਰਾਊਜ਼ਰ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਇਜਾਜ਼ਤ ਦਿਓ, ਜਾਂ ਕੀਬੋਰਡ ਵਾਲਾ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਵਰਤੋ।",
+    speak_unsupported: "ਇਹ ਬ੍ਰਾਊਜ਼ਰ ਆਵਾਜ਼ ਨਹੀਂ ਸੁਣ ਸਕਦਾ। ਕੀਬੋਰਡ ਵਾਲਾ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਵਰਤੋ।",
+    speak_nothing: "ਠੀਕ ਤਰ੍ਹਾਂ ਸੁਣਾਈ ਨਹੀਂ ਦਿੱਤਾ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+    remember: "ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ",
+    ask_btn: "ਪੁੱਛੋ",
+    ask_loading: "ਤੁਹਾਡਾ ਪਲਾਨ ਦੇਖ ਰਹੇ ਹਾਂ...",
+    ask_waking: "ਸਰਵਰ ਚਾਲੂ ਹੋ ਰਿਹਾ ਹੈ, ਇੱਕ ਮਿੰਟ ਤੱਕ ਲੱਗ ਸਕਦਾ ਹੈ...",
+    res_who: "ਕਿਸ ਕੋਲ ਜਾਓ",
+    res_unsure: "ਹਾਲੇ ਪੱਕਾ ਨਹੀਂ",
+    res_hmm: "ਹੰਮ",
+    res_cost_you: "ਤੁਹਾਨੂੰ ਕਿੰਨਾ ਦੇਣਾ ਪਵੇਗਾ",
+    res_msp: "ਇਹ MSP ਤੋਂ ਕਵਰ ਹੁੰਦਾ ਹੈ, ਸਟੂਡੈਂਟ ਪਲਾਨ ਤੋਂ ਨਹੀਂ।",
+    res_pays_back: "ਤੁਹਾਡਾ ਪਲਾਨ ਵੱਧ ਤੋਂ ਵੱਧ ਵਾਪਸ ਦਿੰਦਾ ਹੈ",
+    unit_visit: "ਹਰ ਵਿਜ਼ਿਟ",
+    unit_session: "ਹਰ ਸੈਸ਼ਨ",
+    res_rest: "ਬਾਕੀ ਬਿੱਲ ਤੁਸੀਂ ਦਿੰਦੇ ਹੋ।",
+    res_plan_pays: "ਤੁਹਾਡਾ ਪਲਾਨ ਦਿੰਦਾ ਹੈ",
+    unit_cost: "ਖ਼ਰਚਾ",
+    res_left_of: "ਇਸ ਸਾਲ {total} ਵਿੱਚੋਂ {left} ਬਾਕੀ",
+    res_yearly_max: "ਸਾਲਾਨਾ ਹੱਦ",
+    res_add_used: "ਕਿੰਨਾ ਬਾਕੀ ਹੈ ਦੇਖਣ ਲਈ ਵਰਤੀ ਰਕਮ ਪਾਓ",
+    res_resets: "ਬਚੀ ਹੋਈ ਰਕਮ {date} ਨੂੰ ਰੀਸੈੱਟ ਹੋ ਜਾਵੇਗੀ ({days} ਬਾਕੀ)।",
+    days_one: "1 ਦਿਨ",
+    days_many: "{n} ਦਿਨ",
+    res_confirm: "ਅਸੀਂ ਹਾਲੇ ਇਸ ਰਕਮ ਦੀ ਪੁਸ਼ਟੀ ਕਰ ਰਹੇ ਹਾਂ। Pacific Blue Cross ਐਪ ਵਿੱਚ ਜ਼ਰੂਰ ਦੇਖ ਲਓ।",
+    res_cheaper: "ਸਸਤਾ ਵਿਕਲਪ",
+    res_where: "ਕਿੱਥੇ ਜਾਓ",
+    res_nurse_title: "ਪਤਾ ਨਹੀਂ ਕਿੰਨਾ ਗੰਭੀਰ ਹੈ?",
+    res_nurse_text: "HealthLink BC ਦੀ ਨਰਸ ਨਾਲ ਗੱਲ ਕਰਨ ਲਈ 811 'ਤੇ ਕਾਲ ਕਰੋ। ਇਹ ਮੁਫ਼ਤ ਹੈ ਅਤੇ 24/7 ਖੁੱਲ੍ਹਾ ਹੈ।",
+    res_call_811: "811 'ਤੇ ਕਾਲ ਕਰੋ",
+    res_places: "UBC ਦੇ ਨੇੜੇ",
+    res_places_note: "ਜਾਣ ਤੋਂ ਪਹਿਲਾਂ ਕਾਲ ਕਰਕੇ ਪੁੱਛ ਲਓ ਕਿ ਕੀ ਉਹ Pacific Blue Cross ਨੂੰ ਸਿੱਧਾ ਬਿੱਲ ਕਰਦੇ ਹਨ।",
+    res_direct: "ਸਿੱਧੀ ਬਿਲਿੰਗ",
+    res_on_campus: "ਕੈਂਪਸ ਵਿੱਚ",
+    res_call: "ਕਾਲ",
+    res_directions: "ਰਸਤਾ",
+    res_say: "ਅਪੌਇੰਟਮੈਂਟ ਲੈਣ ਵੇਲੇ ਇਹ ਕਹੋ (ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ)",
+    copy: "ਕਾਪੀ ਕਰੋ",
+    copied: "ਕਾਪੀ ਹੋ ਗਿਆ",
+    copy_failed: "ਕਾਪੀ ਨਹੀਂ ਹੋਇਆ",
+    copy_label: "ਇਹ ਵਾਕ ਕਾਪੀ ਕਰੋ",
+    disclaimer: "ਇਹ ਡਾਕਟਰੀ ਸਲਾਹ ਨਹੀਂ ਹੈ। ਜੇ ਲੱਛਣ ਗੰਭੀਰ ਹਨ ਜਾਂ ਵਧ ਰਹੇ ਹਨ, ਤਾਂ ਡਾਕਟਰ ਨੂੰ ਦਿਖਾਓ।",
+    err_server: "ਸਰਵਰ ਨਾਲ ਜੁੜ ਨਹੀਂ ਸਕੇ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+    rem_title: "{date} ਤੋਂ ਪਹਿਲਾਂ ਵਰਤੋ",
+    rem_until: "ਬਾਅਦ ਤੁਹਾਡਾ ਪਲਾਨ ਰੀਸੈੱਟ ਹੋਵੇਗਾ ({date})। ਬਚੀ ਰਕਮ ਅਗਲੇ ਸਾਲ ਨਹੀਂ ਜੁੜਦੀ।",
+    rem_not_yet: "ਤੁਸੀਂ ਇਹ ਹਾਲੇ ਨਹੀਂ ਵਰਤੇ:",
+    rem_unused: "{amt} ਬਾਕੀ",
+    rem_not_used: "ਹਾਲੇ ਨਹੀਂ ਵਰਤਿਆ",
+    rem_two: "(ਸਾਲ ਵਿੱਚ 2 ਵਾਰ)",
+    rem_all: "ਅਸੀਂ ਜਿਹੜੇ ਫ਼ਾਇਦੇ ਟਰੈਕ ਕਰਦੇ ਹਾਂ, ਤੁਸੀਂ ਉਹ ਸਾਰੇ ਵਰਤਣੇ ਸ਼ੁਰੂ ਕਰ ਦਿੱਤੇ ਹਨ।",
+    cov_title: "ਤੁਹਾਡੀ ਕਵਰੇਜ, ਸੌਖੀ ਭਾਸ਼ਾ ਵਿੱਚ",
+    cov_sub: "AMS/GSS ਪਲਾਨ ਸਾਲ: 1 ਸਤੰਬਰ ਤੋਂ 31 ਅਗਸਤ। {days} ਵਿੱਚ ਰੀਸੈੱਟ ਹੋਵੇਗਾ।",
+    cov_banner: "1 ਸਤੰਬਰ ਤੋਂ ਹੁਣ ਤੱਕ ਲਗਭਗ ਕਿੰਨਾ ਕਲੇਮ ਕੀਤਾ ਹੈ ਉਹ ਪਾਓ, ਅਸੀਂ ਦੱਸਾਂਗੇ ਕਿ ਕਿੰਨਾ ਬਾਕੀ ਹੈ। ਜੋ ਨਹੀਂ ਵਰਤਿਆ ਉਸਨੂੰ $0 ਰਹਿਣ ਦਿਓ।",
+    cov_you_pay: "ਤੁਸੀਂ ਦਿੰਦੇ ਹੋ",
+    cov_per_visit: "ਹਰ ਵਿਜ਼ਿਟ",
+    cov_per_session: "ਹਰ ਸੈਸ਼ਨ",
+    cov_plan_pays: "ਪਲਾਨ ਦਿੰਦਾ ਹੈ",
+    cov_network: "ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ {p}%",
+    cov_per_year: "ਹਰ ਸਾਲ",
+    cov_up_to: "{amt} ਤੱਕ",
+    cov_used: "1 ਸਤੰਬਰ ਤੋਂ ਵਰਤਿਆ",
+    cov_left: "ਇਸ ਸਾਲ {amt} ਬਾਕੀ",
+    cov_had_one: "1 ਸਤੰਬਰ ਤੋਂ ਬਾਅਦ ਕਰਵਾ ਲਿਆ ਹੈ",
+    cov_confirm: "ਅਸੀਂ ਹਾਲੇ ਇਸਦੀ ਪੁਸ਼ਟੀ ਕਰ ਰਹੇ ਹਾਂ। Pacific Blue Cross ਐਪ ਵਿੱਚ ਜ਼ਰੂਰ ਦੇਖ ਲਓ।",
+    s911_title: "ਇਹ ਐਮਰਜੈਂਸੀ ਲੱਗਦੀ ਹੈ।",
+    s911_call: "911 'ਤੇ ਕਾਲ ਕਰੋ",
+    s911_note: "ਹੋ ਸਕੇ ਤਾਂ ਨੇੜੇ ਕਿਸੇ ਨੂੰ ਆਪਣੇ ਕੋਲ ਰਹਿਣ ਲਈ ਕਹੋ।",
+    s988_title: "ਤੁਹਾਨੂੰ ਇਸ ਵਿੱਚੋਂ ਇਕੱਲਿਆਂ ਨਹੀਂ ਲੰਘਣਾ ਪਵੇਗਾ।",
+    s988_call: "988 'ਤੇ ਕਾਲ ਜਾਂ ਮੈਸੇਜ ਕਰੋ",
+    s988_text: "988 'ਤੇ ਮੈਸੇਜ ਕਰੋ",
+    s988_note: "988 ਮੁਫ਼ਤ ਹੈ, 24/7, ਪੂਰੇ ਕੈਨੇਡਾ ਵਿੱਚ।",
+    s_back: "ਮੈਂ ਸੁਰੱਖਿਅਤ ਹਾਂ — ਵਾਪਸ ਜਾਓ",
+    cat: {
+      physio: { title: "ਫਿਜ਼ੀਓਥੈਰੇਪੀ", who: "ਫਿਜ਼ੀਓਥੈਰੇਪਿਸਟ",
+        plain: "ਪਲਾਨ ਹਰ ਵਿਜ਼ਿਟ 'ਤੇ $40 ਤੱਕ ਅਤੇ ਸਾਲ ਵਿੱਚ $400 ਤੱਕ ਦਿੰਦਾ ਹੈ। ਬਾਕੀ ਬਿੱਲ ਤੁਸੀਂ ਦਿੰਦੇ ਹੋ।" },
+      massage: { title: "ਮਸਾਜ ਥੈਰੇਪੀ", who: "ਰਜਿਸਟਰਡ ਮਸਾਜ ਥੈਰੇਪਿਸਟ",
+        plain: "ਪਲਾਨ ਹਰ ਵਿਜ਼ਿਟ 'ਤੇ $35 ਤੱਕ ਅਤੇ ਸਾਲ ਵਿੱਚ $400 ਤੱਕ ਦਿੰਦਾ ਹੈ। ਬਾਕੀ ਬਿੱਲ ਤੁਸੀਂ ਦਿੰਦੇ ਹੋ।" },
+      counselling: { title: "ਕਾਊਂਸਲਿੰਗ / ਸਾਈਕੋਲੋਜੀ", who: "ਕਾਊਂਸਲਰ ਜਾਂ ਸਾਈਕੋਲੋਜਿਸਟ",
+        plain: "ਹਰ ਸੈਸ਼ਨ 'ਤੇ $300 ਤੱਕ ਅਤੇ ਸਾਲ ਵਿੱਚ $1,250 ਤੱਕ ਪੂਰੀ ਕਵਰੇਜ (ਲਗਭਗ 8 ਜਾਂ ਵੱਧ ਸੈਸ਼ਨ)।",
+        where: "UBC Counselling Services ਪਹਿਲਾਂ ਕੁਝ ਸੈਸ਼ਨ ਮੁਫ਼ਤ ਦਿੰਦੀ ਹੈ।" },
+      dental_cleaning: { title: "ਦੰਦਾਂ ਦੀ ਸਫ਼ਾਈ", who: "ਡੈਂਟਿਸਟ (ਸਫ਼ਾਈ)",
+        plain: "ਪਲਾਨ ਸਫ਼ਾਈ ਦਾ 70% ਦਿੰਦਾ ਹੈ। ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ 100% ਦਿੰਦਾ ਹੈ, ਯਾਨੀ ਤੁਹਾਨੂੰ ਕੁਝ ਨਹੀਂ ਦੇਣਾ ਪੈਂਦਾ। ਸਾਲ ਵਿੱਚ 2 ਵਾਰ ਤੱਕ।",
+        where: "Alumo ਨੈੱਟਵਰਕ ਦੇ ਡੈਂਟਿਸਟ। ਕਲੀਨਿਕ ਤੋਂ ਪੁੱਛ ਲਓ ਕਿ ਕੀ ਉਹ ਨੈੱਟਵਰਕ ਵਿੱਚ ਹਨ।",
+        shared: "ਹੋਰ ਦੰਦਾਂ ਦੇ ਕੰਮ ਨਾਲ ਸਾਂਝੀ ਹੱਦ।" },
+      eye_exam: { title: "ਅੱਖਾਂ ਦੀ ਜਾਂਚ", who: "ਆਪਟੋਮੈਟ੍ਰਿਸਟ (ਅੱਖਾਂ ਦੀ ਜਾਂਚ)",
+        plain: "ਵਿਜ਼ਨ ਕੇਅਰ ਪਲਾਨ ਵਿੱਚ ਕਵਰ ਹੈ। ਸਹੀ ਰਕਮ Pacific Blue Cross ਐਪ ਵਿੱਚ ਦੇਖੋ।",
+        where: "AMS Nest ਵਾਲਾ ਆਪਟੋਮੈਟ੍ਰਿਸਟ ਕਾਂਟੈਕਟ ਲੈਂਜ਼ਾਂ 'ਤੇ ਛੋਟ ਦਿੰਦਾ ਹੈ।" },
+      prescription: { title: "ਦਵਾਈਆਂ (ਪ੍ਰਿਸਕ੍ਰਿਪਸ਼ਨ)", who: "ਫਾਰਮਾਸਿਸਟ",
+        plain: "ਪਲਾਨ ਪ੍ਰਿਸਕ੍ਰਿਪਸ਼ਨ ਦਵਾਈਆਂ ਦਾ ਜ਼ਿਆਦਾਤਰ ਖ਼ਰਚਾ ਦਿੰਦਾ ਹੈ। ਨੈੱਟਵਰਕ ਫਾਰਮੇਸੀ (ਜਿਵੇਂ Rexall) 'ਤੇ ਤੁਹਾਨੂੰ ਘੱਟ ਦੇਣਾ ਪੈਂਦਾ ਹੈ।",
+        where: "Rexall ਵਰਗੀਆਂ ਨੈੱਟਵਰਕ ਫਾਰਮੇਸੀਆਂ।" },
+      doctor_visit: { title: "ਡਾਕਟਰ ਵਿਜ਼ਿਟ", who: "ਡਾਕਟਰ (ਫੈਮਿਲੀ ਡਾਕਟਰ ਜਾਂ ਵਾਕ-ਇਨ ਕਲੀਨਿਕ)",
+        plain: "ਫੈਮਿਲੀ ਡਾਕਟਰ ਜਾਂ UBC Student Health ਦੀ ਵਿਜ਼ਿਟ ਸੂਬਾਈ MSP ਤੋਂ ਕਵਰ ਹੁੰਦੀ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਨੂੰ ਕੁਝ ਨਹੀਂ ਦੇਣਾ ਪੈਂਦਾ।",
+        where: "UBC Student Health Service" },
+    },
+  },
+
+  hi: {
+    ob_tagline: "आपका UBC हेल्थ प्लान, आसान भाषा में। तीन छोटे सवाल और आप शुरू कर सकते हैं।",
+    ob_title: "चलिए शुरुआत करते हैं",
+    ob_sub: "लगभग 30 सेकंड लगेंगे।",
+    ob_q_lang: "1. आप कौन-सी भाषा पसंद करते हैं?",
+    ob_lang_note: "जवाब इसी भाषा में आएँगे।",
+    ob_q_plan: "2. आप किस प्लान में हैं?",
+    ob_plan_ams: "AMS/GSS स्टूडेंट हेल्थ प्लान",
+    ob_plan_ams_sub: "UBC के हर छात्र का इसमें अपने-आप नामांकन होता है",
+    ob_plan_other: "कोई दूसरा प्लान",
+    ob_coming_soon: "जल्द आ रहा है",
+    ob_q_usage: "3. क्या आपने 1 सितंबर के बाद अपना प्लान इस्तेमाल किया है?",
+    ob_no: "नहीं, अभी नहीं",
+    ob_yes: "हाँ",
+    ob_yes_sub: "हम पूछेंगे कि लगभग कितना इस्तेमाल हुआ, ताकि बता सकें कि कितना बचा है",
+    ob_unsure: "पक्का नहीं पता",
+    ob_start: "शुरू करें",
+    lang_auto: "जिस भाषा में मैं लिखूँ, उसी में",
+    top_larger: "बड़े अक्षर",
+    top_settings: "सेटिंग्स",
+    top_language: "भाषा",
+    plan_line: "AMS/GSS प्लान",
+    tabs_label: "सेक्शन",
+    tab_ask: "पूछें",
+    tab_coverage: "मेरा कवरेज",
+    ask_title: "क्या हुआ है?",
+    ask_sub: "किसी भी भाषा में लिखें या बोलें। हम बताएँगे कि किसके पास जाना है और आपका प्लान कितना देता है।",
+    ask_label: "बताइए क्या हुआ है",
+    ask_placeholder: "जैसे: फ़ुटबॉल खेलते समय मेरे टखने में चोट लग गई",
+    ask_try: "या इनमें से एक चुनें:",
+    ex_ankle: "फ़ुटबॉल खेलते समय मेरा टखना मुड़ गया",
+    ex_stress: "मुझे परीक्षा का बहुत तनाव है",
+    ex_teeth: "मुझे दाँतों की सफ़ाई करवानी है",
+    ex_eyes: "पढ़ते समय मुझे धुंधला दिखता है",
+    speak: "बोलें",
+    speak_stop: "रोकें",
+    speak_listening: "{lang} में सुन रहे हैं। बोलना पूरा हो जाए तो 'रोकें' दबाएँ।",
+    speak_denied: "आपका माइक्रोफ़ोन बंद है। ब्राउज़र सेटिंग्स में इसकी अनुमति दें, या कीबोर्ड का माइक्रोफ़ोन इस्तेमाल करें।",
+    speak_unsupported: "यह ब्राउज़र आवाज़ नहीं सुन सकता। कीबोर्ड का माइक्रोफ़ोन इस्तेमाल करें।",
+    speak_nothing: "ठीक से सुनाई नहीं दिया। फिर से कोशिश करें।",
+    remember: "इस डिवाइस पर मुझे याद रखें",
+    ask_btn: "पूछें",
+    ask_loading: "आपका प्लान देख रहे हैं...",
+    ask_waking: "सर्वर शुरू हो रहा है, इसमें एक मिनट तक लग सकता है...",
+    res_who: "किसके पास जाएँ",
+    res_unsure: "अभी पक्का नहीं",
+    res_hmm: "हम्म",
+    res_cost_you: "आपको कितना देना होगा",
+    res_msp: "यह MSP से कवर होता है, स्टूडेंट प्लान से नहीं।",
+    res_pays_back: "आपका प्लान ज़्यादा से ज़्यादा लौटाता है",
+    unit_visit: "हर विज़िट",
+    unit_session: "हर सेशन",
+    res_rest: "बाकी बिल आप देते हैं।",
+    res_plan_pays: "आपका प्लान देता है",
+    unit_cost: "खर्च",
+    res_left_of: "इस साल {total} में से {left} बाकी",
+    res_yearly_max: "सालाना सीमा",
+    res_add_used: "कितना बचा है देखने के लिए इस्तेमाल की गई रकम डालें",
+    res_resets: "बची हुई रकम {date} को रीसेट हो जाएगी ({days} बाकी)।",
+    days_one: "1 दिन",
+    days_many: "{n} दिन",
+    res_confirm: "हम अभी इस रकम की पुष्टि कर रहे हैं। Pacific Blue Cross ऐप में एक बार ज़रूर जाँच लें।",
+    res_cheaper: "सस्ता विकल्प",
+    res_where: "कहाँ जाएँ",
+    res_nurse_title: "पता नहीं कितना गंभीर है?",
+    res_nurse_text: "HealthLink BC की नर्स से बात करने के लिए 811 पर कॉल करें। यह मुफ़्त है और 24/7 खुला है।",
+    res_call_811: "811 पर कॉल करें",
+    res_places: "UBC के पास",
+    res_places_note: "जाने से पहले कॉल करके पूछ लें कि क्या वे Pacific Blue Cross को सीधे बिल करते हैं।",
+    res_direct: "डायरेक्ट बिलिंग",
+    res_on_campus: "कैंपस में",
+    res_call: "कॉल",
+    res_directions: "रास्ता",
+    res_say: "अपॉइंटमेंट लेते समय यह कहें (अंग्रेज़ी में)",
+    copy: "कॉपी करें",
+    copied: "कॉपी हो गया",
+    copy_failed: "कॉपी नहीं हुआ",
+    copy_label: "यह वाक्य कॉपी करें",
+    disclaimer: "यह मेडिकल सलाह नहीं है। अगर लक्षण गंभीर हैं या बढ़ रहे हैं, तो डॉक्टर को दिखाएँ।",
+    err_server: "सर्वर से कनेक्ट नहीं हो पाया। फिर से कोशिश करें।",
+    rem_title: "{date} से पहले इस्तेमाल करें",
+    rem_until: "बाद आपका प्लान रीसेट होगा ({date})। बची हुई रकम आगे नहीं जुड़ती।",
+    rem_not_yet: "आपने ये अभी तक इस्तेमाल नहीं किए:",
+    rem_unused: "{amt} बाकी",
+    rem_not_used: "अभी तक नहीं",
+    rem_two: "(साल में 2 बार)",
+    rem_all: "हम जिन फ़ायदों को ट्रैक करते हैं, आपने वे सभी इस्तेमाल करने शुरू कर दिए हैं।",
+    cov_title: "आपका कवरेज, आसान भाषा में",
+    cov_sub: "AMS/GSS प्लान वर्ष: 1 सितंबर से 31 अगस्त। {days} में रीसेट होगा।",
+    cov_banner: "1 सितंबर से अब तक लगभग कितना क्लेम किया है, वह डालें और हम बताएँगे कि कितना बचा है। जो इस्तेमाल नहीं किया, उसे $0 रहने दें।",
+    cov_you_pay: "आप देते हैं",
+    cov_per_visit: "हर विज़िट",
+    cov_per_session: "हर सेशन",
+    cov_plan_pays: "प्लान देता है",
+    cov_network: "नेटवर्क डेंटिस्ट के यहाँ {p}%",
+    cov_per_year: "हर साल",
+    cov_up_to: "{amt} तक",
+    cov_used: "1 सितंबर से इस्तेमाल",
+    cov_left: "इस साल {amt} बाकी",
+    cov_had_one: "1 सितंबर के बाद करवा लिया है",
+    cov_confirm: "हम अभी इसकी पुष्टि कर रहे हैं। Pacific Blue Cross ऐप में ज़रूर जाँच लें।",
+    s911_title: "यह आपातकालीन स्थिति लगती है।",
+    s911_call: "911 पर कॉल करें",
+    s911_note: "हो सके तो पास में किसी को अपने साथ रहने के लिए कहें।",
+    s988_title: "आपको इससे अकेले नहीं गुज़रना है।",
+    s988_call: "988 पर कॉल या मैसेज करें",
+    s988_text: "988 पर मैसेज करें",
+    s988_note: "988 मुफ़्त है, 24/7, पूरे कनाडा में।",
+    s_back: "मैं सुरक्षित हूँ — वापस जाएँ",
+    cat: {
+      physio: { title: "फ़िज़ियोथेरेपी", who: "फ़िज़ियोथेरेपिस्ट",
+        plain: "प्लान हर विज़िट पर $40 तक और साल में $400 तक देता है। बाकी बिल आप देते हैं।" },
+      massage: { title: "मसाज थेरेपी", who: "रजिस्टर्ड मसाज थेरेपिस्ट",
+        plain: "प्लान हर विज़िट पर $35 तक और साल में $400 तक देता है। बाकी बिल आप देते हैं।" },
+      counselling: { title: "काउंसलिंग / साइकोलॉजी", who: "काउंसलर या साइकोलॉजिस्ट",
+        plain: "हर सेशन पर $300 तक और साल में $1,250 तक पूरा कवर (लगभग 8 या ज़्यादा सेशन)।",
+        where: "UBC Counselling Services पहले कुछ सेशन मुफ़्त देती है।" },
+      dental_cleaning: { title: "दाँतों की सफ़ाई", who: "डेंटिस्ट (सफ़ाई)",
+        plain: "प्लान सफ़ाई का 70% देता है। नेटवर्क डेंटिस्ट के यहाँ 100% देता है, यानी आपको कुछ नहीं देना। साल में 2 बार तक।",
+        where: "Alumo नेटवर्क के डेंटिस्ट। क्लिनिक से पूछ लें कि वे नेटवर्क में हैं या नहीं।",
+        shared: "दूसरे डेंटल काम के साथ साझा सीमा।" },
+      eye_exam: { title: "आँखों की जाँच", who: "ऑप्टोमेट्रिस्ट (आँखों की जाँच)",
+        plain: "विज़न केयर प्लान में कवर है। सही रकम Pacific Blue Cross ऐप में देखें।",
+        where: "AMS Nest के ऑप्टोमेट्रिस्ट कॉन्टैक्ट लेंस पर छूट देते हैं।" },
+      prescription: { title: "दवाइयाँ (प्रिस्क्रिप्शन)", who: "फ़ार्मासिस्ट",
+        plain: "प्लान प्रिस्क्रिप्शन दवाइयों का ज़्यादातर खर्च देता है। नेटवर्क फ़ार्मेसी (जैसे Rexall) पर आपको कम देना पड़ता है।",
+        where: "Rexall जैसी नेटवर्क फ़ार्मेसी।" },
+      doctor_visit: { title: "डॉक्टर विज़िट", who: "डॉक्टर (फ़ैमिली डॉक्टर या वॉक-इन क्लिनिक)",
+        plain: "फ़ैमिली डॉक्टर या UBC Student Health की विज़िट प्रांतीय MSP से कवर होती है, इसलिए आपको कुछ नहीं देना पड़ता।",
+        where: "UBC Student Health Service" },
+    },
+  },
+
+  ko: {
+    ob_tagline: "UBC 건강보험을 쉬운 말로 알려드려요. 간단한 질문 세 개면 시작할 수 있어요.",
+    ob_title: "간단히 설정해 볼게요",
+    ob_sub: "30초 정도 걸려요.",
+    ob_q_lang: "1. 어떤 언어가 편하세요?",
+    ob_lang_note: "답변이 이 언어로 나와요.",
+    ob_q_plan: "2. 어떤 보험에 가입되어 있나요?",
+    ob_plan_ams: "AMS/GSS 학생 건강보험",
+    ob_plan_ams_sub: "모든 UBC 학생이 자동으로 가입돼요",
+    ob_plan_other: "다른 보험",
+    ob_coming_soon: "곧 지원 예정",
+    ob_q_usage: "3. 9월 1일 이후 보험을 사용한 적이 있나요?",
+    ob_no: "아니요, 아직이요",
+    ob_yes: "네",
+    ob_yes_sub: "남은 금액을 보여드리기 위해 대략 얼마나 썼는지 여쭤볼게요",
+    ob_unsure: "잘 모르겠어요",
+    ob_start: "시작하기",
+    lang_auto: "내가 입력하는 언어로",
+    top_larger: "글자 크게",
+    top_settings: "설정",
+    top_language: "언어",
+    plan_line: "AMS/GSS 보험",
+    tabs_label: "메뉴",
+    tab_ask: "질문하기",
+    tab_coverage: "내 보장 내용",
+    ask_title: "무슨 일이 있나요?",
+    ask_sub: "어떤 언어로든 입력하거나 말해 주세요. 누구에게 가야 하는지, 보험에서 얼마나 나오는지 알려드릴게요.",
+    ask_label: "상황을 설명해 주세요",
+    ask_placeholder: "예: 축구하다가 발목을 다쳤어요",
+    ask_try: "또는 하나를 눌러 보세요:",
+    ex_ankle: "축구하다가 발목을 삐었어요",
+    ex_stress: "시험 때문에 스트레스가 너무 심해요",
+    ex_teeth: "스케일링을 받아야 해요",
+    ex_eyes: "책을 읽을 때 눈이 침침해요",
+    speak: "말하기",
+    speak_stop: "멈추기",
+    speak_listening: "{lang}(으)로 듣고 있어요. 다 말했으면 '멈추기'를 눌러 주세요.",
+    speak_denied: "마이크가 차단되어 있어요. 브라우저 설정에서 허용하거나 키보드의 마이크를 사용해 주세요.",
+    speak_unsupported: "이 브라우저에서는 음성 입력이 안 돼요. 키보드의 마이크를 사용해 주세요.",
+    speak_nothing: "잘 못 들었어요. 다시 해 주세요.",
+    remember: "이 기기에서 기억하기",
+    ask_btn: "질문하기",
+    ask_loading: "보험 내용을 확인하고 있어요...",
+    ask_waking: "서버를 깨우는 중이에요. 1분 정도 걸릴 수 있어요...",
+    res_who: "추천 진료",
+    res_unsure: "아직 잘 모르겠어요",
+    res_hmm: "음",
+    res_cost_you: "내가 내는 비용",
+    res_msp: "학생 보험이 아니라 MSP(주 의료보험)에서 보장돼요.",
+    res_pays_back: "보험 환급 한도",
+    unit_visit: "1회당",
+    unit_session: "1회당",
+    res_rest: "나머지 금액은 본인이 내요.",
+    res_plan_pays: "보험 부담",
+    unit_cost: "보장",
+    res_left_of: "올해 {total} 중 {left} 남음",
+    res_yearly_max: "연간 한도",
+    res_add_used: "사용한 금액을 입력하고 남은 금액을 확인하세요",
+    res_resets: "남은 금액은 {date}에 초기화돼요 ({days} 남음).",
+    days_one: "1일",
+    days_many: "{n}일",
+    res_confirm: "이 금액은 아직 확인 중이에요. Pacific Blue Cross 앱에서 꼭 다시 확인해 주세요.",
+    res_cheaper: "더 저렴한 방법",
+    res_where: "어디로 가면 되나요",
+    res_nurse_title: "얼마나 심각한지 모르겠나요?",
+    res_nurse_text: "811에 전화하면 HealthLink BC 간호사와 상담할 수 있어요. 무료이고 24시간 운영해요.",
+    res_call_811: "811에 전화하기",
+    res_places: "UBC 근처",
+    res_places_note: "Pacific Blue Cross 직접 청구가 되는지 미리 전화로 확인하세요.",
+    res_direct: "직접 청구",
+    res_on_campus: "캠퍼스 안",
+    res_call: "전화",
+    res_directions: "길찾기",
+    res_say: "예약할 때 이렇게 말하세요 (영어)",
+    copy: "복사",
+    copied: "복사됨",
+    copy_failed: "복사 실패",
+    copy_label: "문구 복사",
+    disclaimer: "의학적 조언이 아니에요. 증상이 심하거나 나빠지고 있다면 의사를 만나 보세요.",
+    err_server: "서버에 연결할 수 없어요. 다시 시도해 주세요.",
+    rem_title: "{date} 전에 사용하세요",
+    rem_until: "후 보험이 초기화돼요 ({date}). 남은 금액은 이월되지 않아요.",
+    rem_not_yet: "아직 사용하지 않은 항목:",
+    rem_unused: "{amt} 미사용",
+    rem_not_used: "아직 안 씀",
+    rem_two: "(1년에 2회)",
+    rem_all: "확인 중인 모든 혜택을 사용하기 시작했어요.",
+    cov_title: "내 보장 내용, 쉽게 보기",
+    cov_sub: "AMS/GSS 보험 연도: 9월 1일 ~ 8월 31일. {days} 후 초기화돼요.",
+    cov_banner: "9월 1일 이후 대략 얼마나 청구했는지 입력하면 남은 금액을 보여드려요. 쓰지 않은 항목은 $0으로 두세요.",
+    cov_you_pay: "본인 부담",
+    cov_per_visit: "1회당",
+    cov_per_session: "1회당",
+    cov_plan_pays: "보험 부담",
+    cov_network: "네트워크 치과에서는 {p}%",
+    cov_per_year: "연간",
+    cov_up_to: "최대 {amt}",
+    cov_used: "9월 1일 이후 사용",
+    cov_left: "올해 {amt} 남음",
+    cov_had_one: "9월 1일 이후 검사를 받았어요",
+    cov_confirm: "아직 확인 중이에요. Pacific Blue Cross 앱에서 다시 확인해 주세요.",
+    s911_title: "응급 상황인 것 같아요.",
+    s911_call: "911에 전화하기",
+    s911_note: "가능하면 근처에 있는 사람에게 곁에 있어 달라고 부탁하세요.",
+    s988_title: "혼자 견디지 않아도 돼요.",
+    s988_call: "988에 전화 또는 문자하기",
+    s988_text: "988에 문자하기",
+    s988_note: "988은 무료이고 24시간, 캐나다 어디서나 이용할 수 있어요.",
+    s_back: "괜찮아요 — 돌아가기",
+    cat: {
+      physio: { title: "물리치료", who: "물리치료사",
+        plain: "보험에서 1회당 최대 $40, 연간 최대 $400까지 나와요. 나머지는 본인이 내요." },
+      massage: { title: "마사지 치료", who: "등록 마사지 치료사(RMT)",
+        plain: "보험에서 1회당 최대 $35, 연간 최대 $400까지 나와요. 나머지는 본인이 내요." },
+      counselling: { title: "상담 / 심리 치료", who: "상담사 또는 심리학자",
+        plain: "1회당 최대 $300, 연간 최대 $1,250까지 전액 보장돼요 (대략 8회 이상).",
+        where: "UBC 상담 서비스(Counselling Services)에서 먼저 무료 상담을 몇 번 받을 수 있어요." },
+      dental_cleaning: { title: "스케일링", who: "치과 (스케일링)",
+        plain: "스케일링 비용의 70%가 보장돼요. 네트워크 치과에서는 100% 보장돼서 내는 돈이 없어요. 1년에 최대 2회.",
+        where: "Alumo 네트워크 치과. 네트워크에 속해 있는지 치과에 물어보세요.",
+        shared: "다른 치과 진료와 한도를 같이 써요." },
+      eye_exam: { title: "눈 검사", who: "검안사 (눈 검사)",
+        plain: "시력 관리는 보험에서 보장돼요. 정확한 금액은 Pacific Blue Cross 앱에서 확인하세요.",
+        where: "AMS Nest에 있는 검안사가 콘택트렌즈 할인을 해 줘요." },
+      prescription: { title: "처방약", who: "약사",
+        plain: "처방약 비용 대부분이 보장돼요. 네트워크 약국(예: Rexall)에서는 더 적게 내요.",
+        where: "Rexall 같은 네트워크 약국." },
+      doctor_visit: { title: "의사 진료", who: "의사 (가정의 또는 워크인 클리닉)",
+        plain: "가정의나 UBC Student Health 진료는 주 의료보험(MSP)에서 보장되어 비용이 들지 않아요.",
+        where: "UBC 학생 건강 서비스(Student Health Service)" },
+    },
+  },
+};
+
+
+const CLINICS = {};
+
+/* =========================================================================
+   1. CONFIG
+   The page talks to the team's server on Render.
+   Add ?api=mock to the page address to use made-up answers (no server),
+   or ?api=<address> to point at another server, e.g.
+     index.html?api=http://127.0.0.1:5000/ask
+   ========================================================================= */
+const LIVE_SERVER = "/ask";
+const API_URL = (() => {
+  try {
+    const forced = new URLSearchParams(location.search).get("api");
+    if (forced) return forced === "mock" ? "" : forced;
+  } catch (e) {}
+  return LIVE_SERVER;
+})();
+const PLAN = "AMS/GSS";
+const TIMEOUT_MS = 60000;      // free Render servers can take about a minute to wake up
+const SLOW_NOTICE_MS = 5000;
+const STORAGE_KEY = "planpal_prefs";
+const CALL_SCRIPT = "Hi, I'm a UBC student on the AMS/GSS health plan with Pacific Blue Cross. Do you bill them directly?";
+
+/* =========================================================================
+   2. PLAN NUMBERS
+   Copied from the team's coverage.py (merged in PR #1). The wording for each
+   category lives in the translation table above. If coverage.py changes,
+   update this block. Amounts the server sends with an answer win over this.
+   ========================================================================= */
+const COVERAGE = {
+  physio:          { per_visit: 40,   annual_max: 400,  percent: 100, verified: true,  track: "money" },
+  massage:         { per_visit: 35,   annual_max: 400,  percent: 100, verified: true,  track: "money" },
+  counselling:     { per_visit: 300,  annual_max: 1250, percent: 100, verified: false, track: "money", per_session: true },
+  dental_cleaning: { per_visit: null, annual_max: 750,  percent: 70,  percent_network: 100, verified: false, track: "money", two_a_year: true },
+  eye_exam:        { per_visit: null, annual_max: null, percent: null, verified: false, track: "flag" },
+  prescription:    { per_visit: null, annual_max: null, percent: null, verified: false, track: null, no_script: true },
+  doctor_visit:    { per_visit: null, annual_max: null, percent: 100, verified: true,  track: null, free: true, no_script: true },
+};
+const CATEGORY_ORDER = ["physio", "massage", "counselling", "dental_cleaning", "eye_exam", "prescription", "doctor_visit"];
+const REMINDER_ORDER = ["dental_cleaning", "eye_exam", "physio", "massage", "counselling"];
+
+/* Languages: code, name shown in the menu, browser locale, speech locale.
+   Only some have translated menus (see I18N); the rest get English menus
+   and answers in their language. */
+const LANGUAGES = [
+  { code: "auto",    name: null },
+  { code: "en",      name: "English",      locale: "en-CA", speech: "en-CA" },
+  { code: "zh-Hans", name: "中文（简体）",   locale: "zh-CN", speech: "zh-CN" },
+  { code: "zh-Hant", name: "中文（繁體）",   locale: "zh-TW", speech: "zh-TW" },
+  { code: "pa",      name: "ਪੰਜਾਬੀ",        locale: "pa-IN", speech: "pa-IN" },
+  { code: "hi",      name: "हिन्दी",         locale: "hi-IN", speech: "hi-IN" },
+  { code: "ko",      name: "한국어",         locale: "ko-KR", speech: "ko-KR" },
+  { code: "ja",      name: "日本語",         locale: "ja-JP", speech: "ja-JP" },
+  { code: "vi",      name: "Tiếng Việt",   locale: "vi-VN", speech: "vi-VN" },
+  { code: "tl",      name: "Tagalog",      locale: "en-CA", speech: "fil-PH" },
+  { code: "es",      name: "Español",      locale: "es-ES", speech: "es-ES" },
+  { code: "fr",      name: "Français",     locale: "fr-CA", speech: "fr-CA" },
+  { code: "fa",      name: "فارسی",        locale: "fa-IR", speech: "fa-IR" },
+  { code: "ar",      name: "العربية",      locale: "ar",    speech: "ar-SA" },
+];
+const langInfo = code => LANGUAGES.find(l => l.code === code) || LANGUAGES[1];
+
+/* =========================================================================
+   3. STATE + REMEMBER ME
+   Only settings and usage amounts are saved, and only when "Remember me" is
+   ticked. What the student types or says is never saved.
+   ========================================================================= */
+const state = {
+  remember: false, onboarded: false, plan: PLAN, language: "auto",
+  usageKnown: false, used: {}, eyeUsed: false, large: false,
+};
+let lastResult = null;
+
+function save() {
+  if (!state.remember) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      remember: true, onboarded: state.onboarded, plan: state.plan, language: state.language,
+      usageKnown: state.usageKnown, used: state.used, eyeUsed: state.eyeUsed, large: state.large,
+    }));
+  } catch (e) {}
+}
+function forget() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (!s || s.remember !== true) return;
+    state.remember = true;
+    state.onboarded = s.onboarded === true;
+    state.language = LANGUAGES.some(l => l.code === s.language) ? s.language : "auto";
+    state.usageKnown = s.usageKnown === true;
+    state.used = {};
+    if (s.used && typeof s.used === "object") {
+      for (const k of CATEGORY_ORDER) {
+        const v = Number(s.used[k]);
+        if (isFinite(v) && v >= 0) state.used[k] = v;
+      }
+    }
+    state.eyeUsed = s.eyeUsed === true;
+    state.large = s.large === true;
+  } catch (e) {}
+}
+
+/* =========================================================================
+   4. TRANSLATION HELPERS
+   ========================================================================= */
+function browserUiLang() {
+  const list = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"]);
+  for (const raw of list) {
+    const l = String(raw).toLowerCase();
+    if (l.startsWith("zh")) return /tw|hk|mo|hant/.test(l) ? "zh-Hant" : "zh-Hans";
+    if (l.startsWith("pa")) return "pa";
+    if (l.startsWith("hi")) return "hi";
+    if (l.startsWith("ko")) return "ko";
+    if (l.startsWith("en")) return "en";
+  }
+  return "en";
+}
+function uiLang() {
+  if (state.language === "auto") return browserUiLang();
+  return I18N[state.language] ? state.language : "en";
+}
+function t(key, vars) {
+  const table = I18N[uiLang()] || I18N.en;
+  let s = table[key] != null ? table[key] : (I18N.en[key] != null ? I18N.en[key] : key);
+  if (vars) for (const [k, v] of Object.entries(vars)) s = s.split("{" + k + "}").join(String(v));
+  return s;
+}
+function tc(cat, field) {
+  const table = (I18N[uiLang()] || I18N.en).cat || {};
+  const c = table[cat] || I18N.en.cat[cat] || {};
+  return c[field] != null ? c[field] : ((I18N.en.cat[cat] || {})[field] || "");
+}
+function locale() { return langInfo(uiLang()).locale || "en-CA"; }
+function langName(code) { return code === "auto" ? t("lang_auto") : langInfo(code).name; }
+
+function applyI18n() {
+  document.documentElement.lang = uiLang();
+  document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = t(n.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(n => { n.placeholder = t(n.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(n => { n.setAttribute("aria-label", t(n.dataset.i18nAria)); });
+  document.querySelectorAll("[data-example]").forEach(n => { n.textContent = t(n.dataset.example); });
+  for (const sel of [$("ob-language"), $("top-language")]) {
+    sel.replaceChildren(...LANGUAGES.map(l => el("option", { value: l.code }, langName(l.code))));
+    sel.value = state.language;
+  }
+  updateSpeakButton();
+  if (!busy) askBtn.textContent = t("ask_btn");
+}
+
+/* =========================================================================
+   5. SAFETY CHECK (backup, runs before anything is sent)
+   Same English lists as the team's safety.py, with two fixes: "hurt myself"
+   removed (it caught "I hurt myself playing soccer") and whole-word matching
+   (so "backstroke" doesn't match "stroke"). A few unambiguous phrases in the
+   translated languages are added. The server's red_flag still decides for
+   everything else.
+   ========================================================================= */
+const EMERGENCY_911 = [
+  "chest pain", "chest pressure", "heart attack", "can't breathe", "cannot breathe",
+  "cant breathe", "trouble breathing", "difficulty breathing", "not breathing", "choking",
+  "stroke", "face drooping", "slurred speech", "sudden numbness", "can't move one side",
+  "passed out", "unconscious", "unresponsive", "fainted", "seizure",
+  "overdose", "overdosed", "took too many pills", "poisoned", "poisoning",
+  "anaphylaxis", "throat closing", "throat swelling", "severe allergic",
+  "bleeding heavily", "won't stop bleeding", "coughing up blood", "vomiting blood",
+  "hit my head", "head injury", "bone sticking out", "severe burn",
+  "going to hurt someone", "kill someone",
+];
+const CRISIS_988 = [
+  "suicide", "suicidal", "kill myself", "end my life", "end it all", "want to die",
+  "wanna die", "don't want to live", "dont want to live", "don't want to be alive",
+  "better off dead", "no reason to live", "self harm", "self-harm",
+  "harm myself", "cut myself", "cutting myself", "tried to kill myself",
+];
+const EMERGENCY_911_OTHER = ["胸痛", "呼吸困难", "呼吸困難", "가슴 통증", "숨을 못 쉬", "सीने में दर्द", "ਛਾਤੀ ਵਿੱਚ ਦਰਦ"];
+const CRISIS_988_OTHER = ["自杀", "自殺", "不想活", "자살", "आत्महत्या", "ਖ਼ੁਦਕੁਸ਼ੀ", "ਖੁਦਕੁਸ਼ੀ"];
+
+function normalize(text) {
+  return String(text || "").toLowerCase()
+    .replace(/[‘’ʼ`´]/g, "'")
+    .replace(/\s+/g, " ");
+}
+function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function phraseRegex(list) {
+  return new RegExp("(^|[^a-z0-9])(" + list.map(escapeRe).join("|") + ")(?=$|[^a-z0-9])");
+}
+const RE_911 = phraseRegex(EMERGENCY_911);
+const RE_988 = phraseRegex(CRISIS_988);
+function detectSafety(text) {
+  const t0 = normalize(text);
+  if (RE_911.test(t0) || EMERGENCY_911_OTHER.some(p => t0.includes(p))) return "911";
+  if (RE_988.test(t0) || CRISIS_988_OTHER.some(p => t0.includes(p))) return "988";
+  return null;
+}
+
+/* =========================================================================
+   6. SERVER
+   Request:  POST { question, language, plan }
+   Response: { language, red_flag: null|"911"|"988"|"811", category,
+               why_one_line, coverage: { per_visit, per_year } | null, echo }
+   Optional: clinics (replaces the built-in list), what_to_say
+   ========================================================================= */
+function mockResponse(question) {
+  const q = normalize(question);
+  const base = { language: "en", red_flag: null, category: null, why_one_line: "", coverage: null, echo: question };
+  const s = detectSafety(q);
+  if (s) return { ...base, red_flag: s };
+  const pick = (cat, why) => ({ ...base, category: cat, why_one_line: why,
+    coverage: COVERAGE[cat].per_visit != null || COVERAGE[cat].annual_max != null
+      ? { per_visit: COVERAGE[cat].per_visit, per_year: COVERAGE[cat].annual_max } : null });
+  const has = (...words) => words.some(w => q.includes(w));
+  if (has("ankle", "knee", "back", "sprain", "shoulder", "脚踝", "腳踝", "ਗਿੱਟ", "टखन", "발목")) return pick("physio", "Sprains and joint pain are usually treated by a physiotherapist.");
+  if (has("sore muscles", "tight", "tension", "neck")) return pick("massage", "Muscle tension is often helped by a registered massage therapist.");
+  if (has("stress", "anxious", "sad", "overwhelmed", "压力", "壓力", "ਤਣਾਅ", "तनाव", "스트레스")) return pick("counselling", "Talking to someone can help. Counselling is well covered by your plan.");
+  if (has("teeth", "tooth", "cleaning", "dentist", "洗牙", "ਦੰਦ", "दाँत", "스케일링")) return pick("dental_cleaning", "A regular cleaning is covered, and free at a network dentist.");
+  if (has("eye", "glasses", "contacts", "vision", "blurry", "眼睛", "ਧੁੰਦਲਾ", "धुंधला", "눈이")) return pick("eye_exam", "An optometrist can check your eyes and update your prescription.");
+  if (has("fever", "rash")) return { ...pick("doctor_visit", "Doctor visits are covered by MSP, so they're free."), red_flag: "811" };
+  if (has("stomach", "sick", "cough", "cold")) return pick("doctor_visit", "Doctor visits are covered by MSP, so they're free.");
+  return { ...base, why_one_line: "Try describing where it hurts or what happened." };
+}
+
+function hasNum(n) { return n !== null && n !== undefined && n !== "" && isFinite(Number(n)); }
+
+function cleanResponse(d) {
+  d = d && typeof d === "object" ? d : {};
+  const flag = d.red_flag == null ? null : String(d.red_flag).trim();
+  const catKey = d.category ? String(d.category).toLowerCase().trim() : null;
+  const cov = d.coverage && typeof d.coverage === "object" ? d.coverage : null;
+  return {
+    emergency: flag === "911" || flag === "988" ? flag : null,
+    nurse: flag === "811",
+    language: typeof d.language === "string" && d.language ? d.language : "en",
+    category: catKey,
+    why: typeof d.why_one_line === "string" ? d.why_one_line : "",
+    per_visit: cov && hasNum(cov.per_visit) ? Number(cov.per_visit) : null,
+    per_year: cov && hasNum(cov.per_year) ? Number(cov.per_year) : null,
+    clinics: Array.isArray(d.clinics) ? d.clinics : null,
+    what_to_say: typeof d.what_to_say === "string" ? d.what_to_say : "",
+  };
+}
+
+async function askServer(question) {
+  if (!API_URL) {
+    await new Promise(r => setTimeout(r, 900));
+    return cleanResponse(mockResponse(question));
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, language: state.language, plan: state.plan }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return cleanResponse(await res.json());
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Wake the free server as soon as the page opens.
+if (API_URL) {
+  try { fetch(new URL(API_URL).origin + "/health").catch(() => {}); } catch (e) {}
+}
+
+/* =========================================================================
+   7. HELPERS
+   ========================================================================= */
+const $ = id => document.getElementById(id);
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "class") node.className = v;
+    else node.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of children) if (c !== null && c !== undefined && c !== false) node.append(c);
+  return node;
+}
+function money(n) {
+  const x = Number(n);
+  if (!isFinite(x)) return "";
+  return "$" + (Number.isInteger(x) ? x.toLocaleString("en-CA") : x.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+}
+function planReset() {
+  // The AMS/GSS plan year runs Sep 1 to Aug 31.
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let reset = new Date(today.getFullYear(), 7, 31);
+  if (today > reset) reset = new Date(today.getFullYear() + 1, 7, 31);
+  const days = Math.round((reset - today) / 86400000);
+  return {
+    days,
+    label: reset.toLocaleDateString(locale(), { month: "short", day: "numeric", year: "numeric" }),
+    short: reset.toLocaleDateString(locale(), { month: "short", day: "numeric" }),
+  };
+}
+function daysText(n) { return n === 1 ? t("days_one") : t("days_many", { n }); }
+function icon(paths) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  for (const [k, v] of Object.entries({ class: "icon", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "1.75", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" })) svg.setAttribute(k, v);
+  paths.forEach(d => { const p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.append(p); });
+  return svg;
+}
+const PHONE_ICON = ["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"];
+const COPY_ICON = ["M8 8h12v12H8z", "M4 16V6a2 2 0 0 1 2-2h10"];
+const PIN_ICON = ["M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z", "M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"];
+function prettyCategory(key) {
+  if (!key) return t("res_unsure");
+  const s = key.replace(/[_-]+/g, " ").trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function remainingFor(cat, annual) {
+  if (!state.usageKnown || !hasNum(annual)) return null;
+  return Math.max(0, annual - Number(state.used[cat] || 0));
+}
+function telHref(phone) { return "tel:" + String(phone).replace(/[^\d+]/g, ""); }
+function mapsHref(p) {
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([p.name, p.address].filter(Boolean).join(", "));
+}
+
+/* ---------- Places list (used in the answer card and My coverage) ---------- */
+function placesFor(cat, fromServer) {
+  if (Array.isArray(fromServer) && fromServer.length) return fromServer;
+  return (typeof CLINICS !== "undefined" && CLINICS[cat]) ? CLINICS[cat] : [];
+}
+function renderPlaces(list) {
+  const wrap = el("div", {});
+  list.forEach(p => {
+    if (!p || typeof p !== "object" || !p.name) return;
+    const tags = [];
+    if (p.on_campus === true) tags.push(el("span", { class: "pill grey" }, t("res_on_campus")));
+    if (p.direct_billing === true || p.direct_billing === "yes") tags.push(el("span", { class: "pill" }, t("res_direct")));
+    const actions = el("div", { class: "place-actions" });
+    if (p.phone) actions.append(el("a", { class: "call solid", href: telHref(p.phone), "aria-label": t("res_call") + " " + p.name + " " + p.phone }, icon(PHONE_ICON), t("res_call") + " " + p.phone));
+    if (p.address) actions.append(el("a", { class: "call", href: mapsHref(p), target: "_blank", rel: "noopener" }, icon(PIN_ICON), t("res_directions")));
+    wrap.append(el("div", { class: "place" },
+      el("p", { class: "place-name" }, String(p.name)),
+      p.address ? el("p", { class: "place-addr" }, String(p.address)) : null,
+      tags.length ? el("div", { class: "place-tags" }, ...tags) : null,
+      actions));
+  });
+  return wrap;
+}
+
+/* =========================================================================
+   8. VIEWS
+   ========================================================================= */
+const views = { ask: $("view-ask"), coverage: $("view-coverage") };
+let currentView = "ask";
+
+function showOnboarding() {
+  stopListening();
+  $("main").hidden = true;
+  $("view-onboarding").hidden = false;
+  const form = $("ob-form");
+  form.language.value = state.language;
+  const usage = state.usageKnown ? (Object.values(state.used).some(v => v > 0) || state.eyeUsed ? "yes" : "no") : "unsure";
+  form.querySelector(`input[name="usage"][value="${usage}"]`).checked = true;
+  $("ob-title").focus();
+}
+
+function showMain(view) {
+  $("view-onboarding").hidden = true;
+  $("main").hidden = false;
+  switchView(view || "ask", false);
+}
+
+function switchView(name, moveFocus) {
+  currentView = name;
+  if (name !== "ask") stopListening();
+  for (const [k, node] of Object.entries(views)) node.hidden = k !== name;
+  document.querySelectorAll(".tab").forEach(tb => {
+    if (tb.dataset.view === name) tb.setAttribute("aria-current", "page"); else tb.removeAttribute("aria-current");
+  });
+  if (name === "coverage") renderCoverage();
+  if (name === "ask") renderReminder();
+  if (moveFocus !== false) $(name === "ask" ? "ask-title" : "cov-title").focus();
+}
+
+function refreshLanguage() {
+  applyI18n();
+  if (!$("main").hidden) {
+    if (currentView === "coverage") renderCoverage(); else renderReminder();
+    if (lastResult && !resultEl.hidden) renderResult(lastResult);
+  }
+}
+
+/* ---------- Answer card ---------- */
+const resultEl = $("result");
+
+function moneyBlock(cat, info, r) {
+  const sec = el("div", { class: "section" });
+  const perVisit = r.per_visit != null ? r.per_visit : (info ? info.per_visit : null);
+  const annual = r.per_year != null ? r.per_year : (info ? info.annual_max : null);
+
+  if (info && info.free) {
+    sec.append(el("p", { class: "hero-label" }, t("res_cost_you")),
+      el("p", { class: "hero" }, "$0"),
+      el("p", { class: "hero-note" }, t("res_msp")));
+    return sec;
+  }
+  if (hasNum(perVisit)) {
+    sec.append(el("p", { class: "hero-label" }, t("res_pays_back")),
+      el("p", { class: "hero" }, money(perVisit), el("span", { class: "hero-unit" }, " " + t(info && info.per_session ? "unit_session" : "unit_visit"))),
+      el("p", { class: "hero-note" }, t("res_rest")));
+  } else if (info && hasNum(info.percent)) {
+    sec.append(el("p", { class: "hero-label" }, t("res_plan_pays")),
+      el("p", { class: "hero" }, info.percent + "%", el("span", { class: "hero-unit" }, " " + t("unit_cost"))),
+      el("p", { class: "hero-note" }, tc(cat, "plain")));
+  } else if (info) {
+    sec.append(el("p", { class: "cov-plain" }, tc(cat, "plain")));
+  }
+
+  if (hasNum(annual)) {
+    const left = remainingFor(cat, annual);
+    const box = el("div", { style: "margin-top:1.5rem" });
+    if (left !== null) {
+      const pct = annual > 0 ? Math.max(0, Math.min(100, (left / annual) * 100)) : 0;
+      const label = t("res_left_of", { left: money(left), total: money(annual) });
+      box.append(el("p", { class: "bar-label" }, label),
+        el("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(annual), "aria-valuenow": String(left), "aria-label": label },
+          el("span", { style: "width:" + pct + "%" })));
+    } else {
+      const update = el("button", { class: "link-btn", type: "button" }, t("res_add_used"));
+      update.addEventListener("click", () => switchView("coverage"));
+      box.append(el("div", { class: "row" }, el("span", { class: "label" }, t("res_yearly_max")), el("span", { class: "amt" }, money(annual))), update);
+    }
+    if (info && tc(cat, "shared")) box.append(el("p", { class: "note" }, tc(cat, "shared")));
+    sec.append(box);
+  }
+  const reset = planReset();
+  sec.append(el("p", { class: "note" }, t("res_resets", { date: reset.label, days: daysText(reset.days) })));
+  if (info && !info.verified) sec.append(el("p", { class: "check-note" }, t("res_confirm")));
+  return sec;
+}
+
+function renderResult(r) {
+  lastResult = r;
+  resultEl.replaceChildren();
+  const info = r.category ? COVERAGE[r.category] : null;
+  const who = info ? tc(r.category, "who") : prettyCategory(r.category);
+
+  resultEl.append(el("p", { class: "eyebrow" }, r.category ? t("res_who") : t("res_hmm")), el("h2", {}, who));
+  if (r.why) resultEl.append(el("p", { class: "why", lang: r.language, dir: "auto" }, r.why));
+
+  if (info || r.per_visit != null || r.per_year != null) resultEl.append(moneyBlock(r.category, info, r));
+
+  if (info && tc(r.category, "where")) {
+    resultEl.append(el("div", { class: "section" },
+      el("div", { class: "tip" },
+        el("p", { class: "tip-title" }, info.free ? t("res_where") : t("res_cheaper")),
+        el("p", { class: "tip-text" }, tc(r.category, "where")))));
+  }
+
+  if (r.nurse) {
+    resultEl.append(el("div", { class: "section" },
+      el("div", { class: "tip" },
+        el("p", { class: "tip-title" }, t("res_nurse_title")),
+        el("p", { class: "tip-text" }, t("res_nurse_text")),
+        el("a", { class: "call", href: "tel:811" }, icon(PHONE_ICON), t("res_call_811")))));
+  }
+
+  const places = r.category ? placesFor(r.category, r.clinics) : (r.clinics || []);
+  if (places.length) {
+    resultEl.append(el("div", { class: "section" },
+      el("p", { class: "tip-title" }, t("res_places")),
+      el("p", { class: "note", style: "margin:0 0 0.25rem" }, t("res_places_note")),
+      renderPlaces(places.slice(0, 3))));
+  }
+
+  const script = r.what_to_say || (info && !info.no_script ? CALL_SCRIPT : "");
+  if (script) {
+    const copyBtn = el("button", { class: "copy", type: "button", "aria-label": t("copy_label") }, icon(COPY_ICON), el("span", {}, t("copy")));
+    copyBtn.addEventListener("click", () => copyText(script, copyBtn));
+    resultEl.append(el("div", { class: "section" },
+      el("div", { class: "tip" },
+        el("div", { class: "say-head" }, el("p", { class: "tip-title" }, t("res_say")), copyBtn),
+        el("p", { class: "tip-text", lang: "en", dir: "ltr" }, script))));
+  }
+
+  resultEl.append(el("p", { class: "disclaimer" }, t("disclaimer")));
+  resultEl.hidden = false;
+}
+
+function renderError() {
+  lastResult = null;
+  resultEl.replaceChildren(el("p", {}, t("err_server")));
+  resultEl.hidden = false;
+}
+
+async function copyText(text, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    const ta = el("textarea", { class: "sr-only", "aria-hidden": "true" }); ta.value = text;
+    document.body.append(ta); ta.select();
+    try { ok = document.execCommand("copy"); } catch (e2) {}
+    ta.remove();
+  }
+  const label = btn.querySelector("span");
+  label.textContent = ok ? t("copied") : t("copy_failed");
+  setTimeout(() => { label.textContent = t("copy"); }, 2000);
+}
+
+/* ---------- Reminder: use it before Aug 31 ---------- */
+function renderReminder() {
+  const box = $("reminder");
+  const reset = planReset();
+  box.replaceChildren(
+    el("h2", { id: "reminder-title" }, t("rem_title", { date: reset.short })),
+    el("p", { class: "countdown" }, daysText(reset.days)),
+    el("p", { class: "muted" }, t("rem_until", { date: reset.label })));
+
+  if (!state.usageKnown) {
+    const b = el("button", { class: "link-btn", type: "button" }, t("res_add_used"));
+    b.addEventListener("click", () => switchView("coverage"));
+    box.append(b);
+    return;
+  }
+  const items = [];
+  for (const cat of REMINDER_ORDER) {
+    const c = COVERAGE[cat];
+    if (c.track === "flag") { if (!state.eyeUsed) items.push([tc(cat, "title"), t("rem_not_used")]); continue; }
+    if (c.track !== "money" || !hasNum(c.annual_max)) continue;
+    if (Number(state.used[cat] || 0) === 0) items.push([tc(cat, "title") + (c.two_a_year ? " " + t("rem_two") : ""), t("rem_unused", { amt: money(c.annual_max) })]);
+  }
+  if (!items.length) {
+    box.append(el("p", { style: "margin-top:1rem;font-size:1rem" }, t("rem_all")));
+    return;
+  }
+  box.append(el("p", { style: "margin-top:1rem;font-weight:700;font-size:1rem" }, t("rem_not_yet")),
+    el("ul", { class: "unused" }, ...items.map(([a, b]) => el("li", {}, el("span", {}, a), el("span", {}, b)))));
+}
+
+/* ---------- My coverage ---------- */
+function renderCoverage() {
+  const reset = planReset();
+  $("cov-sub").textContent = t("cov_sub", { days: daysText(reset.days) });
+  const banner = $("cov-banner");
+  banner.replaceChildren();
+  if (!state.usageKnown) banner.append(el("div", { class: "banner" }, t("cov_banner")));
+
+  const list = $("cov-list");
+  list.replaceChildren();
+  for (const cat of CATEGORY_ORDER) {
+    const c = COVERAGE[cat];
+    const card = el("article", { class: "card cov", "aria-labelledby": "cov-h-" + cat });
+    card.append(el("h3", { id: "cov-h-" + cat }, tc(cat, "title")), el("p", { class: "cov-plain" }, tc(cat, "plain")));
+
+    const stats = [];
+    if (c.free) stats.push([t("cov_you_pay"), "$0"]);
+    if (hasNum(c.per_visit)) stats.push([t(c.per_session ? "cov_per_session" : "cov_per_visit"), t("cov_up_to", { amt: money(c.per_visit) })]);
+    if (hasNum(c.percent) && !hasNum(c.per_visit) && !c.free) stats.push([t("cov_plan_pays"), c.percent + "%"]);
+    if (hasNum(c.annual_max)) stats.push([t("cov_per_year"), money(c.annual_max)]);
+    if (stats.length) card.append(el("div", { class: "stats" }, ...stats.map(([l, v]) =>
+      el("div", { class: "stat" }, el("p", { class: "stat-label" }, l), el("p", { class: "stat-value" }, v)))));
+    if (c.percent_network) card.append(el("p", { class: "note" }, t("cov_network", { p: c.percent_network })));
+
+    if (c.track === "money" && hasNum(c.annual_max)) {
+      const id = "used-" + cat;
+      const input = el("input", { id, type: "number", inputmode: "decimal", min: "0", step: "1", placeholder: "0" });
+      input.value = state.usageKnown ? String(state.used[cat] || 0) : "";
+      const leftLine = el("p", { class: "left-line", "aria-live": "polite" });
+      const updateLeft = () => {
+        const left = remainingFor(cat, c.annual_max);
+        leftLine.textContent = left === null ? "" : t("cov_left", { amt: money(left) });
+      };
+      input.addEventListener("input", () => {
+        let v = Number(input.value);
+        if (!isFinite(v) || v < 0 || input.value === "") v = 0;
+        state.used[cat] = v;
+        state.usageKnown = true;
+        save();
+        updateLeft();
+      });
+      card.append(el("div", { class: "used-row" },
+        el("label", { for: id }, t("cov_used")),
+        el("div", { class: "money-input" }, el("span", { "aria-hidden": "true" }, "$"), input)), leftLine);
+      if (tc(cat, "shared")) card.append(el("p", { class: "note" }, tc(cat, "shared")));
+      updateLeft();
+    } else if (c.track === "flag") {
+      const cb = el("input", { type: "checkbox", id: "used-" + cat });
+      cb.checked = state.eyeUsed;
+      cb.addEventListener("change", () => { state.eyeUsed = cb.checked; state.usageKnown = true; save(); });
+      card.append(el("label", { class: "check", style: "margin-top:0.5rem;color:var(--text)" }, cb, el("span", {}, t("cov_had_one"))));
+    }
+
+    if (tc(cat, "where")) card.append(el("div", { class: "tip", style: "margin-top:1rem" },
+      el("p", { class: "tip-title" }, c.free ? t("res_where") : t("res_cheaper")), el("p", { class: "tip-text" }, tc(cat, "where"))));
+    if (!c.verified) card.append(el("p", { class: "check-note" }, t("cov_confirm")));
+
+    const places = placesFor(cat, null);
+    if (places.length) {
+      card.append(el("details", { class: "places" },
+        el("summary", {}, t("res_places") + " (" + places.length + ")"),
+        el("p", { class: "note", style: "margin:0" }, t("res_places_note")),
+        renderPlaces(places)));
+    }
+    list.append(card);
+  }
+}
+
+/* ---------- Safety screen ---------- */
+const safetyEl = $("safety");
+function showSafety(type) {
+  stopListening();
+  const heading = $("safety-heading");
+  const actions = $("safety-actions");
+  actions.replaceChildren();
+  if (type === "988") {
+    heading.textContent = t("s988_title");
+    actions.append(
+      el("a", { class: "safety-btn main", href: "tel:988" }, t("s988_call")),
+      el("a", { class: "safety-btn secondary", href: "sms:988" }, t("s988_text")),
+      el("p", {}, t("s988_note")));
+  } else {
+    heading.textContent = t("s911_title");
+    actions.append(el("a", { class: "safety-btn main", href: "tel:911" }, t("s911_call")),
+      el("p", {}, t("s911_note")));
+  }
+  resultEl.hidden = true;
+  safetyEl.hidden = false;
+  $("app").setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "hidden";
+  heading.focus();
+}
+$("safety-back").addEventListener("click", () => {
+  safetyEl.hidden = true;
+  $("app").removeAttribute("aria-hidden");
+  document.body.style.overflow = "";
+  input.value = "";
+  askBtn.disabled = true;
+  input.focus();
+});
+
+/* =========================================================================
+   9. SPEAK (browser speech recognition)
+   Works in Chrome, Edge and Safari. Some browsers send the audio to their
+   own speech service to turn it into text. Firefox doesn't support it, so
+   the button explains how to use the keyboard's microphone instead.
+   ========================================================================= */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const speakBtn = $("speak");
+const speakStatus = $("speak-status");
+let rec = null;
+let listening = false;
+
+function speechLocale() {
+  const code = state.language === "auto" ? uiLang() : state.language;
+  return langInfo(code).speech || navigator.language || "en-CA";
+}
+function speechLangName() {
+  const code = state.language === "auto" ? uiLang() : state.language;
+  return langInfo(code).name;
+}
+function setSpeakStatus(msg) { speakStatus.textContent = msg || ""; speakStatus.hidden = !msg; }
+function updateSpeakButton() {
+  $("speak-label").textContent = listening ? t("speak_stop") : t("speak");
+  speakBtn.setAttribute("aria-pressed", String(listening));
+}
+function stopListening() {
+  if (rec && listening) { try { rec.stop(); } catch (e) {} }
+}
+speakBtn.addEventListener("click", () => {
+  if (!SpeechRec) { setSpeakStatus(t("speak_unsupported")); return; }
+  if (listening) { stopListening(); return; }
+
+  const base = input.value.trim() ? input.value.trim() + " " : "";
+  let heard = false;
+  rec = new SpeechRec();
+  rec.lang = speechLocale();
+  rec.interimResults = true;
+  rec.continuous = true;
+  rec.onresult = e => {
+    let finalText = "", interim = "";
+    for (let i = 0; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+    }
+    if ((finalText + interim).trim()) heard = true;
+    input.value = base + finalText + interim;
+    askBtn.disabled = busy || !input.value.trim();
+  };
+  rec.onerror = e => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") setSpeakStatus(t("speak_denied"));
+    else if (e.error !== "aborted") setSpeakStatus(t("speak_nothing"));
+  };
+  rec.onend = () => {
+    listening = false;
+    updateSpeakButton();
+    if (heard) { setSpeakStatus(""); input.focus(); }
+    else if (!speakStatus.textContent || speakStatus.textContent === t("speak_listening", { lang: speechLangName() })) setSpeakStatus(t("speak_nothing"));
+  };
+  try {
+    rec.start();
+    listening = true;
+    updateSpeakButton();
+    setSpeakStatus(t("speak_listening", { lang: speechLangName() }));
+  } catch (e) {
+    listening = false;
+    updateSpeakButton();
+    setSpeakStatus(t("speak_nothing"));
+  }
+});
+
+/* =========================================================================
+   10. EVENTS
+   ========================================================================= */
+const input = $("message");
+const askBtn = $("ask");
+let busy = false;
+
+// Language: setup screen and header picker switch everything immediately.
+$("ob-language").addEventListener("change", e => { state.language = e.target.value; save(); refreshLanguage(); });
+$("top-language").addEventListener("change", e => { state.language = e.target.value; save(); refreshLanguage(); });
+
+$("ob-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.target;
+  state.plan = PLAN;
+  state.language = f.language.value || "auto";
+  const usage = (f.querySelector('input[name="usage"]:checked') || {}).value || "unsure";
+  if (usage === "no") { state.usageKnown = true; state.used = {}; state.eyeUsed = false; }
+  else if (usage === "unsure") { state.usageKnown = false; }
+  else if (usage === "yes") { state.usageKnown = true; }
+  state.onboarded = true;
+  save();
+  applyI18n();
+  showMain(usage === "yes" ? "coverage" : "ask");
+});
+
+document.querySelectorAll(".tab").forEach(tb => tb.addEventListener("click", () => switchView(tb.dataset.view)));
+$("btn-settings").addEventListener("click", showOnboarding);
+
+const largeBtn = $("btn-large");
+function applyLarge() {
+  document.documentElement.classList.toggle("large", state.large);
+  largeBtn.setAttribute("aria-pressed", String(state.large));
+}
+largeBtn.addEventListener("click", () => { state.large = !state.large; applyLarge(); save(); });
+
+const rememberBox = $("remember");
+rememberBox.addEventListener("change", () => {
+  state.remember = rememberBox.checked;
+  if (state.remember) save(); else forget();
+});
+
+document.querySelectorAll("[data-example]").forEach(b => b.addEventListener("click", () => {
+  stopListening();
+  input.value = t(b.dataset.example);
+  askBtn.disabled = busy;
+  input.focus();
+}));
+
+input.addEventListener("input", () => { askBtn.disabled = busy || !input.value.trim(); });
+input.addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !askBtn.disabled) onAsk(); });
+askBtn.addEventListener("click", onAsk);
+
+function setLoading(on) {
+  busy = on;
+  askBtn.disabled = on || !input.value.trim();
+  if (on) askBtn.replaceChildren(el("span", { class: "spinner", "aria-hidden": "true" }), el("span", {}, t("ask_loading")));
+  else askBtn.replaceChildren(t("ask_btn"));
+}
+
+async function onAsk() {
+  const text = input.value.trim();
+  if (!text || busy) return;
+  stopListening();
+  const local = detectSafety(text);
+  if (local) { showSafety(local); return; }
+
+  setLoading(true);
+  const slow = setTimeout(() => {
+    const label = askBtn.querySelector("span:last-child");
+    if (busy && label) label.textContent = t("ask_waking");
+  }, SLOW_NOTICE_MS);
+  try {
+    const r = await askServer(text);
+    if (r.emergency) showSafety(r.emergency);
+    else renderResult(r);
+  } catch (e) {
+    renderError();
+  } finally {
+    clearTimeout(slow);
+    setLoading(false);
+  }
+}
+
+/* =========================================================================
+   11. START
+   ========================================================================= */
+load();
+rememberBox.checked = state.remember;
+applyLarge();
+applyI18n();
+if (state.onboarded) showMain("ask"); else showOnboarding();
+</script>
+</body>
+</html>
