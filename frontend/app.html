@@ -1114,7 +1114,7 @@ function dentalPlan() {
   const PS = planStart(TODAY), PE = planEnd(TODAY);
   const a = answerOf("dental");
   if (a && a.v === "unknown") {
-    return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("ck_unknown") + " " + t("ck_dental_cost"), book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
+    return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("dental_lead", { n: 2 }) + " " + t("ck_dental_cost"), book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
   }
   const known = [];
   if (a) {
@@ -1159,7 +1159,7 @@ function dentalPlan() {
 function eyePlan() {
   const a = answerOf("eye");
   const lead = t("eye_lead");
-  if (a && a.v === "unknown") return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("ck_unknown") + " " + lead, book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
+  if (a && a.v === "unknown") return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead, book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
   const known = [];
   if (a) {
     const ps = planStart(a.at);
@@ -1171,7 +1171,7 @@ function eyePlan() {
   const done = known.filter(c => c.done), future = known.filter(c => !c.done);
   const last = done[done.length - 1] || null;
   const rows = [];
-  if (last && last.lo) rows.push(last.src === "answer" ? answerRow("eye", t("eye_last")) : bookingRow(last, t("eye_last")));
+  if (last) rows.push(last.src === "answer" ? answerRow("eye", t("eye_last")) : bookingRow(last, t("eye_last")));
   if (future.length) rows.push(bookingRow(future[0], t("eye_next")));
   else {
     let lo = last && last.lo ? addDays(last.lo, 730) : new Date(TODAY);
@@ -1255,7 +1255,7 @@ function askAlready(key) {
   const item = CK_ITEMS[key], a = state.ck[key];
   const opts = el("div", { class: "opts" });
   item.opts.forEach(([v, label]) => opts.append(on(el("button", { class: "opt", type: "button", "aria-pressed": String(!!a && a.v === v) }, t(label)), "click", () => {
-    setCk(key, v); closeSheet(); refreshAfterCk(key);
+    setCk(key, v); refreshAfterCk(key); showResult(key);
   })));
   const body = [opts];
   if (key === "dental" || key === "eye") body.push(el("p", { class: "grey", style: "margin-top:1rem" }, t("already_note")));
@@ -1287,7 +1287,8 @@ function askBooked() {
     const opts = el("div", { class: "opts" });
     plan.book.forEach(m => opts.append(on(el("button", { class: "opt center", type: "button" }, monthName(m) + (m.getFullYear() !== TODAY.getFullYear() ? " " + m.getFullYear() : "")), "click", () => {
       (state.bk[key] = state.bk[key] || []).push({ at: isoDate(TODAY), m: monthKey(m) });
-      markChanged(); closeSheet(); refreshAfterCk(key);
+      markChanged(); refreshAfterCk(key);
+      showBooked(monthName(m));
     })));
     $("sheet-title").textContent = t("which_month");
     $("sheet-body").replaceChildren(opts);
@@ -1297,8 +1298,50 @@ function askBooked() {
   const no = on(el("button", { class: "opt center", type: "button" }, t("bk_no")), "click", closeSheet);
   openSheet(t(CK_ITEMS[key].bk), [el("div", { class: "opts" }, yes, no)]);
 }
+/* After someone answers "When was your last ...?", say what that means
+   instead of closing quietly: how often people usually go, when theirs is,
+   and one next step. */
+function showResult(key) {
+  const plan = planFor(key), next = plan.next;
+  const due = plan.kind === "due" || plan.kind === "none";
+  let title, when;
+  if (due) { title = t("res_due_" + key); when = key === "doctor" ? null : t("res_when_due"); }
+  else if (next && next.kind === "booked") { title = t("res_soon"); when = t("res_when_booked", { month: monthName(next.lo) }); }
+  else if (next && next.lo) { title = t("res_soon"); when = t("res_when_next", { range: rangeText(next.lo, next.hi) }); }
+  else { title = t("res_done"); when = key === "flu" ? t("res_when_next", { range: t("word_fall") }) : plan.lead; }
+  const doctorDone = key === "doctor" && !due;
+  const body = [el("p", { class: "lead" }, doctorDone ? t("ck_doctor_yes") : t("freq_" + key))];
+  if (doctorDone) when = null;
+  if (when) body.push(el("p", { class: "lead", style: "font-weight:600" }, when));
+  if (!due && !doctorDone) body.push(el("p", { class: "grey", style: "margin-top:0.5rem" }, t("res_home")));
+  const opts = el("div", { class: "opts" });
+  if (plan.book) opts.append(on(el("button", { class: "opt primary", type: "button" }, t("res_show_where")), "click", () => goToBook(key)));
+  opts.append(on(el("button", { class: "opt " + (plan.book ? "center" : "primary"), type: "button" }, t("res_got_it")), "click", closeSheet));
+  body.push(opts);
+  fillSheet(title, body);
+}
+function showBooked(month) {
+  fillSheet(t("res_booked_title", { month }), [
+    el("p", { class: "lead" }, t("res_booked_text", { month })),
+    el("div", { class: "opts" }, on(el("button", { class: "opt primary", type: "button" }, t("res_got_it")), "click", closeSheet))]);
+}
+function fillSheet(title, body) {
+  if ($("sheet").hidden) { openSheet(title, body); return; }
+  $("sheet-title").textContent = title;
+  $("sheet-body").replaceChildren(...body);
+  const f = $("sheet-body").querySelector("button");
+  (f || $("sheet-title")).focus();
+}
+function goToBook(key) {
+  closeSheet();
+  if (currentView !== "item" || currentItem !== key) openItem(key);
+  setTimeout(() => {
+    const b = document.querySelector("#view-item a.big");
+    if (b) { b.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); b.focus({ preventScroll: true }); }
+  }, 50);
+}
 function refreshAfterCk(key) {
-  if (currentView === "item") { renderItem(); const h = $("item-title"); if (h) h.focus({ preventScroll: true }); }
+  if (currentView === "item") { renderItem(); const h = $("item-title"); if (h) { if ($("sheet").hidden) h.focus({ preventScroll: true }); else sheetReturn = h; } }
   else if (currentView === "ask") renderPlan();
   else if (currentView === "answer" && current) renderAnswer();
 }
