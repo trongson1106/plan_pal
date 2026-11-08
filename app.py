@@ -12,7 +12,7 @@ except ImportError:
 
 from data.safety import EMERGENCY_911, CRISIS_988
 from api import classify
-from coverage import coverage_for
+from data.coverage import coverage_for
 
 app = Flask(__name__)
 CORS(app)

@@ -16,7 +16,7 @@ import os
 from google import genai
 from google.genai import types
 
-from coverage import CATEGORIES, CONDITIONS, DENTAL_TYPES
+from data.coverage import CATEGORIES, CONDITIONS, DENTAL_TYPES
 
 VALID_FLAGS = {"none", "911", "988", "811"}
 MAX_NEEDS = 3
