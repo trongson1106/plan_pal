@@ -76,3 +76,15 @@ def coverage_for(category, dental_type=None):
         result.update(DENTAL_COVERAGE[dental_type])
         result["dental_type"] = dental_type
     return result
+
+
+def get_plan_meta():
+    """Return the meta block from ubc_student_health_deals.json, or a minimal fallback."""
+    import json as _json
+    import os as _os
+    try:
+        p = _os.path.join(_os.path.dirname(__file__), "ubc_student_health_deals.json")
+        with open(p, encoding="utf-8") as f:
+            return _json.load(f).get("meta", {})
+    except Exception:
+        return {"pulled": "2026-11-07", "administrator": "Alumo"}
