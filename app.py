@@ -14,6 +14,7 @@ except ImportError:
 from data.safety import check_safety
 from api import classify
 from data.coverage import coverage_for, get_plan_meta
+from data.er_signs import er_signs_for
 
 app = Flask(__name__)
 
@@ -96,6 +97,7 @@ def ask():
             "why_one_line": n.get("why_one_line"),
             "what_to_say": n.get("what_to_say_when_booking"),
             "coverage": coverage_for(n["category"], n.get("dental_type")),
+            "er_signs": er_signs_for(n["category"], n.get("condition")),
         })
 
     first = needs[0] if needs else {}
