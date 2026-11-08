@@ -3,405 +3,245 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#EEF3EF" id="theme-color">
+<meta name="theme-color" content="#F6F5F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111614" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <meta name="format-detection" content="telephone=no">
 <title>PlanPal</title>
 <meta name="description" content="Tell us what's going on. We'll tell you who to see, what your UBC AMS/GSS health plan pays, and where to go.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <style>
   /* =====================================================================
      Design rules
-     - Frosted glass over a soft gradient. Every bit of text sits on a
-       near-white surface or a dark button, so contrast stays at 4.5:1 or
-       better (most text is 7:1+).
-     - One green action colour; red only for the safety screen.
-     - The next step is always a full-width button whose label is the
-       instruction. Cost and details come after it.
+     - One job per screen: one big green button, one or two smaller choices.
+     - Three text styles: title, normal, small grey. Green only means "tap".
+     - Alternatives stay on the same screen; extra detail opens in a panel.
+     - No boxes inside boxes: one card per section, rows split by hairlines.
+     - Text contrast 4.5:1 or better in light and dark mode.
      - rem units everywhere so "Larger" text scales the whole page.
-     - Motion is short and soft, and switched off for reduced motion.
      ===================================================================== */
   :root {
-    --bg: #EEF2EE;
-    --text: #13201C; --muted: #45524E; --faint: #56635F;
-    --accent: #0B5D4B; --accent-top: #0E6E59; --accent-pressed: #084537; --accent-soft: #DDF0E7;
-    --glass: rgba(255,255,255,0.68); --glass-strong: rgba(255,255,255,0.84); --glass-edge: rgba(255,255,255,0.85);
-    --field: rgba(255,255,255,0.78);
-    --line: rgba(19,32,28,0.11); --line-strong: rgba(19,32,28,0.18);
-    --wash: rgba(19,32,28,0.045);
-    --shadow: 0 1px 2px rgba(19,32,28,0.05), 0 12px 32px -10px rgba(19,32,28,0.18);
-    --shadow-btn: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px -8px rgba(11,93,75,0.55);
-    --blur: saturate(170%) blur(22px);
-    --safety: #B00020;
+    --bg: #F6F5F1; --card: #FFFFFF; --text: #13201C; --muted: #56625E;
+    --line: #E6E3DD; --row: #ECE9E3; --border: #D6D2CA;
+    --btn: #0B5D4B; --btn-text: #FFFFFF; --btn-press: #084537; --link: #0B5D4B;
+    --soft: #E3F1EB; --soft-text: #0A4F40; --warn-bg: #FFF1CC; --warn-text: #5E4500;
+    --scrim: rgba(19,32,28,0.45); --safety: #B00020; --err: #8C0016;
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  html { font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 5rem; scroll-padding-bottom: 5.5rem; }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111614; --card: #1B2220; --text: #EEF2EF; --muted: #A7B2AE;
+      --line: #27302D; --row: #2A3330; --border: #3A4642;
+      --btn: #5CC9A7; --btn-text: #062019; --btn-press: #4AB494; --link: #74D6B7;
+      --soft: #1F3A32; --soft-text: #BFEBDD; --warn-bg: #3A3018; --warn-text: #F3DFA6;
+      --scrim: rgba(0,0,0,0.6); --err: #FF9AA8;
+    }
+  }
+  html { font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 5rem; }
   html.large { font-size: 125%; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1.0625rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  /* Soft gradient backdrop, fixed behind everything. */
-  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background:
-      radial-gradient(42rem 30rem at 0% 0%, rgba(150,214,186,0.55), transparent 70%),
-      radial-gradient(36rem 28rem at 100% 8%, rgba(196,190,240,0.50), transparent 70%),
-      radial-gradient(40rem 30rem at 100% 100%, rgba(248,206,178,0.45), transparent 70%),
-      radial-gradient(36rem 30rem at 0% 100%, rgba(178,214,240,0.45), transparent 70%),
-      var(--bg); }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1.0625rem; line-height: 1.45; -webkit-font-smoothing: antialiased; }
   [hidden] { display: none !important; }
   h1, h2, h3, p { margin: 0; }
-  ul { margin: 0; padding: 0; }
+  ul { margin: 0; padding: 0; list-style: none; }
   button, input, select, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
-  button, a, summary, select, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-  a { color: inherit; }
-  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 0.5rem; }
+  button, a, select, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  a { color: var(--link); }
+  :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; border-radius: 0.5rem; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   svg.icon { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+  .desk { display: none; }
+  @media (hover: hover) and (pointer: fine) { .desk { display: inline; } }
 
-  .glass { background: var(--glass); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border: 1px solid var(--glass-edge); box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9); border-radius: 1.75rem; }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass, .topbar, .sticky-bar { background: rgba(255,255,255,0.96) !important; }
-  }
+  /* ---------- Top bar ---------- */
+  .topbar { position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
+  .topbar-in { max-width: 30rem; margin: 0 auto; min-height: 3.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left)); }
+  .brand { display: inline-flex; align-items: center; gap: 0.625rem; min-height: 2.75rem; background: none; border: 0; padding: 0; font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+  .brand-mark { width: 1.75rem; height: 1.75rem; border-radius: 0.5rem; background: var(--btn); color: var(--btn-text); display: inline-flex; align-items: center; justify-content: center; }
+  .brand-mark svg { width: 1rem; height: 1rem; }
+  .back { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 2.75rem; padding: 0 0.25rem; margin-left: -0.375rem; background: none; border: 0; color: var(--link); font-size: 1rem; font-weight: 600; text-decoration: none; }
+  .top-right { display: flex; align-items: center; gap: 0.25rem; }
+  .top-link { display: none; min-height: 2.75rem; padding: 0 0.75rem; background: none; border: 0; color: var(--muted); font-size: 0.9375rem; font-weight: 600; border-radius: 999px; }
+  .lang { position: relative; display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.875rem; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: 0.9375rem; font-weight: 600; }
+  .lang select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 1rem; }
+  .lang:focus-within { outline: 3px solid var(--link); outline-offset: 2px; }
 
-  /* ---------- Top bar (frosted, sticky) ---------- */
-  .topbar { position: sticky; top: 0; z-index: 30; background: rgba(246,249,247,0.72); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border-bottom: 1px solid rgba(255,255,255,0.7); box-shadow: 0 1px 0 var(--line); padding-top: env(safe-area-inset-top); }
-  .topbar-in { max-width: 30rem; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; min-height: 3.5rem; padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left)); }
-  .brand { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.1875rem; font-weight: 700; letter-spacing: -0.02em; background: none; border: 0; padding: 0; min-height: 3rem; }
-  .brand-mark { width: 1.875rem; height: 1.875rem; border-radius: 0.625rem; background: linear-gradient(160deg, #13866E, #0A5242); color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px -4px rgba(11,93,75,0.6); }
-  .brand-mark svg { width: 1.125rem; height: 1.125rem; }
-  .header-right { display: flex; align-items: center; gap: 0.125rem; }
-  .header-link { display: none; background: none; border: 0; min-height: 3rem; padding: 0 0.75rem; color: var(--muted); font-size: 0.9375rem; font-weight: 600; border-radius: 999px; }
-  .header-link:hover { background: var(--wash); color: var(--text); }
-  .quiet-select { position: relative; display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.75rem; border-radius: 999px; background: var(--wash); color: var(--text); font-size: 0.9375rem; font-weight: 600; }
-  .quiet-select .chev { width: 0.4rem; height: 0.4rem; margin: 0 0.125rem 0.2rem 0.125rem; border-right: 1.75px solid currentColor; border-bottom: 1.75px solid currentColor; transform: rotate(45deg); }
-  .quiet-select select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 1rem; }
-  .quiet-select:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .wrap { max-width: 30rem; margin: 0 auto; padding: 1.5rem max(1.25rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)); }
 
-  .wrap { max-width: 30rem; margin: 0 auto; padding: 1rem max(1rem, env(safe-area-inset-right)) calc(2.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
-
-  /* ---------- Shared ---------- */
-  .page-title { font-size: 1.875rem; font-weight: 700; line-height: 1.12; letter-spacing: -0.03em; outline: none; }
-  .page-sub { color: var(--muted); margin-top: 0.375rem; }
-  .section-title { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.01em; }
-  .eyebrow { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink, var(--muted)); }
-  :lang(zh-Hans) .eyebrow, :lang(zh-Hant) .eyebrow, :lang(ko) .eyebrow, :lang(hi) .eyebrow, :lang(pa) .eyebrow { letter-spacing: 0; text-transform: none; font-size: 0.875rem; }
-  .back-link { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 3rem; padding: 0; margin: 0 0 0.5rem; background: none; border: 0; color: var(--accent); font-weight: 700; font-size: 1rem; }
-  .primary { width: 100%; min-height: 3.5rem; border: 0; border-radius: 1.125rem; background: linear-gradient(180deg, var(--accent-top), var(--accent)); color: #fff; font-size: 1.0625rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.125rem; text-align: center; text-decoration: none; line-height: 1.3; box-shadow: var(--shadow-btn); transition: transform 160ms var(--ease), filter 160ms; }
-  .primary:hover:not(:disabled) { filter: brightness(1.06); }
-  .primary:active:not(:disabled) { transform: scale(0.985); background: var(--accent-pressed); }
-  .primary:disabled { background: #9DB3AC; box-shadow: none; cursor: not-allowed; }
-  .secondary { width: 100%; min-height: 3.25rem; border-radius: 1.125rem; border: 1px solid var(--line-strong); background: var(--glass-strong); display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.625rem 1rem; font-size: 1rem; font-weight: 700; text-decoration: none; text-align: center; line-height: 1.35; color: var(--text); transition: transform 160ms var(--ease); }
-  .secondary:active { transform: scale(0.985); }
-  .text-link { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; font-size: 0.9375rem; text-decoration: none; text-align: left; }
-  .text-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .small { font-size: 0.9375rem; color: var(--muted); }
-  .tiny { font-size: 0.8125rem; color: var(--faint); }
-  .spinner { width: 1.125rem; height: 1.125rem; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.45); border-top-color: #fff; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  /* ---------- Shared pieces ---------- */
+  .title { font-size: 1.875rem; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; outline: none; }
+  .h2 { font-size: 1.375rem; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+  .grey { font-size: 0.9375rem; color: var(--muted); }
+  .tiny { font-size: 0.8125rem; color: var(--muted); }
+  .lead { font-size: 1.0625rem; line-height: 1.45; margin-top: 0.5rem; }
+  .card { background: var(--card); border-radius: 1.25rem; }
+  .big { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; min-height: 3.75rem; padding: 0.625rem 1.25rem; border: 0; border-radius: 1.125rem; background: var(--btn); color: var(--btn-text); font-size: 1.0625rem; font-weight: 700; line-height: 1.3; text-align: center; text-decoration: none; transition: transform 150ms var(--ease), background-color 150ms; }
+  .big:active { transform: scale(0.985); background: var(--btn-press); }
+  .meta { margin-top: 0.5rem; text-align: center; font-size: 0.9375rem; color: var(--muted); }
+  .link { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0; background: none; border: 0; color: var(--link); font-size: 0.9375rem; font-weight: 600; text-decoration: none; text-align: left; }
+  .link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 1.5rem; margin-top: 1rem; }
+  .pill-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0 1.125rem; border-radius: 999px; border: 1.5px solid var(--btn); background: transparent; color: var(--link); font-size: 0.9375rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .chip, .area { min-height: 2.75rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.9375rem; font-weight: 600; }
+  .area[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
+  .spinner { width: 1.125rem; height: 1.125rem; border-radius: 50%; border: 2.5px solid currentColor; border-top-color: transparent; animation: spin 0.8s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .chip, .area, .opt { min-height: 2.75rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--field); font-size: 0.9375rem; font-weight: 600; color: var(--text); transition: background-color 150ms, border-color 150ms, transform 150ms var(--ease); }
-  .chip:hover, .area:hover, .opt:hover { border-color: var(--accent); }
-  .chip:active, .area:active, .opt:active { transform: scale(0.97); }
-  .area[aria-pressed="true"], .opt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  /* Category tints: soft backgrounds with a darker ink of the same hue. */
-  .tint-physio { --tint: #FBE6D8; --ink: #8E3F12; }
-  .tint-massage, .tint-chiropractor, .tint-other_practitioner { --tint: #F5E5D4; --ink: #7E4A15; }
-  .tint-counselling { --tint: #EAE4F8; --ink: #523590; }
-  .tint-dental { --tint: #D9F0E6; --ink: #0A5444; }
-  .tint-vision { --tint: #DFEAF8; --ink: #24507F; }
-  .tint-prescription, .tint-vaccine { --tint: #F5EDD0; --ink: #6E5208; }
-  .tint-doctor_visit, .tint-other, .tint-nurse { --tint: #DAEEF0; --ink: #1A575C; }
-  .tint-medical_equipment, .tint-hearing, .tint-travel { --tint: #E9E7E2; --ink: #48443E; }
-  .cat-icon { width: 3rem; height: 3rem; border-radius: 1rem; background: var(--tint, var(--accent-soft)); color: var(--ink, var(--accent)); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.7); }
-  .cat-icon svg { width: 1.5rem; height: 1.5rem; }
-  .cat-icon.sm { width: 2.5rem; height: 2.5rem; border-radius: 0.875rem; }
-  .cat-icon.sm svg { width: 1.25rem; height: 1.25rem; }
-
-  /* ---------- Motion ---------- */
-  .enter { animation: rise 320ms var(--ease) both; }
-  .enter-2 { animation: rise 320ms 60ms var(--ease) both; }
-  .enter-3 { animation: rise 320ms 120ms var(--ease) both; }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .enter { animation: rise 260ms var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     .spinner { animation: spin 1.6s linear infinite !important; }
   }
 
+  /* Rows inside one card, split by hairlines */
+  .rows { padding: 0 1.125rem; }
+  .row { display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; padding: 0.5rem 0; border-top: 1px solid var(--row); color: var(--text); text-decoration: none; width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; }
+  .rows > :first-child { border-top: 0; }
+  .row-name { flex: 1; min-width: 0; font-weight: 600; }
+  .row-st { font-size: 0.9375rem; color: var(--muted); white-space: nowrap; }
+  .row-st.due { color: var(--text); font-weight: 600; }
+  .chev { width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin: 0 0.25rem 0 0.125rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(-45deg); }
+  .row-sub { display: block; font-size: 0.875rem; color: var(--muted); font-weight: 400; margin-top: 0.125rem; }
+
   /* ---------- Home ---------- */
-  .home-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
-  .home-grid > div, .answer-layout > * { min-width: 0; }
-  .ask-card { padding: 1.375rem 1.25rem 1.125rem; }
-  .composer { margin-top: 1.125rem; padding: 0.875rem 0.875rem 0.625rem 1rem; border-radius: 1.25rem; background: var(--field); border: 1px solid var(--line-strong); transition: border-color 150ms, box-shadow 150ms; }
-  .composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(11,93,75,0.14); }
-  .composer textarea { display: block; width: 100%; min-height: 4.75rem; resize: none; border: 0; outline: none; background: transparent; font-size: 1.125rem; line-height: 1.45; padding: 0; }
-  .composer textarea::placeholder { color: #6A7672; }
-  .composer-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.25rem; }
-  .mic { width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(255,255,255,0.9); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background-color 150ms, transform 150ms var(--ease); }
-  .mic:active { transform: scale(0.95); }
-  .mic[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; animation: pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(11,93,75,0.35); } 50% { box-shadow: 0 0 0 8px rgba(11,93,75,0); } }
-  #ask { width: auto; min-width: 6.5rem; min-height: 3rem; border-radius: 999px; padding: 0 1.375rem; }
+  .composer { margin-top: 1rem; padding: 0.875rem 0.875rem 0.75rem 1rem; border: 1px solid var(--border); border-radius: 1.25rem; background: var(--card); transition: border-color 150ms, box-shadow 150ms; }
+  .composer:focus-within { border-color: var(--link); box-shadow: 0 0 0 3px color-mix(in srgb, var(--link) 22%, transparent); }
+  .composer textarea { display: block; width: 100%; min-height: 3.25rem; resize: none; border: 0; outline: none; background: transparent; font-size: 1.0625rem; line-height: 1.45; padding: 0; }
+  .composer textarea::placeholder { color: var(--muted); }
+  .composer-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.5rem; }
+  .mic { width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--link); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mic[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
+  #ask { min-width: 6rem; min-height: 3rem; padding: 0 1.5rem; border: 0; border-radius: 999px; background: var(--btn); color: var(--btn-text); font-size: 1.0625rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+  #ask:disabled { opacity: 0.45; cursor: not-allowed; }
   .ask-status { margin-top: 0.625rem; }
-  .ask-error { margin-top: 0.625rem; color: #8C0016; font-weight: 600; font-size: 0.9375rem; }
+  .ask-error { margin-top: 0.625rem; color: var(--err); font-weight: 600; font-size: 0.9375rem; }
   .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.875rem; }
-  .privacy-line { display: flex; gap: 0.625rem; align-items: flex-start; margin-top: 1rem; padding-top: 0.875rem; border-top: 1px solid var(--line); }
-  .privacy-line .icon { color: var(--accent); margin-top: 0.125rem; }
-  .privacy-line p { font-size: 0.875rem; color: var(--muted); }
-  .privacy-line button { display: inline; background: none; border: 0; padding: 0.125rem 0; color: var(--accent); font-weight: 700; font-size: 0.875rem; text-decoration: underline; text-underline-offset: 3px; text-align: left; }
+  .recent { margin-top: 1.25rem; }
+  .recent .row-name { font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .plan-sec { margin-top: 2rem; }
+  .plan-sec .card { margin-top: 0.75rem; }
+  .foot { display: flex; flex-direction: column; align-items: center; margin-top: 1.5rem; }
+  .private { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.75rem; background: none; border: 0; color: var(--muted); font-size: 0.875rem; font-weight: 600; }
+  .private .icon { width: 0.9375rem; height: 0.9375rem; }
+  .foot-links { display: flex; gap: 0 1.25rem; }
+  .foot-links button { min-height: 2.75rem; background: none; border: 0; padding: 0 0.25rem; color: var(--muted); font-size: 0.875rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border); }
 
-  .recent { margin-top: 0.25rem; padding: 0.375rem 1.25rem 0.5rem; }
-  .recent-list { list-style: none; margin-top: 0.25rem; }
-  .recent-list button { width: 100%; display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; padding: 0.5rem 0; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; }
-  .recent-q { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .recent-cat { color: var(--muted); font-size: 0.875rem; white-space: nowrap; }
-  .recent > h2 { padding-top: 0.75rem; }
-
-  /* Check-up plan */
-  .plan { padding: 1.375rem 1.25rem 1.125rem; }
-  .plan-title { font-size: 1.625rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; }
-  .plan-newyear { margin-top: 0.625rem; display: inline-flex; padding: 0.375rem 0.75rem; border-radius: 999px; background: #FFF1CC; color: #5E4500; font-weight: 700; font-size: 0.875rem; }
-  .plan-loc { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.5rem; margin-top: 0.5rem; font-size: 0.9375rem; color: var(--muted); }
-  .plan-loc .icon { width: 1rem; height: 1rem; color: var(--accent); }
-  .plan-picker { margin-top: 0.5rem; padding: 0.875rem; border-radius: 1.25rem; background: var(--wash); }
-  .save-nudge { margin-top: 1rem; padding: 0.75rem 0.875rem; border-radius: 1rem; background: var(--accent-soft); }
-  .switch { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 2.75rem; cursor: pointer; font-weight: 600; font-size: 0.9375rem; }
-  .switch input { appearance: none; -webkit-appearance: none; position: relative; width: 3.25rem; height: 2rem; border-radius: 999px; background: #8E9C97; flex-shrink: 0; margin: 0; cursor: pointer; transition: background-color 180ms; }
-  .switch input::after { content: ""; position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1.625rem; height: 1.625rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 180ms var(--ease); }
-  .switch input:checked { background: var(--accent); }
-  .switch input:checked::after { transform: translateX(1.25rem); }
-  .switch input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .ck-list { list-style: none; margin-top: 0.75rem; }
-  .ck { padding: 1rem 0; border-top: 1px solid var(--line); }
-  .ck:first-child { border-top: 0; }
-  .ck-head { display: flex; gap: 0.75rem; align-items: flex-start; }
-  .ck-head h3 { font-size: 1.0625rem; font-weight: 700; line-height: 1.3; outline: none; }
-  .ck-meta { font-size: 0.875rem; color: var(--muted); margin-top: 0.125rem; }
-  .ck-body { margin-left: 3.25rem; }
-  .ck-status { margin-top: 0.5rem; font-weight: 600; }
-  .pill { display: inline-flex; align-items: center; gap: 0.25rem; vertical-align: 0.0625rem; margin-right: 0.375rem; padding: 0.125rem 0.625rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; white-space: nowrap; }
-  .pill .icon { width: 0.875rem; height: 0.875rem; }
-  .pill.due { background: var(--accent); color: #fff; }
-  .pill.done { background: var(--accent-soft); color: #0A4F40; }
-  .pill.soon { background: var(--wash); color: var(--muted); }
-  .ck-text { font-size: 0.9375rem; margin-top: 0.5rem; }
-  .ck-place { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 0.75rem; margin-top: 0.75rem; padding: 0.75rem 0.75rem 0.75rem 0.875rem; border-radius: 1rem; background: rgba(255,255,255,0.7); border: 1px solid var(--line); }
-  .ck-pname { font-weight: 700; font-size: 0.9375rem; line-height: 1.3; }
-  .ck-pinfo { flex: 1 1 9rem; min-width: 0; }
-  .ck-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .btn-sm { display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 1rem; border-radius: 999px; font-weight: 700; font-size: 0.9375rem; text-decoration: none; white-space: nowrap; }
-  .btn-sm.solid { background: linear-gradient(180deg, var(--accent-top), var(--accent)); color: #fff; box-shadow: var(--shadow-btn); }
-  .btn-sm.line { border: 1px solid var(--line-strong); background: rgba(255,255,255,0.85); color: var(--text); }
-  .btn-sm .icon { width: 1.0625rem; height: 1.0625rem; }
-  .ck-after { margin-top: 0.5rem; }
-  .ck-links { display: flex; flex-wrap: wrap; gap: 0 1.25rem; margin-top: 0.25rem; }
-  .ck-ask { margin-top: 0.5rem; padding: 0.875rem; border-radius: 1rem; background: var(--wash); }
-  .ck-ask p { font-weight: 700; font-size: 0.9375rem; }
-  .opts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.625rem; }
-  .plan-foot { margin-top: 0.5rem; padding-top: 0.875rem; border-top: 1px solid var(--line); }
-  .also { display: flex; gap: 0.75rem; align-items: center; width: 100%; padding: 0.5rem 0; background: none; border: 0; text-align: left; font-size: 0.9375rem; color: var(--text); min-height: 3rem; }
-  .also .cat-icon { width: 2.25rem; height: 2.25rem; border-radius: 0.75rem; }
-  .also .cat-icon svg { width: 1.125rem; height: 1.125rem; }
-  .also span.txt { flex: 1; }
-  .chev-r { width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin-right: 0.375rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(-45deg); }
-  .stamp { margin-top: 0.375rem; }
-  .foot-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 0 1.25rem; margin-top: 1rem; }
-  .foot-links button { background: none; border: 0; min-height: 3rem; padding: 0 0.25rem; color: var(--muted); font-size: 0.9375rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-strong); }
-
-  /* Location picker (answer screen, and behind "Change" on the plan) */
-  .loc-line { font-size: 0.9375rem; color: var(--muted); display: flex; align-items: center; gap: 0.375rem; }
-  .loc-line .icon { width: 1rem; height: 1rem; color: var(--accent); }
-  .loc-line strong { color: var(--text); }
-  .areas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.625rem; }
-  .postal { position: relative; margin-top: 0.625rem; max-width: 18rem; }
-  .postal svg { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); }
-  .postal input { width: 100%; min-height: 3rem; padding: 0 1rem 0 2.75rem; border-radius: 999px; border: 1px solid var(--line-strong); background: rgba(255,255,255,0.9); outline: none; font-size: 1.0625rem; letter-spacing: 0.04em; text-transform: uppercase; }
-  .postal input::placeholder { text-transform: none; letter-spacing: 0; color: #6A7672; }
-  .postal input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(11,93,75,0.14); }
-  .postal.ok input { border-color: var(--accent); }
-  .loc-msg { margin-top: 0.375rem; }
-  .loc-msg.err { color: #8C0016; font-weight: 600; }
-
-  /* ---------- Answer ---------- */
-  #view-answer { padding-top: 0.25rem; }
-  .needs-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.25rem 0.125rem 0.75rem; scrollbar-width: none; }
-  .needs-tabs::-webkit-scrollbar { display: none; }
-  .need-tab { flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0 1rem 0 0.375rem; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--glass-strong); font-weight: 600; font-size: 0.9375rem; }
-  .need-tab .cat-icon { width: 2rem; height: 2rem; border-radius: 999px; }
-  .need-tab .cat-icon svg { width: 1rem; height: 1rem; }
-  .need-tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent); color: #fff; }
-
-  .a-head { overflow: hidden; }
-  .a-band { background: linear-gradient(135deg, var(--tint), rgba(255,255,255,0.35)); padding: 1.25rem 1.375rem; display: flex; gap: 1rem; align-items: center; }
-  .a-band .cat-icon { background: rgba(255,255,255,0.85); }
-  .a-head h1 { font-size: 1.625rem; font-weight: 700; line-height: 1.18; letter-spacing: -0.025em; margin-top: 0.125rem; outline: none; }
-  .why { color: var(--muted); padding: 1rem 1.375rem 0; }
-  .today { display: flex; gap: 0.5rem; align-items: center; margin: 0.875rem 1.375rem 0; padding: 0.625rem 0.875rem; border-radius: 0.875rem; background: #FFF1CC; color: #5E4500; font-weight: 700; font-size: 0.9375rem; }
-  .next { margin: 1.25rem 1.375rem 0; }
-  .next .eyebrow { margin-bottom: 0.5rem; }
-  .next-btn { min-height: 3.875rem; font-size: 1.125rem; border-radius: 1.25rem; }
-  .next-btn .num { font-weight: 600; opacity: 0.92; white-space: nowrap; }
-  .next-line { margin-top: 0.5rem; font-size: 0.9375rem; color: var(--muted); }
-  .next-line strong { color: var(--accent); }
-  .next-links { display: flex; flex-wrap: wrap; gap: 0 1.25rem; margin-top: 0.125rem; }
-  .next-text { padding: 0.875rem 1rem; border-radius: 1rem; background: var(--wash); font-weight: 600; }
-  .backup { display: flex; align-items: center; gap: 0.625rem; margin-top: 0.75rem; min-height: 3rem; padding: 0.625rem 0.875rem; border-radius: 1rem; background: var(--wash); text-decoration: none; font-weight: 600; font-size: 0.9375rem; }
-  .backup .icon { color: var(--accent); }
-  .backup b { color: var(--accent); }
-  .a-body { padding: 0 1.375rem 1.375rem; }
-  .cost { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
-  .money { margin-top: 0.5rem; }
-  .money-label { font-size: 0.9375rem; color: var(--muted); }
-  .money-figure { font-size: 2.5rem; font-weight: 700; line-height: 1.05; letter-spacing: -0.035em; margin-top: 0.125rem; }
-  .money-unit { font-size: 1.0625rem; font-weight: 600; letter-spacing: 0; color: var(--muted); margin-left: 0.25rem; }
-  .money-note { font-size: 0.9375rem; color: var(--muted); margin-top: 0.375rem; }
-  .money-list { list-style: none; margin: 0.5rem 0 0; }
-  .money-list li { padding: 0.25rem 0; }
-  .cond { margin-top: 1.125rem; padding: 1rem 1.125rem; border-radius: 1.125rem; background: var(--wash); }
-  .cond-title { font-weight: 700; }
-  .cond ul { margin: 0.5rem 0 0; padding-left: 1.125rem; }
+  /* ---------- Item + answer ---------- */
+  .detail-head { margin-bottom: 1.5rem; }
+  .asked { font-size: 0.9375rem; color: var(--muted); margin-bottom: 0.375rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .today { display: inline-flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; padding: 0.375rem 0.75rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn-text); font-weight: 700; font-size: 0.9375rem; }
+  .cond { margin-top: 1rem; }
+  .cond-title { font-weight: 700; font-size: 0.9375rem; }
+  .cond ul { margin-top: 0.375rem; padding-left: 1.125rem; list-style: disc; }
   .cond li { font-size: 0.9375rem; padding: 0.125rem 0; }
+  .also { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.75rem; }
+  .also-card { margin-top: 0.25rem; }
+  .place { min-height: 4.5rem; }
+  .place-info { flex: 1; min-width: 0; }
+  .place-name { display: block; font-weight: 600; line-height: 1.3; }
+  .picker { margin-top: 0.5rem; padding: 0.875rem; border-radius: 1.125rem; background: var(--card); }
+  .areas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .postal { position: relative; margin-top: 0.75rem; max-width: 18rem; }
+  .postal svg { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .postal input { width: 100%; min-height: 3rem; padding: 0 1rem 0 2.75rem; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); outline: none; font-size: 1.0625rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  .postal input::placeholder { text-transform: none; letter-spacing: 0; color: var(--muted); }
+  .postal input:focus { border-color: var(--link); }
+  .loc-msg { margin-top: 0.375rem; }
+  .loc-msg.err { color: var(--err); font-weight: 600; }
+  .done-card { margin-top: 1.5rem; }
+  .next-text { padding: 1rem 1.125rem; border-radius: 1.125rem; background: var(--card); font-weight: 600; }
+  .fine { text-align: center; margin-top: 1.25rem; }
+  .nudge { margin-top: 1.25rem; padding: 0.75rem 1rem; border-radius: 1.125rem; background: var(--soft); color: var(--soft-text); }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; min-height: 2.75rem; cursor: pointer; font-weight: 600; font-size: 0.9375rem; }
+  .switch input { appearance: none; -webkit-appearance: none; position: relative; width: 3.25rem; height: 2rem; border-radius: 999px; background: #8A9692; flex-shrink: 0; margin: 0; cursor: pointer; transition: background-color 180ms; }
+  .switch input::after { content: ""; position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1.625rem; height: 1.625rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 180ms var(--ease); }
+  .switch input:checked { background: var(--btn); }
+  .switch input:checked::after { transform: translateX(1.25rem); }
+  .tabs { display: flex; gap: 0.5rem; overflow-x: auto; margin: -0.5rem 0 1.25rem; padding: 0.125rem; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; min-height: 2.75rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: 0.9375rem; font-weight: 600; }
+  .tab[aria-selected="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
 
-  .a-places { margin-top: 1.25rem; }
-  .loc-card { padding: 1rem 1.125rem; }
-  .group { margin-top: 1.25rem; }
-  .group-title { font-size: 1.0625rem; font-weight: 700; padding: 0 0.25rem; }
-  .places-note { margin-top: 0.25rem; padding: 0 0.25rem; }
-  .scroller { display: flex; gap: 0.75rem; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0.5rem calc(-1 * max(1rem, env(safe-area-inset-left))) 0; padding: 0.25rem max(1rem, env(safe-area-inset-left)) 0.875rem; scroll-padding-left: max(1rem, env(safe-area-inset-left)); scrollbar-width: none; }
-  .scroller::-webkit-scrollbar { display: none; }
-  .place-card { flex: 0 0 84%; scroll-snap-align: start; padding: 1.125rem; display: flex; flex-direction: column; gap: 0.375rem; border-radius: 1.375rem; }
-  .scroller .place-card:only-child { flex-basis: 100%; }
-  .pc-top { display: flex; align-items: center; gap: 0.5rem; }
-  .pc-dist { font-weight: 700; }
-  .pc-flag { font-size: 0.8125rem; font-weight: 700; color: #0A4F40; background: var(--accent-soft); border-radius: 999px; padding: 0.125rem 0.5rem; }
-  .pc-name { font-weight: 700; font-size: 1.0625rem; line-height: 1.3; }
-  .pc-deal { font-size: 0.9375rem; font-weight: 700; color: var(--accent); }
-  .pc-deal.none { color: var(--muted); font-weight: 600; }
-  .pc-addr { font-size: 0.875rem; color: var(--muted); }
-  .pc-phone { font-size: 0.875rem; font-weight: 600; }
-  .pc-actions { display: flex; gap: 0.5rem; margin-top: auto; padding-top: 0.5rem; }
-  .pc-actions a { flex: 1; }
+  /* ---------- Slide-up panel ---------- */
+  .sheet-wrap { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; justify-content: flex-end; }
+  .sheet-scrim { position: absolute; inset: 0; background: var(--scrim); animation: fade 200ms ease both; }
+  .sheet { position: relative; width: 100%; max-width: 30rem; margin: 0 auto; max-height: 90vh; overflow-y: auto; background: var(--card); border-radius: 1.5rem 1.5rem 0 0; padding: 0.625rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom)); animation: up 260ms var(--ease) both; }
+  @media (min-width: 900px) { .sheet-wrap { justify-content: center; } .sheet { border-radius: 1.5rem; } }
+  @keyframes up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .grab { width: 2.5rem; height: 0.3125rem; border-radius: 999px; background: var(--border); margin: 0 auto 0.75rem; }
+  .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+  .sheet-head h2 { font-size: 1.375rem; line-height: 1.25; font-weight: 700; padding-top: 0.5rem; outline: none; }
+  .x { width: 2.75rem; height: 2.75rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--muted); border-radius: 999px; }
+  .opts { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+  .opt { min-height: 3.5rem; padding: 0 1.125rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 1.0625rem; font-weight: 600; text-align: left; }
+  .opt[aria-pressed="true"] { border-color: var(--btn); box-shadow: inset 0 0 0 1px var(--btn); }
+  .opt.primary { background: var(--btn); border-color: var(--btn); color: var(--btn-text); text-align: center; font-weight: 700; }
+  .opt.center { text-align: center; }
+  .say { margin-top: 1rem; padding: 1rem 1.125rem; border-radius: 1rem; background: var(--bg); font-size: 1.0625rem; line-height: 1.5; }
 
-  .a-more { margin-top: 1.25rem; padding: 0.25rem 1.375rem 0.75rem; }
-  details.row { border-top: 1px solid var(--line); }
-  details.row:first-child { border-top: 0; }
-  details.row summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.5rem; font-weight: 600; cursor: pointer; }
-  details.row summary::-webkit-details-marker { display: none; }
-  details.row summary::after { content: ""; width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin-right: 0.25rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform 180ms var(--ease); }
-  details.row[open] summary::after { transform: rotate(-135deg) translate(-2px, 0); }
-  .row-body { padding: 0 0 1.25rem; }
-  .bar-label { font-weight: 700; }
-  .bar { height: 0.5rem; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; }
-  .bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
-  .say-text { padding: 1rem; background: var(--wash); border-radius: 1rem; }
-  .copy-btn { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 3rem; background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; font-size: 1rem; }
-  .more-actions { display: flex; flex-wrap: wrap; gap: 0 1.5rem; border-top: 1px solid var(--line); padding-top: 0.25rem; }
-  .disclaimer { text-align: center; margin-top: 1.25rem; }
-  .toast { position: fixed; left: 50%; bottom: calc(5.75rem + env(safe-area-inset-bottom)); transform: translateX(-50%); background: rgba(19,32,28,0.92); color: #fff; padding: 0.75rem 1.125rem; border-radius: 999px; font-size: 0.9375rem; font-weight: 600; z-index: 50; box-shadow: var(--shadow); max-width: calc(100% - 2rem); text-align: center; }
-
-  /* Sticky bar (phones, answer screen): frosted. */
-  .sticky-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(246,249,247,0.74); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border-top: 1px solid rgba(255,255,255,0.7); box-shadow: 0 -1px 0 var(--line); padding: 0.625rem max(1rem, env(safe-area-inset-right)) calc(0.625rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
-  .sticky-bar .secondary { max-width: 30rem; margin: 0 auto; }
-  body.has-sticky .wrap { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
-
-  /* ---------- Coverage ---------- */
-  .reminder { padding: 1.375rem; margin-top: 1.25rem; }
-  .countdown { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-top: 0.25rem; }
-  .unused { list-style: none; margin: 1rem 0 0; }
-  .unused li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.625rem 0; border-top: 1px solid var(--line); font-size: 0.9375rem; }
-  .unused li span:last-child { font-weight: 700; white-space: nowrap; }
-  .cov-list { padding: 0 1.375rem; margin-top: 1rem; }
-  .cov-sum { display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0; }
-  .cov-key { margin-left: auto; color: var(--muted); font-weight: 600; font-size: 0.9375rem; white-space: nowrap; }
-  .travel { display: flex; gap: 0.75rem; align-items: flex-start; padding: 1rem 0; border-top: 1px solid var(--line); }
-  .stat-line { display: flex; justify-content: space-between; gap: 1rem; padding: 0.375rem 0; font-size: 0.9375rem; }
-  .stat-line span:first-child { color: var(--muted); }
-  .stat-line span:last-child { font-weight: 700; text-align: right; }
+  /* ---------- Coverage / settings / privacy ---------- */
+  .page-sub { color: var(--muted); margin-top: 0.375rem; }
+  .sec { margin-top: 1.25rem; }
+  details.row-d { border-top: 1px solid var(--row); }
+  details.row-d:first-child { border-top: 0; }
+  details.row-d summary { list-style: none; display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; cursor: pointer; font-weight: 600; }
+  details.row-d summary::-webkit-details-marker { display: none; }
+  details.row-d summary::after { content: ""; width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin-right: 0.25rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(45deg) translateY(-2px); }
+  details.row-d[open] summary::after { transform: rotate(-135deg) translate(-2px, 0); }
+  .cov-key { margin-left: auto; color: var(--muted); font-size: 0.9375rem; white-space: nowrap; }
+  .row-body { padding: 0 0 1.125rem; }
   .used-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.75rem; }
   .used-row label { font-size: 0.9375rem; }
   .money-input { position: relative; width: 7.5rem; flex-shrink: 0; }
   .money-input span { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: var(--muted); }
-  .money-input input { width: 100%; min-height: 3rem; padding: 0 0.75rem 0 1.75rem; text-align: right; background: rgba(255,255,255,0.9); border: 1px solid var(--line-strong); border-radius: 0.875rem; outline: none; }
-  .money-input input:focus { border-color: var(--accent); }
-  .left-line { font-size: 0.9375rem; font-weight: 700; color: var(--accent); margin-top: 0.375rem; }
+  .money-input input { width: 100%; min-height: 3rem; padding: 0 0.75rem 0 1.75rem; text-align: right; background: var(--bg); border: 1px solid var(--border); border-radius: 0.875rem; outline: none; }
+  .left-line { font-size: 0.9375rem; font-weight: 700; color: var(--link); margin-top: 0.375rem; }
   .check { display: flex; align-items: center; gap: 0.625rem; min-height: 3rem; cursor: pointer; }
-  .check input { width: 1.375rem; height: 1.375rem; margin: 0; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
-  .sub-head { font-size: 0.875rem; font-weight: 700; color: var(--muted); margin-top: 1rem; }
-  .cov-stamp { text-align: center; margin-top: 1rem; }
-
-  /* ---------- Settings + privacy ---------- */
-  .settings { padding: 0.5rem 1.375rem 1rem; margin-top: 1.25rem; }
-  .setting { padding: 1.125rem 0; }
-  .setting + .setting { border-top: 1px solid var(--line); }
+  .check input { width: 1.375rem; height: 1.375rem; margin: 0; accent-color: var(--btn); }
+  .reminder { padding: 1.25rem 1.25rem; }
+  .countdown { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 0.25rem; }
+  .unused { margin-top: 0.75rem; }
+  .unused li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-top: 1px solid var(--row); font-size: 0.9375rem; }
+  .settings { padding: 0.25rem 1.25rem 0.75rem; }
+  .setting { padding: 1rem 0; }
+  .setting + .setting { border-top: 1px solid var(--row); }
   .setting-label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
-  .settings select { width: 100%; min-height: 3rem; padding: 0 1rem; background: rgba(255,255,255,0.9); border: 1px solid var(--line-strong); border-radius: 0.875rem; }
-  .seg { display: flex; background: var(--wash); border-radius: 0.875rem; padding: 0.25rem; }
+  .settings select { width: 100%; min-height: 3rem; padding: 0 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 0.875rem; }
+  .seg { display: flex; background: var(--bg); border-radius: 0.875rem; padding: 0.25rem; }
   .seg label { flex: 1; }
   .seg input { position: absolute; opacity: 0; pointer-events: none; }
   .seg span { display: flex; align-items: center; justify-content: center; min-height: 2.75rem; border-radius: 0.625rem; font-weight: 600; color: var(--muted); cursor: pointer; }
-  .seg input:checked + span { background: #fff; color: var(--text); font-weight: 700; box-shadow: 0 1px 3px rgba(19,32,28,0.12); }
-  .seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .priv-card { margin-top: 1.25rem; padding: 0.5rem 1.375rem; }
-  .priv-list { list-style: none; }
-  .priv-list li { display: flex; gap: 0.75rem; padding: 0.875rem 0; border-top: 1px solid var(--line); }
-  .priv-list li:first-child { border-top: 0; }
-  .priv-list .icon { color: var(--accent); margin-top: 0.1875rem; }
+  .seg input:checked + span { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .seg input:focus-visible + span { outline: 3px solid var(--link); outline-offset: 2px; }
+  .priv li { display: flex; gap: 0.75rem; padding: 0.875rem 0; border-top: 1px solid var(--row); }
+  .priv li:first-child { border-top: 0; }
+  .priv .icon { color: var(--link); margin-top: 0.125rem; }
 
-  /* ---------- Desktop: use the width ---------- */
+  /* ---------- Desktop ---------- */
   @media (min-width: 900px) {
-    .topbar-in, .wrap { max-width: 72rem; }
-    .topbar-in { padding: 0 2rem; min-height: 4rem; }
-    .wrap { padding: 2rem 2rem 3rem; }
-    .header-link { display: inline-flex; align-items: center; }
-    .home-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
-    .ask-card, .plan { padding: 1.75rem; }
-    .page-title, .plan-title { font-size: 2.25rem; }
+    .topbar-in { max-width: 64rem; padding: 0 2rem; }
+    .top-link { display: inline-flex; align-items: center; }
+    .wrap { max-width: 64rem; padding: 2.5rem 2rem 3rem; }
+    .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+    .plan-sec { margin-top: 0; }
     .foot-links { display: none; }
-    .home-grid > div:first-child { position: sticky; top: 5.5rem; }
-    .answer-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); grid-template-areas: "head places" "more places"; grid-template-rows: auto 1fr; gap: 1.5rem 2rem; align-items: start; }
-    .a-head { grid-area: head; }
-    .a-places { grid-area: places; margin-top: 0; }
-    .a-more { grid-area: more; margin-top: 0; }
-    .scroller { flex-direction: column; overflow: visible; margin: 0.5rem 0 0; padding: 0; scroll-snap-type: none; }
-    .place-card { flex-basis: auto; }
-    .sticky-bar { display: none; }
-    body.has-sticky .wrap { padding-bottom: 3rem; }
-    #view-coverage, #view-settings, #view-privacy { max-width: 42rem; margin: 0 auto; }
-    .next-btn .num { font-size: 1.125rem; }
+    #view-answer, #view-item, #view-coverage, #view-settings, #view-privacy { max-width: 34rem; margin: 0 auto; }
+    .title { font-size: 2.25rem; }
   }
-  @media (max-width: 899px) {
-    #view-answer > .back-link { display: none; }
-  }
+  .home-grid > * { min-width: 0; }
 
-  /* ---------- Shorter phones: keep the essentials above the fold ---------- */
-  @media (max-height: 700px) and (max-width: 899px) {
-    .wrap { padding-top: 0.75rem; }
-    .page-title { font-size: 1.625rem; }
-    .plan-title { font-size: 1.5rem; }
-    .page-sub { font-size: 1rem; }
-    .ask-card, .plan { padding-top: 1.125rem; }
-    .composer { margin-top: 0.875rem; }
-    .composer textarea { min-height: 3.5rem; }
-    .money-figure { font-size: 2.125rem; }
-  }
-  @media (max-height: 560px) and (max-width: 899px) {
-    .topbar-in { min-height: 3rem; }
-    .a-band { padding: 0.875rem 1.25rem; }
-    .place-card { flex-basis: 46%; }
-  }
-  @media (max-width: 359px) {
-    .ck-body { margin-left: 0; }
-    .ask-card, .plan { padding-left: 1rem; padding-right: 1rem; }
-  }
-
-  /* ---------- Windows high contrast ---------- */
+  /* ---------- High contrast ---------- */
   @media (forced-colors: active) {
-    .glass, .composer, .chip, .area, .opt, .pill, .backup, .ck-place { border: 1px solid CanvasText; }
-    .primary, .btn-sm.solid { border: 2px solid ButtonText; }
+    .card, .composer, .chip, .area, .opt, .tab, .pill-btn { border: 1px solid CanvasText; }
+    .big, #ask { border: 2px solid ButtonText; }
   }
 
   /* ---------- Safety screen ---------- */
-  .safety { position: fixed; inset: 0; z-index: 100; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; background: var(--safety); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: calc(2rem + env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left)); }
+  .safety { position: fixed; inset: 0; z-index: 100; overflow-y: auto; overscroll-behavior: contain; background: var(--safety); color: #fff; display: flex; flex-direction: column; justify-content: center; padding: calc(2rem + env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left)); }
   .safety-inner { max-width: 30rem; width: 100%; margin: 0 auto; }
   .safety h2 { font-size: 2rem; font-weight: 700; line-height: 1.2; margin: 1rem 0 1.5rem; outline: none; }
   .safety p { margin: 0 0 1.5rem; }
@@ -417,15 +257,18 @@
 <div id="app">
   <header class="topbar">
     <div class="topbar-in">
-      <button class="brand" type="button" data-go="ask" aria-label="PlanPal">
-        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>PlanPal
+      <button class="brand" type="button" id="brand" data-go="ask" aria-label="PlanPal">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>PlanPal
       </button>
-      <div class="header-right">
-        <button class="header-link" type="button" data-go="coverage" data-i18n="tab_coverage"></button>
-        <button class="header-link" type="button" data-go="settings" data-i18n="top_settings"></button>
-        <span class="quiet-select">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span id="lang-current" aria-hidden="true"></span><span class="chev" aria-hidden="true"></span>
+      <button class="back" type="button" id="back" data-go="back" hidden>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span id="back-label"></span>
+      </button>
+      <div class="top-right">
+        <button class="top-link" type="button" data-go="coverage" data-i18n="tab_coverage"></button>
+        <button class="top-link" type="button" data-go="settings" data-i18n="top_settings"></button>
+        <span class="lang">
+          <span id="lang-current" aria-hidden="true"></span>
           <label class="sr-only" for="lang-header" data-i18n="top_language"></label>
           <select id="lang-header"></select>
         </span>
@@ -435,104 +278,70 @@
 
   <div class="wrap">
     <!-- ================= HOME ================= -->
-    <main id="view-ask" aria-labelledby="ask-title">
+    <main id="view-ask">
       <div class="home-grid">
-        <div>
-          <section class="glass ask-card enter" aria-labelledby="ask-title">
-            <h1 class="page-title" id="ask-title" tabindex="-1" data-i18n="ask_title"></h1>
-            <p class="page-sub" data-i18n="ask_sub"></p>
-            <div class="composer">
-              <label class="sr-only" for="message" data-i18n="ask_label"></label>
-              <textarea id="message" dir="auto" enterkeyhint="send" autocomplete="off" data-i18n-placeholder="ask_placeholder"></textarea>
-              <div class="composer-bar">
-                <button class="mic" id="speak" type="button" aria-pressed="false">
-                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
-                </button>
-                <button class="primary" id="ask" type="button" disabled></button>
-              </div>
+        <section aria-labelledby="ask-title">
+          <h1 class="title" id="ask-title" tabindex="-1" data-i18n="ask_title"></h1>
+          <div class="composer">
+            <label class="sr-only" for="message" data-i18n="ask_label"></label>
+            <textarea id="message" dir="auto" enterkeyhint="send" autocomplete="off" data-i18n-placeholder="ask_placeholder"></textarea>
+            <div class="composer-bar">
+              <button class="mic" id="speak" type="button" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
+              </button>
+              <button id="ask" type="button" disabled></button>
             </div>
-            <p class="small ask-status" id="ask-status" aria-live="polite" hidden></p>
-            <p class="ask-error" id="ask-error" role="alert" hidden></p>
-            <div class="chips" role="group" data-i18n-aria="ask_try">
-              <button class="chip" type="button" data-chip="chip_ankle" data-example="ex_ankle"></button>
-              <button class="chip" type="button" data-chip="chip_stress" data-example="ex_stress"></button>
-              <button class="chip" type="button" data-chip="chip_tooth" data-example="ex_tooth"></button>
-            </div>
-            <div class="privacy-line">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <p><span data-i18n="privacy_line"></span> <button type="button" data-go="privacy" data-i18n="privacy_link"></button></p>
-            </div>
+          </div>
+          <p class="grey ask-status" id="ask-status" aria-live="polite" hidden></p>
+          <p class="ask-error" id="ask-error" role="alert" hidden></p>
+          <div class="chips" role="group" data-i18n-aria="ask_try">
+            <button class="chip" type="button" data-chip="chip_ankle" data-example="ex_ankle"></button>
+            <button class="chip" type="button" data-chip="chip_stress" data-example="ex_stress"></button>
+            <button class="chip" type="button" data-chip="chip_asthma" data-example="ex_asthma"></button>
+          </div>
+          <section class="recent" id="recent" hidden>
+            <h2 class="grey" data-i18n="recent_title"></h2>
+            <div class="card rows" id="recent-list" style="margin-top:0.5rem"></div>
           </section>
-          <section class="glass recent enter-2" id="recent" hidden style="margin-top:1rem">
-            <h2 class="section-title" data-i18n="recent_title"></h2>
-            <ul class="recent-list" id="recent-list"></ul>
-          </section>
-        </div>
+        </section>
 
-        <div>
-          <section class="glass plan enter-2" aria-labelledby="plan-title">
-            <h2 class="plan-title" id="plan-title" data-i18n="plan_title"></h2>
-            <p class="page-sub" data-i18n="plan_sub"></p>
-            <p class="plan-newyear" id="plan-newyear" hidden data-i18n="plan_newyear"></p>
-            <div class="plan-loc">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span id="plan-near"></span>
-              <button class="text-link" type="button" id="plan-loc-btn" aria-expanded="false" aria-controls="plan-picker" data-i18n="change"></button>
-            </div>
-            <div class="plan-picker" id="plan-picker" hidden></div>
-            <div class="save-nudge" id="save-nudge" hidden></div>
-            <ul class="ck-list" id="ck-list"></ul>
-            <div class="plan-foot">
-              <button class="also" type="button" id="also-counselling"></button>
-              <p class="tiny stamp" data-i18n="stamp"></p>
-            </div>
-          </section>
-          <nav class="foot-links">
-            <button type="button" data-go="coverage" data-i18n="tab_coverage"></button>
-            <button type="button" data-go="settings" data-i18n="top_settings"></button>
-            <button type="button" data-go="privacy" data-i18n="privacy_link"></button>
-          </nav>
-        </div>
+        <section class="plan-sec" aria-labelledby="plan-title">
+          <h2 class="h2" id="plan-title" data-i18n="plan_title"></h2>
+          <p class="grey" style="margin-top:0.25rem" data-i18n="plan_sub2"></p>
+          <div class="card rows" id="plan-list"></div>
+        </section>
+      </div>
+      <div class="foot">
+        <button class="private" type="button" data-go="privacy">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span data-i18n="private_link"></span>
+        </button>
+        <nav class="foot-links">
+          <button type="button" data-go="coverage" data-i18n="tab_coverage"></button>
+          <button type="button" data-go="settings" data-i18n="top_settings"></button>
+        </nav>
       </div>
     </main>
 
+    <!-- ================= CHECK-UP ITEM ================= -->
+    <main id="view-item" hidden></main>
+
     <!-- ================= ANSWER ================= -->
-    <main id="view-answer" hidden>
-      <button class="back-link" type="button" data-go="ask">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-i18n="ask_another"></span>
-      </button>
-      <div class="needs-tabs" id="needs-tabs" role="tablist" hidden></div>
-      <div class="answer-layout" id="answer" aria-live="polite"></div>
-      <p class="tiny disclaimer"><span data-i18n="disclaimer"></span><br><span data-i18n="stamp"></span></p>
-    </main>
+    <main id="view-answer" hidden></main>
 
     <!-- ================= COVERAGE ================= -->
     <main id="view-coverage" hidden>
-      <button class="back-link" type="button" data-go="ask">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-i18n="back"></span>
-      </button>
-      <h1 class="page-title" id="cov-title" tabindex="-1" data-i18n="cov_title"></h1>
+      <h1 class="title" id="cov-title" tabindex="-1" data-i18n="cov_title"></h1>
       <p class="page-sub" id="cov-sub"></p>
-      <section class="glass reminder" id="reminder" aria-labelledby="reminder-title"></section>
-      <section class="glass cov-list" id="cov-list"></section>
-      <p class="tiny cov-stamp" data-i18n="stamp"></p>
+      <section class="card reminder sec" id="reminder"></section>
+      <section class="card rows sec" id="cov-list"></section>
+      <p class="tiny fine" data-i18n="stamp"></p>
     </main>
 
     <!-- ================= SETTINGS ================= -->
     <main id="view-settings" hidden>
-      <button class="back-link" type="button" data-go="ask">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-i18n="back"></span>
-      </button>
-      <h1 class="page-title" id="set-title" tabindex="-1" data-i18n="set_title"></h1>
-      <section class="glass settings">
-        <div class="setting">
-          <label class="setting-label" for="lang-settings" data-i18n="top_language"></label>
-          <select id="lang-settings"></select>
-          <p class="small" style="margin-top:0.5rem" data-i18n="ob_lang_note"></p>
-        </div>
+      <h1 class="title" id="set-title" tabindex="-1" data-i18n="set_access"></h1>
+      <section class="card settings sec">
         <div class="setting">
           <p class="setting-label" id="text-size-label" data-i18n="set_text"></p>
           <div class="seg" role="radiogroup" aria-labelledby="text-size-label">
@@ -541,34 +350,38 @@
           </div>
         </div>
         <div class="setting">
+          <label class="setting-label" for="lang-settings" data-i18n="top_language"></label>
+          <select id="lang-settings"></select>
+          <p class="grey" style="margin-top:0.5rem" data-i18n="ob_lang_note"></p>
+        </div>
+        <div class="setting">
           <label class="switch"><span data-i18n="remember"></span><input type="checkbox" role="switch" id="remember"></label>
-          <p class="small" data-i18n="set_remember_note"></p>
-          <button class="text-link" type="button" data-go="privacy" data-i18n="privacy_link"></button>
+          <p class="grey" data-i18n="set_remember_note"></p>
         </div>
       </section>
     </main>
 
     <!-- ================= PRIVACY ================= -->
     <main id="view-privacy" hidden>
-      <button class="back-link" type="button" data-go="back">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-i18n="back"></span>
-      </button>
-      <h1 class="page-title" id="priv-title" tabindex="-1" data-i18n="priv_title"></h1>
-      <section class="glass priv-card">
-        <ul class="priv-list" id="priv-list"></ul>
-      </section>
+      <h1 class="title" id="priv-title" tabindex="-1" data-i18n="priv_title"></h1>
+      <section class="card rows sec priv"><ul id="priv-list"></ul></section>
     </main>
   </div>
 </div>
 
-<div class="sticky-bar" id="sticky-bar" hidden>
-  <button class="secondary" type="button" data-go="ask">
-    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-    <span data-i18n="ask_another"></span>
-  </button>
+<div class="sheet-wrap" id="sheet" hidden>
+  <div class="sheet-scrim" id="sheet-scrim"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <h2 id="sheet-title" tabindex="-1"></h2>
+      <button class="x" type="button" id="sheet-close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="sheet-body"></div>
+  </div>
 </div>
-<div class="toast" id="toast" role="status" hidden></div>
 
 <!-- ================= SAFETY SCREEN ================= -->
 <div class="safety" id="safety" role="alertdialog" aria-modal="true" aria-labelledby="safety-heading" hidden>
@@ -2465,6 +2278,353 @@ const I18N_V4 = {
   },
 };
 
+/* English labels added or changed in version 5 (merged into I18N.en). */
+const I18N_V5_EN = {
+  ask_placeholder: "Type or speak, in any language",
+  chip_asthma: "I have asthma",
+  ex_asthma: "I have asthma and need my inhaler refilled",
+  plan_sub2: "Already paid for.",
+  st_due: "Due now",
+  st_done: "Done",
+  st_setup: "Set up",
+  st_anytime: "Anytime",
+  ck_counsel: "Counselling",
+  ck_doctor_short: "A regular doctor",
+  private_link: "Private by design",
+  back_home: "Home",
+  ck_dental_cost: "$0 at a network dentist.",
+  ck_eye_cost: "Your plan pays $50.",
+  ck_flu_due: "Free for everyone in BC.",
+  ck_doctor_text: "UBC Student Health can be your doctor while you're a student. Ask to see the same doctor each time.",
+  already_had: "Already had one?",
+  also_near: "Also near {place}",
+  change_area: "Change area",
+  free_msp: "Free with MSP",
+  online: "Online",
+  bk_q_dental: "Did you book your cleaning?",
+  bk_q_eye: "Did you book your eye exam?",
+  bk_q_flu: "Did you book your flu shot?",
+  bk_q_doctor: "Did you book with UBC Student Health?",
+  bk_yes: "Yes, booked",
+  bk_no: "Not yet",
+  bk_note: "We'll mark it done. You can undo it anytime.",
+  marked_done: "Marked done {date}",
+  didnt_go: "Didn't go after all?",
+  undo: "Undo",
+  your_answer: "Your answer: {answer}",
+  already_note: "A rough guess is fine. The clinic has the exact date.",
+  close: "Close",
+  pay_visit: "Your plan pays {amt} a visit, up to {max} a year.",
+  pay_counsel: "Your plan pays up to $1,250 a year. UBC Counselling is free.",
+  pay_dental_preventive: "Cleanings are $0 at a network dentist.",
+  pay_dental_basic: "Your plan pays 50%, or 70% at a network dentist.",
+  pay_dental_extraction: "Your plan pays 70%, or 90% at a network dentist.",
+  pay_dental_major: "Not covered. Network dentists take 20% off.",
+  pay_dental_accidental: "Covered if a blow to the mouth caused it. Call Alumo before treatment.",
+  pay_vision: "Your plan pays $50 for an eye exam every 2 years.",
+  pay_rx: "Your plan pays 80%. Rexall tops up the rest, up to $40.",
+  pay_vaccine: "Flu shots are free in BC. Other vaccines: up to $150 a year.",
+  pay_msp: "Free with MSP.",
+  pay_hearing: "Your plan pays up to $500 for hearing aids every 5 years.",
+  pay_equip: "Covered with a doctor's note. Ask Alumo for the limit.",
+  nurse_lang: "Say your language and an interpreter joins.",
+  tty: "Deaf or hard of hearing? Dial 711.",
+  say_link: "What to say when you call",
+  say_sub: "In English, so the clinic understands.",
+  read_aloud: "Read aloud",
+  read_stop: "Stop reading",
+  not_med: "Not medical advice.",
+  off_title: "PlanPal can't help with that one.",
+  off_text: "Describe a health problem, like \"my back hurts\".",
+  off_811: "Not feeling well? Call 811",
+  set_text: "Text size",
+  set_access: "Text size and accessibility",
+};
+
+/* Version 5 labels in the other page languages (merged into I18N). */
+const I18N_V5 = {
+  "zh-Hans": {
+    ask_placeholder: "用任何语言输入或说出来",
+    chip_asthma: "我有哮喘",
+    ex_asthma: "我有哮喘，需要续开吸入器",
+    plan_sub2: "已经包含在你的保险里。",
+    st_due: "现在可以去", st_done: "已完成", st_setup: "去安排", st_anytime: "随时",
+    ck_counsel: "心理咨询",
+    ck_doctor_short: "固定看的医生",
+    private_link: "隐私优先",
+    back_home: "首页",
+    ck_dental_cost: "网络内牙医$0。",
+    ck_eye_cost: "保险支付$50。",
+    ck_flu_due: "BC省所有人都免费。",
+    ck_doctor_text: "你在读期间，UBC Student Health可以当你的医生。请求每次都看同一位医生。",
+    already_had: "已经做过了？",
+    also_near: "{place}附近还有",
+    change_area: "换个区域",
+    free_msp: "MSP免费",
+    online: "线上",
+    bk_q_dental: "你预约洗牙了吗？",
+    bk_q_eye: "你预约眼科检查了吗？",
+    bk_q_flu: "你预约流感疫苗了吗？",
+    bk_q_doctor: "你预约UBC Student Health了吗？",
+    bk_yes: "约好了", bk_no: "还没有",
+    bk_note: "我们会标记为已完成。你随时可以撤销。",
+    marked_done: "{date}标记为已完成",
+    didnt_go: "后来没去？",
+    undo: "撤销",
+    your_answer: "你的回答：{answer}",
+    already_note: "大概就行。诊所有准确的日期。",
+    close: "关闭",
+    pay_visit: "保险每次支付{amt}，每年最多{max}。",
+    pay_counsel: "保险每年最多支付$1,250。UBC Counselling免费。",
+    pay_dental_preventive: "网络内牙医洗牙$0。",
+    pay_dental_basic: "保险支付50%，网络内牙医70%。",
+    pay_dental_extraction: "保险支付70%，网络内牙医90%。",
+    pay_dental_major: "保险不包含。网络内牙医打8折。",
+    pay_dental_accidental: "如果是口部受到撞击造成的，保险包含。治疗前请先联系Alumo。",
+    pay_vision: "保险每2年为眼科检查支付$50。",
+    pay_rx: "保险支付80%。Rexall补足其余部分，最多$40。",
+    pay_vaccine: "BC省流感疫苗免费。其他疫苗每年最多$150。",
+    pay_msp: "MSP免费。",
+    pay_hearing: "保险每5年为助听器支付最多$500。",
+    pay_equip: "有医生证明就包含。额度请问Alumo。",
+    nurse_lang: "说出你的语言，会有翻译加入。",
+    tty: "听障人士？请拨打711。",
+    say_link: "打电话时怎么说",
+    say_sub: "用英语，方便诊所听懂。",
+    read_aloud: "朗读", read_stop: "停止朗读",
+    not_med: "这不是医疗建议。",
+    off_title: "PlanPal帮不了这个问题。",
+    off_text: "请描述一个健康问题，比如“我背疼”。",
+    off_811: "身体不舒服？拨打811",
+    set_text: "字体大小",
+    set_access: "字体大小和无障碍",
+  },
+  "zh-Hant": {
+    ask_placeholder: "用任何語言輸入或說出來",
+    chip_asthma: "我有氣喘",
+    ex_asthma: "我有氣喘，需要續開吸入器",
+    plan_sub2: "已經包含在你的保險裡。",
+    st_due: "現在可以去", st_done: "已完成", st_setup: "去安排", st_anytime: "隨時",
+    ck_counsel: "心理諮商",
+    ck_doctor_short: "固定看的醫生",
+    private_link: "隱私優先",
+    back_home: "首頁",
+    ck_dental_cost: "網絡內牙醫$0。",
+    ck_eye_cost: "保險支付$50。",
+    ck_flu_due: "BC省所有人都免費。",
+    ck_doctor_text: "你在學期間，UBC Student Health可以當你的醫生。請求每次都看同一位醫生。",
+    already_had: "已經做過了？",
+    also_near: "{place}附近還有",
+    change_area: "換個區域",
+    free_msp: "MSP免費",
+    online: "線上",
+    bk_q_dental: "你預約洗牙了嗎？",
+    bk_q_eye: "你預約眼科檢查了嗎？",
+    bk_q_flu: "你預約流感疫苗了嗎？",
+    bk_q_doctor: "你預約UBC Student Health了嗎？",
+    bk_yes: "約好了", bk_no: "還沒有",
+    bk_note: "我們會標記為已完成。你隨時可以撤銷。",
+    marked_done: "{date}標記為已完成",
+    didnt_go: "後來沒去？",
+    undo: "撤銷",
+    your_answer: "你的回答：{answer}",
+    already_note: "大概就行。診所有準確的日期。",
+    close: "關閉",
+    pay_visit: "保險每次給付{amt}，每年最多{max}。",
+    pay_counsel: "保險每年最多給付$1,250。UBC Counselling免費。",
+    pay_dental_preventive: "網絡內牙醫洗牙$0。",
+    pay_dental_basic: "保險給付50%，網絡內牙醫70%。",
+    pay_dental_extraction: "保險給付70%，網絡內牙醫90%。",
+    pay_dental_major: "保險不包含。網絡內牙醫打8折。",
+    pay_dental_accidental: "如果是口部受到撞擊造成的，保險包含。治療前請先聯絡Alumo。",
+    pay_vision: "保險每2年為眼科檢查給付$50。",
+    pay_rx: "保險給付80%。Rexall補足其餘部分，最多$40。",
+    pay_vaccine: "BC省流感疫苗免費。其他疫苗每年最多$150。",
+    pay_msp: "MSP免費。",
+    pay_hearing: "保險每5年為助聽器給付最多$500。",
+    pay_equip: "有醫生證明就包含。額度請問Alumo。",
+    nurse_lang: "說出你的語言，會有翻譯加入。",
+    tty: "聽障人士？請撥打711。",
+    say_link: "打電話時怎麼說",
+    say_sub: "用英語，方便診所聽懂。",
+    read_aloud: "朗讀", read_stop: "停止朗讀",
+    not_med: "這不是醫療建議。",
+    off_title: "PlanPal幫不了這個問題。",
+    off_text: "請描述一個健康問題，比如「我背痛」。",
+    off_811: "身體不舒服？撥打811",
+    set_text: "字體大小",
+    set_access: "字體大小和無障礙",
+  },
+  pa: {
+    ask_placeholder: "ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ ਲਿਖੋ ਜਾਂ ਬੋਲੋ",
+    chip_asthma: "ਮੈਨੂੰ ਦਮਾ ਹੈ",
+    ex_asthma: "ਮੈਨੂੰ ਦਮਾ ਹੈ ਅਤੇ ਮੇਰਾ ਇਨਹੇਲਰ ਦੁਬਾਰਾ ਭਰਵਾਉਣਾ ਹੈ",
+    plan_sub2: "ਪਹਿਲਾਂ ਹੀ ਪਲਾਨ ਵਿੱਚ ਸ਼ਾਮਲ।",
+    st_due: "ਹੁਣ ਕਰਵਾਓ", st_done: "ਹੋ ਗਿਆ", st_setup: "ਸੈੱਟ ਕਰੋ", st_anytime: "ਕਦੇ ਵੀ",
+    ck_counsel: "ਕਾਉਂਸਲਿੰਗ",
+    ck_doctor_short: "ਇੱਕ ਪੱਕਾ ਡਾਕਟਰ",
+    private_link: "ਨਿੱਜਤਾ ਪਹਿਲਾਂ",
+    back_home: "ਹੋਮ",
+    ck_dental_cost: "ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ $0।",
+    ck_eye_cost: "ਪਲਾਨ $50 ਦਿੰਦਾ ਹੈ।",
+    ck_flu_due: "BC ਵਿੱਚ ਹਰ ਕਿਸੇ ਲਈ ਮੁਫ਼ਤ।",
+    ck_doctor_text: "ਜਦੋਂ ਤੁਸੀਂ ਵਿਦਿਆਰਥੀ ਹੋ, UBC Student Health ਤੁਹਾਡਾ ਡਾਕਟਰ ਬਣ ਸਕਦਾ ਹੈ। ਹਰ ਵਾਰ ਉਸੇ ਡਾਕਟਰ ਨੂੰ ਮਿਲਣ ਲਈ ਕਹੋ।",
+    already_had: "ਪਹਿਲਾਂ ਹੀ ਕਰਵਾ ਲਿਆ?",
+    also_near: "{place} ਦੇ ਨੇੜੇ ਹੋਰ",
+    change_area: "ਇਲਾਕਾ ਬਦਲੋ",
+    free_msp: "MSP ਨਾਲ ਮੁਫ਼ਤ",
+    online: "ਔਨਲਾਈਨ",
+    bk_q_dental: "ਕੀ ਤੁਸੀਂ ਸਫ਼ਾਈ ਬੁੱਕ ਕਰ ਲਈ?",
+    bk_q_eye: "ਕੀ ਤੁਸੀਂ ਅੱਖਾਂ ਦੀ ਜਾਂਚ ਬੁੱਕ ਕਰ ਲਈ?",
+    bk_q_flu: "ਕੀ ਤੁਸੀਂ ਫਲੂ ਦਾ ਟੀਕਾ ਬੁੱਕ ਕਰ ਲਿਆ?",
+    bk_q_doctor: "ਕੀ ਤੁਸੀਂ UBC Student Health ਨਾਲ ਬੁੱਕ ਕਰ ਲਿਆ?",
+    bk_yes: "ਹਾਂ, ਬੁੱਕ ਕਰ ਲਿਆ", bk_no: "ਅਜੇ ਨਹੀਂ",
+    bk_note: "ਅਸੀਂ ਇਸ ਨੂੰ ਹੋ ਗਿਆ ਮਾਰਕ ਕਰਾਂਗੇ। ਤੁਸੀਂ ਕਦੇ ਵੀ ਵਾਪਸ ਲੈ ਸਕਦੇ ਹੋ।",
+    marked_done: "{date} ਨੂੰ ਹੋ ਗਿਆ ਮਾਰਕ ਕੀਤਾ",
+    didnt_go: "ਆਖ਼ਰ ਨਹੀਂ ਗਏ?",
+    undo: "ਵਾਪਸ ਲਓ",
+    your_answer: "ਤੁਹਾਡਾ ਜਵਾਬ: {answer}",
+    already_note: "ਅੰਦਾਜ਼ਾ ਕਾਫ਼ੀ ਹੈ। ਕਲੀਨਿਕ ਕੋਲ ਪੱਕੀ ਤਾਰੀਖ਼ ਹੈ।",
+    close: "ਬੰਦ ਕਰੋ",
+    pay_visit: "ਤੁਹਾਡਾ ਪਲਾਨ ਹਰ ਵਿਜ਼ਿਟ {amt} ਦਿੰਦਾ ਹੈ, ਸਾਲ ਵਿੱਚ {max} ਤੱਕ।",
+    pay_counsel: "ਤੁਹਾਡਾ ਪਲਾਨ ਸਾਲ ਵਿੱਚ $1,250 ਤੱਕ ਦਿੰਦਾ ਹੈ। UBC Counselling ਮੁਫ਼ਤ ਹੈ।",
+    pay_dental_preventive: "ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ ਸਫ਼ਾਈ $0 ਹੈ।",
+    pay_dental_basic: "ਤੁਹਾਡਾ ਪਲਾਨ 50% ਦਿੰਦਾ ਹੈ, ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ 70%।",
+    pay_dental_extraction: "ਤੁਹਾਡਾ ਪਲਾਨ 70% ਦਿੰਦਾ ਹੈ, ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ 90%।",
+    pay_dental_major: "ਕਵਰ ਨਹੀਂ। ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ 20% ਛੋਟ ਦਿੰਦੇ ਹਨ।",
+    pay_dental_accidental: "ਜੇ ਮੂੰਹ 'ਤੇ ਸੱਟ ਲੱਗਣ ਨਾਲ ਹੋਇਆ ਹੈ ਤਾਂ ਕਵਰ ਹੈ। ਇਲਾਜ ਤੋਂ ਪਹਿਲਾਂ Alumo ਨੂੰ ਕਾਲ ਕਰੋ।",
+    pay_vision: "ਤੁਹਾਡਾ ਪਲਾਨ ਹਰ 2 ਸਾਲ ਅੱਖਾਂ ਦੀ ਜਾਂਚ ਲਈ $50 ਦਿੰਦਾ ਹੈ।",
+    pay_rx: "ਤੁਹਾਡਾ ਪਲਾਨ 80% ਦਿੰਦਾ ਹੈ। ਬਾਕੀ Rexall ਪੂਰਾ ਕਰਦਾ ਹੈ, $40 ਤੱਕ।",
+    pay_vaccine: "BC ਵਿੱਚ ਫਲੂ ਦਾ ਟੀਕਾ ਮੁਫ਼ਤ ਹੈ। ਹੋਰ ਟੀਕੇ: ਸਾਲ ਵਿੱਚ $150 ਤੱਕ।",
+    pay_msp: "MSP ਨਾਲ ਮੁਫ਼ਤ।",
+    pay_hearing: "ਤੁਹਾਡਾ ਪਲਾਨ ਹਰ 5 ਸਾਲ ਸੁਣਨ ਵਾਲੀਆਂ ਮਸ਼ੀਨਾਂ ਲਈ $500 ਤੱਕ ਦਿੰਦਾ ਹੈ।",
+    pay_equip: "ਡਾਕਟਰ ਦੇ ਨੋਟ ਨਾਲ ਕਵਰ। ਹੱਦ ਲਈ Alumo ਨੂੰ ਪੁੱਛੋ।",
+    nurse_lang: "ਆਪਣੀ ਭਾਸ਼ਾ ਦੱਸੋ, ਦੁਭਾਸ਼ੀਆ ਕਾਲ ਵਿੱਚ ਆ ਜਾਵੇਗਾ।",
+    tty: "ਬੋਲ਼ੇ ਜਾਂ ਘੱਟ ਸੁਣਦੇ ਹੋ? 711 ਡਾਇਲ ਕਰੋ।",
+    say_link: "ਕਾਲ ਕਰਨ ਵੇਲੇ ਕੀ ਕਹਿਣਾ ਹੈ",
+    say_sub: "ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ, ਤਾਂ ਜੋ ਕਲੀਨਿਕ ਸਮਝ ਸਕੇ।",
+    read_aloud: "ਪੜ੍ਹ ਕੇ ਸੁਣਾਓ", read_stop: "ਪੜ੍ਹਨਾ ਬੰਦ ਕਰੋ",
+    not_med: "ਇਹ ਡਾਕਟਰੀ ਸਲਾਹ ਨਹੀਂ ਹੈ।",
+    off_title: "PlanPal ਇਸ ਵਿੱਚ ਮਦਦ ਨਹੀਂ ਕਰ ਸਕਦਾ।",
+    off_text: "ਕੋਈ ਸਿਹਤ ਸਮੱਸਿਆ ਦੱਸੋ, ਜਿਵੇਂ \"ਮੇਰੀ ਪਿੱਠ ਦੁਖਦੀ ਹੈ\"।",
+    off_811: "ਤਬੀਅਤ ਠੀਕ ਨਹੀਂ? 811 'ਤੇ ਕਾਲ ਕਰੋ",
+    set_text: "ਅੱਖਰਾਂ ਦਾ ਆਕਾਰ",
+    set_access: "ਅੱਖਰਾਂ ਦਾ ਆਕਾਰ ਅਤੇ ਪਹੁੰਚਯੋਗਤਾ",
+  },
+  hi: {
+    ask_placeholder: "किसी भी भाषा में लिखें या बोलें",
+    chip_asthma: "मुझे अस्थमा है",
+    ex_asthma: "मुझे अस्थमा है और इनहेलर दोबारा भरवाना है",
+    plan_sub2: "पहले से प्लान में शामिल।",
+    st_due: "अभी करवाएँ", st_done: "हो गया", st_setup: "सेट करें", st_anytime: "कभी भी",
+    ck_counsel: "काउंसलिंग",
+    ck_doctor_short: "एक नियमित डॉक्टर",
+    private_link: "निजता पहले",
+    back_home: "होम",
+    ck_dental_cost: "नेटवर्क डेंटिस्ट के पास $0।",
+    ck_eye_cost: "प्लान $50 देता है।",
+    ck_flu_due: "BC में सभी के लिए मुफ़्त।",
+    ck_doctor_text: "जब तक आप छात्र हैं, UBC Student Health आपका डॉक्टर बन सकता है। हर बार उसी डॉक्टर से मिलने के लिए कहें।",
+    already_had: "पहले ही करवा लिया?",
+    also_near: "{place} के पास और",
+    change_area: "इलाक़ा बदलें",
+    free_msp: "MSP से मुफ़्त",
+    online: "ऑनलाइन",
+    bk_q_dental: "क्या आपने सफ़ाई बुक कर ली?",
+    bk_q_eye: "क्या आपने आँखों की जाँच बुक कर ली?",
+    bk_q_flu: "क्या आपने फ़्लू का टीका बुक कर लिया?",
+    bk_q_doctor: "क्या आपने UBC Student Health में बुक कर लिया?",
+    bk_yes: "हाँ, बुक कर लिया", bk_no: "अभी नहीं",
+    bk_note: "हम इसे हो गया मार्क करेंगे। आप कभी भी वापस ले सकते हैं।",
+    marked_done: "{date} को हो गया मार्क किया",
+    didnt_go: "आख़िर में नहीं गए?",
+    undo: "वापस लें",
+    your_answer: "आपका जवाब: {answer}",
+    already_note: "अंदाज़ा काफ़ी है। क्लिनिक के पास सही तारीख़ है।",
+    close: "बंद करें",
+    pay_visit: "आपका प्लान हर विज़िट {amt} देता है, साल में {max} तक।",
+    pay_counsel: "आपका प्लान साल में $1,250 तक देता है। UBC Counselling मुफ़्त है।",
+    pay_dental_preventive: "नेटवर्क डेंटिस्ट के पास सफ़ाई $0 है।",
+    pay_dental_basic: "आपका प्लान 50% देता है, नेटवर्क डेंटिस्ट के पास 70%।",
+    pay_dental_extraction: "आपका प्लान 70% देता है, नेटवर्क डेंटिस्ट के पास 90%।",
+    pay_dental_major: "कवर नहीं। नेटवर्क डेंटिस्ट 20% छूट देते हैं।",
+    pay_dental_accidental: "अगर मुँह पर चोट लगने से हुआ है तो कवर है। इलाज से पहले Alumo को कॉल करें।",
+    pay_vision: "आपका प्लान हर 2 साल आँखों की जाँच के लिए $50 देता है।",
+    pay_rx: "आपका प्लान 80% देता है। बाक़ी Rexall पूरा करता है, $40 तक।",
+    pay_vaccine: "BC में फ़्लू का टीका मुफ़्त है। दूसरे टीके: साल में $150 तक।",
+    pay_msp: "MSP से मुफ़्त।",
+    pay_hearing: "आपका प्लान हर 5 साल हियरिंग एड के लिए $500 तक देता है।",
+    pay_equip: "डॉक्टर के नोट के साथ कवर। सीमा के लिए Alumo से पूछें।",
+    nurse_lang: "अपनी भाषा बताएँ, दुभाषिया कॉल में जुड़ जाएगा।",
+    tty: "बहरे हैं या कम सुनते हैं? 711 डायल करें।",
+    say_link: "कॉल करते समय क्या कहें",
+    say_sub: "अंग्रेज़ी में, ताकि क्लिनिक समझ सके।",
+    read_aloud: "पढ़कर सुनाएँ", read_stop: "पढ़ना बंद करें",
+    not_med: "यह डॉक्टरी सलाह नहीं है।",
+    off_title: "PlanPal इसमें मदद नहीं कर सकता।",
+    off_text: "कोई सेहत की समस्या बताएँ, जैसे \"मेरी पीठ में दर्द है\"।",
+    off_811: "तबीयत ठीक नहीं? 811 पर कॉल करें",
+    set_text: "अक्षरों का आकार",
+    set_access: "अक्षरों का आकार और सुलभता",
+  },
+  ko: {
+    ask_placeholder: "어떤 언어로든 입력하거나 말하세요",
+    chip_asthma: "천식이 있어요",
+    ex_asthma: "천식이 있어서 흡입기를 다시 처방받아야 해요",
+    plan_sub2: "이미 보험에 포함돼 있어요.",
+    st_due: "지금 받기", st_done: "완료", st_setup: "설정하기", st_anytime: "언제든",
+    ck_counsel: "상담",
+    ck_doctor_short: "정기적으로 볼 의사",
+    private_link: "개인정보 보호 우선",
+    back_home: "홈",
+    ck_dental_cost: "네트워크 치과에서 $0.",
+    ck_eye_cost: "보험이 $50 지급해요.",
+    ck_flu_due: "BC에서는 누구나 무료예요.",
+    ck_doctor_text: "학생인 동안 UBC Student Health가 주치의가 되어 줄 수 있어요. 매번 같은 의사를 보고 싶다고 말하세요.",
+    already_had: "이미 받았나요?",
+    also_near: "{place} 근처 다른 곳",
+    change_area: "지역 변경",
+    free_msp: "MSP로 무료",
+    online: "온라인",
+    bk_q_dental: "스케일링 예약했나요?",
+    bk_q_eye: "눈 검사 예약했나요?",
+    bk_q_flu: "독감 예방접종 예약했나요?",
+    bk_q_doctor: "UBC Student Health 예약했나요?",
+    bk_yes: "네, 예약했어요", bk_no: "아직이요",
+    bk_note: "완료로 표시할게요. 언제든 취소할 수 있어요.",
+    marked_done: "{date} 완료로 표시됨",
+    didnt_go: "결국 안 갔나요?",
+    undo: "취소",
+    your_answer: "내 답변: {answer}",
+    already_note: "대략이면 돼요. 정확한 날짜는 병원에 있어요.",
+    close: "닫기",
+    pay_visit: "보험이 방문당 {amt}, 연 {max}까지 지급해요.",
+    pay_counsel: "보험이 연 $1,250까지 지급해요. UBC Counselling은 무료예요.",
+    pay_dental_preventive: "네트워크 치과에서 스케일링은 $0예요.",
+    pay_dental_basic: "보험이 50%, 네트워크 치과에서는 70% 지급해요.",
+    pay_dental_extraction: "보험이 70%, 네트워크 치과에서는 90% 지급해요.",
+    pay_dental_major: "보장되지 않아요. 네트워크 치과는 20% 할인해요.",
+    pay_dental_accidental: "입에 충격을 받아서 생긴 거라면 보장돼요. 치료 전에 Alumo에 전화하세요.",
+    pay_vision: "보험이 2년마다 눈 검사에 $50 지급해요.",
+    pay_rx: "보험이 80% 지급해요. 나머지는 Rexall이 $40까지 채워 줘요.",
+    pay_vaccine: "BC에서 독감 예방접종은 무료예요. 다른 백신은 연 $150까지.",
+    pay_msp: "MSP로 무료예요.",
+    pay_hearing: "보험이 5년마다 보청기에 $500까지 지급해요.",
+    pay_equip: "의사 소견서가 있으면 보장돼요. 한도는 Alumo에 물어보세요.",
+    nurse_lang: "언어를 말하면 통역사가 연결돼요.",
+    tty: "청각 장애가 있나요? 711로 전화하세요.",
+    say_link: "전화할 때 할 말",
+    say_sub: "병원이 이해할 수 있게 영어로.",
+    read_aloud: "소리 내어 읽기", read_stop: "읽기 중지",
+    not_med: "의학적 조언이 아니에요.",
+    off_title: "PlanPal이 도와드릴 수 없는 질문이에요.",
+    off_text: "\"허리가 아파요\"처럼 건강 문제를 설명해 주세요.",
+    off_811: "몸이 안 좋나요? 811에 전화하세요",
+    set_text: "글자 크기",
+    set_access: "글자 크기와 접근성",
+  },
+};
+
 function mergeI18n(lang, add) {
   const target = I18N[lang] || (I18N[lang] = { cat: {} });
   target.cat = target.cat || {};
@@ -2478,6 +2638,8 @@ mergeI18n("en", I18N_V3_EN);
 if (typeof I18N_V3 !== "undefined") for (const [lang, add] of Object.entries(I18N_V3)) mergeI18n(lang, add);
 mergeI18n("en", I18N_V4_EN);
 if (typeof I18N_V4 !== "undefined") for (const [lang, add] of Object.entries(I18N_V4)) mergeI18n(lang, add);
+mergeI18n("en", I18N_V5_EN);
+if (typeof I18N_V5 !== "undefined") for (const [lang, add] of Object.entries(I18N_V5)) mergeI18n(lang, add);
 
 /* ===== Places data (built from the team's ubc_student_health_deals.json; locations from postal codes) ===== */
 const AREAS = {"ubc": {"lat": 49.2611, "lng": -123.2502}, "wesbrook": {"lat": 49.2533, "lng": -123.2222}, "downtown": {"lat": 49.2827, "lng": -123.1207}, "kits": {"lat": 49.2651, "lng": -123.1621}};
@@ -2489,8 +2651,8 @@ const OTHER_CLINICS = [{"c":"doctor_visit","n":"Pure Medical Clinic Lelem","a":"
 
 /* =========================================================================
    1. CONFIG
-   ?api=mock       -> made-up answers, no server needed (demo backup)
-   ?api=<url>      -> another server, e.g. http://127.0.0.1:5000/ask
+   ?api=mock         -> made-up answers, no server needed (demo backup)
+   ?api=<url>        -> another server, e.g. http://127.0.0.1:5000/ask
    ?today=YYYY-MM-DD -> pretend it's another day (to demo the check-up plan)
    ========================================================================= */
 const LIVE_SERVER = "https://ubc-coverage-server.onrender.com/ask";
@@ -2498,7 +2660,7 @@ const PARAMS = (() => { try { return new URLSearchParams(location.search); } cat
 const API_URL = (() => {
   const forced = PARAMS.get("api");
   if (forced) return forced === "mock" ? "" : forced;
-  // Served by the team's Flask server: ask the same server.
+  // Served by the team's Flask server on this computer: ask that same server.
   if (/^https?:$/.test(location.protocol) && location.pathname === "/" && location.port === "5000") return location.origin + "/ask";
   return LIVE_SERVER;
 })();
@@ -2532,21 +2694,10 @@ const COVERAGE = {
   hearing:            { hearing_aids: 500 },
   other:              { free: true },
 };
-const DENTAL = {
-  preventive: { percent: 70, network: 100 },
-  basic:      { percent: 50, network: 70 },
-  extraction: { percent: 70, network: 90 },
-  major:      { percent: 0,  network: 20 },
-};
+const DENTAL = { preventive: {}, basic: {}, extraction: {}, major: {} };
 const CATEGORY_ORDER = ["physio", "massage", "chiropractor", "other_practitioner", "counselling", "dental", "vision", "prescription", "vaccine", "doctor_visit", "medical_equipment", "hearing"];
 const LEGACY = { dental_cleaning: ["dental", "preventive"], eye_exam: ["vision", null] };
 const NETWORK_FOR = { physio: "physio", chiropractor: "chiropractor", dental: "dental", vision: "vision", prescription: "prescription", vaccine: "prescription" };
-const STANDARD_DEAL = {
-  dental: "30% off preventive, 20% off basic, 20% off major restorative",
-  physio: "Max $75 initial assessment, $65 follow-ups",
-  chiropractor: "Max $75 initial assessment, $45 follow-ups",
-  prescription: "Rx top-up to 100% (max $40) + 25% off Rexall brands",
-};
 const CONDITIONS = ["diabetes", "asthma", "hearing_loss", "severe_allergy", "injury_support", "foot", "birth_control", "other_ongoing"];
 const DRUG_CONDITIONS = ["diabetes", "asthma", "severe_allergy", "birth_control", "other_ongoing"];
 const STUDENT_HEALTH = CAMPUS.doctor_visit[0];
@@ -2575,13 +2726,13 @@ const langInfo = code => LANGUAGES.find(l => l.code === code) || LANGUAGES[1];
    3. STATE + REMEMBER ME
    Saved only with "Remember me", only on this device: language, text size,
    amounts used, and check-up answers.
-   Never saved anywhere: what the student types or says, their postal code,
-   or their answers.
+   Never saved anywhere: what the student types or says, their postal code.
    ========================================================================= */
-const CK_VALUES = { doctor: ["yes", "no"], dental: ["lt3", "3to6", "gt6", "unknown"], eye: ["this", "last", "longer", "unknown"], flu: ["yes", "no"] };
+const CK_VALUES = { doctor: ["yes", "no", "booked"], dental: ["lt3", "3to6", "gt6", "unknown", "booked"], eye: ["this", "last", "longer", "unknown", "booked"], flu: ["yes", "no", "booked"] };
 const state = { remember: false, plan: PLAN, language: "auto", usageKnown: false, used: {}, eyeUsed: false, large: false, ck: {} };
 let loc = { kind: "area", key: "ubc" };       // where to measure distance from (this visit only)
-let current = null;                            // { result, needIndex }
+let current = null;                            // { result, needIndex, q }
+let currentItem = null;                        // check-up item key on the item screen
 const recent = [];                             // this visit only, newest first
 let currentView = "ask";
 let nudgeShown = false;
@@ -2596,6 +2747,12 @@ function save() {
   } catch (e) {}
 }
 function forget() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+function cleanCk(k, a) {
+  if (!CK_VALUES[k] || !a || !CK_VALUES[k].includes(a.v) || !parseIso(a.at)) return null;
+  const out = { v: a.v, at: a.at };
+  if (a.prev) { const p = cleanCk(k, a.prev); if (p && p.v !== "booked") out.prev = p; }
+  return out;
+}
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -2616,11 +2773,7 @@ function load() {
     state.eyeUsed = s.eyeUsed === true;
     state.large = s.large === true;
     state.ck = {};
-    if (s.ck && typeof s.ck === "object") {
-      for (const [k, a] of Object.entries(s.ck)) {
-        if (CK_VALUES[k] && a && CK_VALUES[k].includes(a.v) && parseIso(a.at)) state.ck[k] = { v: a.v, at: a.at };
-      }
-    }
+    if (s.ck && typeof s.ck === "object") for (const [k, a] of Object.entries(s.ck)) { const c = cleanCk(k, a); if (c) state.ck[k] = c; }
   } catch (e) {}
 }
 
@@ -2646,13 +2799,9 @@ function t(key, vars) {
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.split("{" + k + "}").join(String(v));
   return s;
 }
-/* Same as t(), but a placeholder can be a DOM node (e.g. a bold place name). */
+/* Like t(), but a placeholder can be a DOM node (e.g. a bold place name). */
 function tn(key, nodes) {
-  const s = t(key);
-  const out = [];
-  let rest = s;
-  const re = /\{(\w+)\}/;
-  let m;
+  const out = []; let rest = t(key); const re = /\{(\w+)\}/; let m;
   while ((m = re.exec(rest))) {
     if (m.index) out.push(rest.slice(0, m.index));
     out.push(nodes[m[1]] != null ? nodes[m[1]] : m[0]);
@@ -2684,10 +2833,12 @@ function applyI18n() {
   fillLanguageSelect($("lang-header"), true);
   fillLanguageSelect($("lang-settings"), false);
   $("lang-current").textContent = state.language === "auto" ? t("top_language") : langInfo(state.language).name;
+  $("sheet-close").setAttribute("aria-label", t("close"));
   updateSpeakButton();
   if (!busy) askBtn.textContent = t("ask_btn");
   renderPlan();
   renderPrivacy();
+  updateBack();
 }
 
 /* =========================================================================
@@ -2726,10 +2877,12 @@ function detectSafety(text) {
 
 /* =========================================================================
    6. SERVER
-   New shape: { language, red_flag, needs: [{ category, dental_type, condition,
+   Shape: { language, red_flag, needs: [{ category, dental_type, condition,
    see_today, practitioner, why_one_line, what_to_say, coverage }] }
    The old one-category shape is still understood.
+   category "other" with no practitioner = not about health or the plan.
    ========================================================================= */
+const OFF_TOPIC_WORDS = ["sandwich", "lunch", "dinner", "breakfast", "recipe", "weather", "homework", "essay", "poem", "joke", "movie", "game", "ignore your instructions", "ignore previous", "gym membership"];
 function mockResponse(question) {
   const q = normalize(question);
   const s = detectSafety(q);
@@ -2738,24 +2891,25 @@ function mockResponse(question) {
   const needs = [];
   const add = (category, extra) => { if (needs.length < 3 && !needs.some(n => n.category === category)) needs.push({ category, see_today: false, ...extra }); };
   let flag = null;
-  if (has("knocked out")) add("dental", { dental_type: "accidental", see_today: true, why_one_line: "A dentist should see a knocked-out tooth as soon as possible." });
-  if (has("chipped", "broke my tooth", "broken tooth")) add("dental", { dental_type: "accidental", why_one_line: "A dentist can check a chipped tooth." });
-  if (has("gum", "toothache", "cavity", "filling", "牙疼")) add("dental", { dental_type: "basic", why_one_line: "A dentist can check sore gums and teeth." });
-  if (has("cleaning", "checkup", "check-up", "洗牙", "ਦੰਦ", "दाँत", "스케일링")) add("dental", { dental_type: "preventive", why_one_line: "Regular cleanings are done by a dentist or hygienist." });
-  if (has("ankle", "knee", "sprain", "shoulder", "back pain", "my back", "脚踝", "腳踝", "ਗਿੱਟ", "टखन", "발목")) add("physio", { why_one_line: "Physiotherapists usually treat sprains and joint pain." });
-  if (has("feet", "foot", "orthotic")) add("physio", { condition: "foot", why_one_line: "A physiotherapist or podiatrist usually helps with foot pain." });
-  if (has("crutch", "brace")) add("medical_equipment", { condition: "injury_support", why_one_line: "Crutches and braces are covered with a doctor's note." });
-  if (has("neck", "tight", "tension", "sore muscles")) add("massage", { why_one_line: "Registered massage therapists usually help with muscle tension." });
-  if (has("stress", "anxious", "overwhelmed", "sad", "压力", "壓力", "ਤਣਾਅ", "तनाव", "스트레스")) add("counselling", { why_one_line: "Talking to a counsellor can help with stress." });
-  if (has("asthma", "inhaler")) add("prescription", { condition: "asthma", why_one_line: "A doctor can renew an inhaler prescription, and a pharmacy fills it." });
-  if (has("diabetes", "insulin")) add("prescription", { condition: "diabetes", why_one_line: "Insulin and diabetic supplies are filled at a pharmacy with a prescription." });
-  if (has("birth control", "contracept")) add("prescription", { condition: "birth_control", why_one_line: "A doctor or pharmacist can help with birth control prescriptions." });
-  if (has("hearing")) add("hearing", { condition: "hearing_loss", why_one_line: "A hearing clinic can test your hearing and fit hearing aids." });
-  if (has("flu shot", "vaccine", "vaccination")) add("vaccine", { why_one_line: "Pharmacists can give flu shots and most vaccines." });
-  if (has("eye", "glasses", "contacts", "blurry", "眼睛", "ਧੁੰਦਲਾ", "धुंधला", "눈이")) add("vision", { why_one_line: "An optometrist can check your eyes and update your prescription." });
-  if (has("fever", "rash", "headache", "dizzy", "头疼", "頭痛")) { add("doctor_visit", { why_one_line: "A doctor can look at symptoms like this." }); flag = "811"; }
-  if (has("stomach", "sick", "cough")) add("doctor_visit", { why_one_line: "A doctor can look at symptoms like this." });
-  if (!needs.length) add("doctor_visit", { why_one_line: "If you're not sure who to see, a doctor can point you in the right direction." });
+  if (has("knocked out")) add("dental", { dental_type: "accidental", see_today: true });
+  if (has("chipped", "broke my tooth", "broken tooth")) add("dental", { dental_type: "accidental" });
+  if (has("gum", "toothache", "cavity", "filling", "牙疼")) add("dental", { dental_type: "basic" });
+  if (has("cleaning", "checkup", "check-up", "洗牙", "ਦੰਦ", "दाँत", "스케일링")) add("dental", { dental_type: "preventive" });
+  if (has("ankle", "knee", "sprain", "shoulder", "back pain", "my back", "脚踝", "腳踝", "ਗਿੱਟ", "टखन", "발목")) add("physio");
+  if (has("feet", "foot", "orthotic")) add("physio", { condition: "foot" });
+  if (has("crutch", "brace")) add("medical_equipment", { condition: "injury_support" });
+  if (has("neck", "tight", "tension", "sore muscles")) add("massage");
+  if (has("stress", "anxious", "overwhelmed", "sad", "压力", "壓力", "ਤਣਾਅ", "तनाव", "스트레스")) add("counselling");
+  if (has("asthma", "inhaler", "哮喘", "천식", "दमा", "ਦਮਾ")) add("prescription", { condition: "asthma" });
+  if (has("diabetes", "insulin", "糖尿病", "당뇨", "मधुमेह", "ਸ਼ੂਗਰ")) add("prescription", { condition: "diabetes" });
+  if (has("birth control", "contracept")) add("prescription", { condition: "birth_control" });
+  if (has("hearing")) add("hearing", { condition: "hearing_loss" });
+  if (has("flu shot", "vaccine", "vaccination")) add("vaccine");
+  if (has("eye", "glasses", "contacts", "blurry", "眼睛", "ਧੁੰਦਲਾ", "धुंधला", "눈이")) add("vision");
+  if (has("fever", "rash", "headache", "dizzy", "头疼", "頭痛")) { add("doctor_visit"); flag = "811"; }
+  if (has("stomach", "sick", "cough")) add("doctor_visit");
+  if (!needs.length && has(...OFF_TOPIC_WORDS)) add("other");
+  if (!needs.length) add("doctor_visit");
   return { language: "en", red_flag: flag, needs };
 }
 
@@ -2768,7 +2922,7 @@ function cleanNeed(n) {
   let dental_type = n.dental_type ? String(n.dental_type).toLowerCase() : null;
   if (category && LEGACY[category]) { const [c, d] = LEGACY[category]; category = c; dental_type = dental_type || d; }
   let practitioner = strOrNull(n.practitioner);
-  if (category && !COVERAGE[category]) { practitioner = practitioner || category.replace(/[_-]+/g, " "); category = "other"; }
+  if (category && !COVERAGE[category]) { practitioner = practitioner || category.replace(/[_-]+/g, " "); category = "other_practitioner"; }
   if (!category) return null;
   if (category === "dental" && !DENTAL[dental_type] && dental_type !== "accidental") dental_type = "basic";
   const cov = n.coverage && typeof n.coverage === "object" ? n.coverage : null;
@@ -2776,8 +2930,7 @@ function cleanNeed(n) {
     category, dental_type: category === "dental" ? dental_type : null,
     condition: CONDITIONS.includes(n.condition) ? n.condition : null,
     see_today: n.see_today === true,
-    practitioner,
-    why: strOrNull(n.why_one_line),
+    practitioner: (category === "other_practitioner" || category === "other") ? practitioner : null,
     what_to_say: strOrNull(n.what_to_say) || strOrNull(n.what_to_say_when_booking),
     per_visit: cov && hasNum(cov.per_visit) ? Number(cov.per_visit) : null,
     per_year: cov && hasNum(cov.per_year) ? Number(cov.per_year) : null,
@@ -2788,7 +2941,9 @@ function cleanResponse(d) {
   const flag = d.red_flag == null ? null : String(d.red_flag).trim();
   let rawNeeds = Array.isArray(d.needs) ? d.needs : [];
   if (!rawNeeds.length && d.category) rawNeeds = [{ ...d }];
-  const needs = rawNeeds.map(cleanNeed).filter(Boolean).slice(0, 3);
+  let needs = rawNeeds.map(cleanNeed).filter(Boolean).slice(0, 3);
+  // An off-topic "other" next to real needs is noise: drop it.
+  if (needs.length > 1) needs = needs.filter(n => !isOffTopic(n));
   return {
     emergency: flag === "911" || flag === "988" ? flag : null,
     nurse: flag === "811",
@@ -2796,6 +2951,7 @@ function cleanResponse(d) {
     needs,
   };
 }
+function isOffTopic(n) { return n && n.category === "other" && !n.practitioner; }
 
 async function askServer(question) {
   if (!API_URL) {
@@ -2826,6 +2982,7 @@ function el(tag, attrs, ...children) {
   for (const c of children.flat()) if (c !== null && c !== undefined && c !== false) node.append(c);
   return node;
 }
+function on(node, ev, fn) { node.addEventListener(ev, fn); return node; }
 function money(n) {
   const x = Number(n);
   if (!isFinite(x)) return "";
@@ -2836,6 +2993,7 @@ function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); retu
 function planStart(d) { return new Date(d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1, 8, 1); }
 function planEnd(d) { const s = planStart(d); return new Date(s.getFullYear() + 1, 7, 31); }
 function monthName(d) { return d.toLocaleDateString(locale(), { month: "long" }); }
+function shortDate(d) { return d.toLocaleDateString(locale(), { month: "short", day: "numeric" }); }
 function planReset() {
   const reset = planEnd(TODAY);
   return { days: Math.round((reset - TODAY) / DAY),
@@ -2843,50 +3001,31 @@ function planReset() {
     short: reset.toLocaleDateString(locale(), { month: "short", day: "numeric" }) };
 }
 function daysText(n) { return n === 1 ? t("days_one") : t("days_many", { n }); }
-
 const ICONS = {
-  physio: ["M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"],
-  massage: ["M18 11V6a2 2 0 0 0-4 0v1", "M14 10V4a2 2 0 0 0-4 0v2", "M10 10.5V6a2 2 0 0 0-4 0v8", "M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"],
-  chiropractor: ["M12 2v4", "M12 18v4", "M8 6h8", "M7 10h10", "M8 14h8", "M9 18h6"],
-  other_practitioner: ["M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z", "M20 21a8 8 0 0 0-16 0"],
-  counselling: ["M7.9 20A9 9 0 1 0 4 16.1L2 22Z"],
-  dental: ["M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 2.5 1 6.5 3 6.5 1.5 0 1.5-3.5 2.5-5 .5-.8 2.5-.8 3 0 1 1.5 1 5 2.5 5 2 0 2.5-4 3-6.5.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3Z"],
-  vision: ["M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0", "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"],
-  prescription: ["m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z", "m8.5 8.5 7 7"],
-  vaccine: ["m18 2 4 4", "m17 7 3-3", "M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5", "m9 11 4 4", "m5 19-3 3", "m14 4 6 6"],
-  doctor_visit: ["M11 2v2", "M5 2v2", "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1", "M8 15a6 6 0 0 0 12 0v-3", "M20 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"],
-  medical_equipment: ["M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z", "M10 10h.01", "M14 14h.01", "M10 14h.01", "M14 10h.01", "M6 6v12", "M18 6v12"],
-  hearing: ["M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0", "M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"],
-  other: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z", "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3", "M12 17h.01"],
-  nurse: ["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"],
+  phone: ["M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"],
   pin: ["M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z", "M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"],
-  copy: ["M8 8h12v12H8z", "M4 16V6a2 2 0 0 1 2-2h10"],
-  share: ["M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8", "m16 6-4-4-4 4", "M12 2v13"],
-  clock: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z", "M12 6v6l4 2"],
   check: ["M20 6 9 17l-5-5"],
-  link: ["M15 3h6v6", "M10 14 21 3", "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"],
   lock: ["M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z", "M7 11V7a5 5 0 0 1 10 0v4"],
-  travel: ["M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"],
+  share: ["M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8", "m16 6-4-4-4 4", "M12 2v13"],
+  info: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z", "M12 16v-4", "M12 8h.01"],
+  clock: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z", "M12 6v6l4 2"],
+  speaker: ["M11 5 6 9H2v6h4l5 4V5Z", "M15.54 8.46a5 5 0 0 1 0 7.07", "M19.07 4.93a10 10 0 0 1 0 14.14"],
 };
-function icon(name, extraClass) {
+function icon(name) {
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
-  for (const [k, v] of Object.entries({ class: "icon" + (extraClass ? " " + extraClass : ""), viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
-    "stroke-width": "1.75", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" })) svg.setAttribute(k, v);
-  (ICONS[name] || ICONS.other).forEach(d => { const p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.append(p); });
+  for (const [k, v] of Object.entries({ class: "icon", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+    "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" })) svg.setAttribute(k, v);
+  (ICONS[name] || ICONS.info).forEach(d => { const p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.append(p); });
   return svg;
 }
-function catIcon(cat, small) { return el("span", { class: "cat-icon" + (small ? " sm" : "") + " tint-" + cat, "aria-hidden": "true" }, icon(cat)); }
 function telHref(phone) { return "tel:" + String(phone).split(/\s*(?:ext\.?|x)\s*/i)[0].replace(/[^\d+]/g, ""); }
 function mapsHref(p) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([p.n, p.a].filter(Boolean).join(", ")); }
 function remainingFor(cat, annual) {
   if (!state.usageKnown || !hasNum(annual)) return null;
   return Math.max(0, annual - Number(state.used[cat] || 0));
 }
-function toast(msg) {
-  const tEl = $("toast"); tEl.textContent = msg; tEl.hidden = false;
-  clearTimeout(toast._t); toast._t = setTimeout(() => { tEl.hidden = true; }, 2600);
-}
+const finePointer = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 /* =========================================================================
    8. LOCATION (area shortcut or postal code; nothing leaves the phone)
@@ -2906,38 +3045,32 @@ function km(a, b) {
 }
 function kmText(d) { return t("km_away", { d: d < 10 ? d.toFixed(1) : Math.round(d) }); }
 
-/* A location picker: "Showing clinics near X", area chips, optional postal code.
-   onChange re-draws whatever depends on distance (never the picker itself,
-   so the postal box keeps focus while typing). */
+/* Area buttons + optional postal code. onChange redraws only what depends
+   on distance, never the picker, so the postal box keeps focus. */
 let pickerSeq = 0;
 function buildLocPicker(onChange) {
   const id = "postal-" + (++pickerSeq);
-  const line = el("p", { class: "loc-line" });
   const chips = el("div", { class: "areas", role: "group", "aria-label": t("loc_areas") });
   const input = el("input", { id, type: "text", inputmode: "text", autocomplete: "postal-code", autocapitalize: "characters", maxlength: "7", spellcheck: "false", placeholder: t("loc_placeholder") });
-  const postalWrap = el("div", { class: "postal" },
-    icon("pin"), el("label", { class: "sr-only", for: id }, t("loc_placeholder")), input);
+  const postalWrap = el("div", { class: "postal" }, icon("pin"), el("label", { class: "sr-only", for: id }, t("loc_placeholder")), input);
   const msg = el("p", { class: "tiny loc-msg", "aria-live": "polite" });
-  const postalBtn = el("button", { class: "text-link", type: "button", "aria-expanded": "false", "aria-controls": id }, t("loc_postal_link"));
+  const postalBtn = el("button", { class: "link", type: "button", "aria-controls": id }, t("loc_postal_link"));
   let open = loc.kind === "postal", err = false;
   if (open) input.value = loc.display;
   function sync() {
-    line.replaceChildren(icon("pin"), el("span", {}, ...tn("loc_showing", { place: el("strong", {}, locLabel()) })));
     chips.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(loc.kind === "area" && loc.key === b.dataset.area)));
-    postalWrap.hidden = !open; postalBtn.hidden = open;
-    postalBtn.setAttribute("aria-expanded", String(open));
+    postalWrap.hidden = !open; postalBtn.hidden = open; msg.hidden = !open;
     postalWrap.classList.toggle("ok", loc.kind === "postal");
-    msg.hidden = !open;
     msg.textContent = err ? t("loc_invalid") : t("loc_private");
     msg.classList.toggle("err", err);
   }
   AREA_KEYS.forEach(k => {
     const b = el("button", { class: "area", type: "button", "data-area": k, "aria-pressed": "false" }, t("area_" + k));
-    b.addEventListener("click", () => { loc = { kind: "area", key: k }; input.value = ""; open = false; err = false; sync(); onChange(); });
+    on(b, "click", () => { loc = { kind: "area", key: k }; input.value = ""; open = false; err = false; sync(); onChange(); });
     chips.append(b);
   });
-  postalBtn.addEventListener("click", () => { open = true; sync(); input.focus(); });
-  input.addEventListener("input", () => {
+  on(postalBtn, "click", () => { open = true; sync(); input.focus(); });
+  on(input, "input", () => {
     const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
     const shown = raw.length > 3 ? raw.slice(0, 3) + " " + raw.slice(3) : raw;
     if (input.value !== shown) input.value = shown;
@@ -2951,336 +3084,395 @@ function buildLocPicker(onChange) {
     sync();
     if (JSON.stringify(loc) !== before) onChange();
   });
-  input.addEventListener("blur", () => {
+  on(input, "blur", () => {
     const raw = input.value.replace(/\s/g, "");
     if (raw && !(loc.kind === "postal" && loc.display.replace(/\s/g, "") === raw)) { err = true; sync(); }
   });
   sync();
-  return el("div", { class: "picker" }, line, chips, postalBtn, postalWrap, msg);
+  return el("div", { class: "picker" }, chips, postalBtn, postalWrap, msg);
 }
 
-/* Places for a category, grouped: deals, free on campus, other clinics. */
+/* Every place for a category, best first: student deals, free on campus,
+   then other clinics. Each entry: { p, kind, cat, dist }. */
 function withDist(list) { const here = locPoint(); return list.map(p => ({ ...p, dist: p.online ? null : km(here, p) })); }
 const byDist = (a, b) => (a.dist == null) - (b.dist == null) || (a.dist || 0) - (b.dist || 0);
-function placesFor(cat) {
-  const groups = [];
+function placesFor(cat, seeToday) {
+  const out = [];
   const netCat = NETWORK_FOR[cat];
-  if (netCat) {
-    const list = withDist(NETWORK.filter(p => p.c === netCat)).sort(byDist).slice(0, 3);
-    if (list.length) groups.push({ kind: "deal", cat: netCat, list });
+  if (netCat) withDist(NETWORK.filter(p => p.c === netCat)).sort(byDist).slice(0, 3).forEach(p => out.push({ p, kind: "deal", cat }));
+  if (CAMPUS[cat]) withDist(CAMPUS[cat]).sort(byDist).forEach(p => out.push({ p, kind: "free", cat }));
+  withDist((typeof OTHER_CLINICS !== "undefined" ? OTHER_CLINICS : []).filter(p => p.c === cat)).sort(byDist).slice(0, 3).forEach(p => out.push({ p, kind: "other", cat }));
+  if (cat === "doctor_visit" && seeToday) {
+    const i = out.findIndex(x => /walk-in/i.test(x.p.n));
+    if (i > 0) out.unshift(out.splice(i, 1)[0]);
   }
-  if (CAMPUS[cat]) groups.push({ kind: "free", cat, list: withDist(CAMPUS[cat]).sort(byDist) });
-  const others = withDist((typeof OTHER_CLINICS !== "undefined" ? OTHER_CLINICS : []).filter(p => p.c === cat)).sort(byDist).slice(0, 3);
-  if (others.length) groups.push({ kind: "other", cat, list: others });
-  return groups;
+  // The big button needs a phone number and a real place.
+  const i = out.findIndex(x => x.p.p && !x.p.online);
+  if (i > 0) out.unshift(out.splice(i, 1)[0]);
+  return out;
 }
-function closest(netCat) { return withDist(NETWORK.filter(p => p.c === netCat)).sort(byDist)[0] || null; }
-function dealLine(p, groupKind, cat) {
-  if (groupKind === "free") return p.deal ? { text: t("deal_generic"), none: false } : { text: t("deal_free"), none: false };
-  if (groupKind === "other") return cat === "doctor_visit" ? { text: t("deal_msp"), none: false } : { text: t("deal_none"), none: true };
-  if (STANDARD_DEAL[cat] && p.d === STANDARD_DEAL[cat]) return { text: t("deal_" + cat), none: false };
-  if (cat === "vision" && /specsavers/i.test(p.d)) return { text: t("deal_vision"), none: false };
-  return { text: p.d || t("deal_generic"), none: false, english: true };
+function dealShort(x) {
+  if (x.kind === "free") return x.p.deal ? t("deal_generic") : t("deal_free");
+  if (x.kind === "other") return x.cat === "doctor_visit" ? t("free_msp") : t("deal_none");
+  return t("deal_generic");
 }
-/* A website link for a place, if we have one, and whether it books online. */
-function webFor(p, cat) {
+function whereText(x) { return x.p.online ? t("online") : kmText(x.p.dist); }
+/* A booking website for a place, if it has one that books online. */
+function bookUrl(p, cat) {
   const url = p.w || p.url;
   if (!url) return null;
-  if (/rexall\.ca/.test(url)) return cat === "vaccine" ? { url, book: true } : null;
-  if (/specsavers\.ca/.test(url) || p === STUDENT_HEALTH || p.n === STUDENT_HEALTH.n) return { url, book: true };
-  return { url, book: false };
+  if (/rexall\.ca/.test(url)) return cat === "vaccine" ? url : null;
+  if (/specsavers\.ca/.test(url) || p.n === STUDENT_HEALTH.n || /psyvitaliti/.test(url)) return url;
+  return null;
 }
-function placeCard(p, groupKind, cat, isFirst) {
-  const deal = dealLine(p, groupKind, cat);
-  const top = el("div", { class: "pc-top" },
-    p.online ? el("span", { class: "pc-dist" }, t("places_online")) : el("span", { class: "pc-dist" }, kmText(p.dist)),
-    isFirst && groupKind === "deal" ? el("span", { class: "pc-flag" }, t("closest")) : null);
-  const actions = el("div", { class: "pc-actions" });
-  if (p.p) actions.append(el("a", { class: "btn-sm solid", href: telHref(p.p), "aria-label": t("call_name", { name: p.n }) + ", " + p.p }, icon("nurse"), t("res_call")));
-  const web = webFor(p, cat);
-  if (p.a) actions.append(el("a", { class: "btn-sm line", href: mapsHref(p), target: "_blank", rel: "noopener" }, icon("pin"), t("res_directions")));
-  else if (web) actions.append(el("a", { class: "btn-sm line", href: web.url, target: "_blank", rel: "noopener" }, icon("link"), web.book ? t("book_online") : t("website")));
-  return el("article", { class: "glass place-card" }, top,
-    el("p", { class: "pc-name" }, p.n),
-    el("p", { class: "pc-deal" + (deal.none ? " none" : ""), lang: deal.english ? "en" : null }, deal.text),
-    p.a ? el("p", { class: "pc-addr" }, p.a) : null,
-    p.p ? el("p", { class: "pc-phone" }, p.p) : null,
-    actions);
+/* Which check-up item a booking counts toward. */
+function bookKeyFor(cat, dentalType) {
+  if (cat === "dental" && dentalType === "preventive") return "dental";
+  if (cat === "vision") return "eye";
+  if (cat === "vaccine") return "flu";
+  return null;
+}
+
+/* Big button + "Also near X" list, redrawn in place when the area changes. */
+function placeBlock(cat, opts) {
+  opts = opts || {};
+  const wrap = el("div");
+  const main = el("div");
+  const alsoHead = el("div", { class: "also" });
+  const pickerBox = el("div", { hidden: true });
+  const alts = el("div", { class: "card rows also-card" });
+  const changeBtn = el("button", { class: "link", type: "button", "aria-expanded": "false" }, t("change_area"));
+  on(changeBtn, "click", () => {
+    pickerBox.hidden = !pickerBox.hidden;
+    changeBtn.setAttribute("aria-expanded", String(!pickerBox.hidden));
+    if (!pickerBox.hidden && !pickerBox.firstChild) pickerBox.append(buildLocPicker(draw));
+    if (!pickerBox.hidden) { const b = pickerBox.querySelector(".area"); if (b) b.focus(); }
+  });
+  function draw() {
+    const list = placesFor(cat, opts.seeToday);
+    main.replaceChildren(); alts.replaceChildren();
+    const first = list[0];
+    if (!first) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const bk = opts.bookKey || null;
+    const url = bookUrl(first.p, cat);
+    const label = url && cat !== "counselling" && cat !== "doctor_visit" ? t("book_online") + " · " + first.p.n : t("call_name", { name: first.p.n });
+    const href = url && cat !== "counselling" && cat !== "doctor_visit" ? url : telHref(first.p.p);
+    const big = el("a", { class: "big", href, target: href.startsWith("http") ? "_blank" : null, rel: href.startsWith("http") ? "noopener" : null, "data-book": bk }, label);
+    main.append(big, el("p", { class: "meta" }, [t("closest"), whereText(first), dealShort(first)].join(" · "), el("span", { class: "desk" }, " · " + first.p.p)));
+    const rest = list.slice(1, 3);
+    alsoHead.replaceChildren(el("p", { class: "grey" }, t("also_near", { place: locLabel() })), changeBtn);
+    rest.forEach(x => {
+      const u = bookUrl(x.p, cat);
+      const a = x.p.p && !(x.p.online && u)
+        ? el("a", { class: "pill-btn", href: telHref(x.p.p), "data-book": bk, "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("res_call"))
+        : el("a", { class: "pill-btn", href: u, target: "_blank", rel: "noopener", "data-book": bk }, t("website"));
+      alts.append(el("div", { class: "row place" },
+        el("div", { class: "place-info" }, el("span", { class: "place-name" }, x.p.n),
+          el("span", { class: "row-sub" }, [whereText(x), dealShort(x)].join(" · "), el("span", { class: "desk" }, x.p.p ? " · " + x.p.p : ""))), a));
+    });
+    alts.hidden = !rest.length;
+  }
+  draw();
+  wrap.append(main, alsoHead, pickerBox, alts);
+  return wrap;
 }
 
 /* =========================================================================
-   9. NAVIGATION
+   9. SLIDE-UP PANEL (keeps focus inside, Escape closes, focus goes back)
    ========================================================================= */
-const VIEWS = ["ask", "answer", "coverage", "settings", "privacy"];
-const TITLE_FOR = { ask: "ask-title", answer: "answer-title", coverage: "cov-title", settings: "set-title", privacy: "priv-title" };
-let lastView = "ask";
-function show(view, push) {
+let sheetReturn = null;
+function openSheet(title, body) {
+  sheetReturn = document.activeElement;
+  $("sheet-title").textContent = title;
+  $("sheet-body").replaceChildren(...body);
+  $("sheet").hidden = false;
+  $("app").setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "hidden";
+  const first = $("sheet-body").querySelector("button, a, input");
+  (first || $("sheet-title")).focus();
+}
+function closeSheet() {
+  if ($("sheet").hidden) return;
+  $("sheet").hidden = true;
+  $("app").removeAttribute("aria-hidden");
+  document.body.style.overflow = "";
+  if (sheetReturn && document.contains(sheetReturn)) sheetReturn.focus();
+  sheetReturn = null;
+}
+on($("sheet-close"), "click", closeSheet);
+on($("sheet-scrim"), "click", closeSheet);
+on(document, "keydown", e => {
+  if ($("sheet").hidden) return;
+  if (e.key === "Escape") { e.preventDefault(); closeSheet(); return; }
+  if (e.key !== "Tab") return;
+  const f = [...document.querySelectorAll("#sheet button, #sheet a[href], #sheet input")].filter(x => x.offsetParent !== null);
+  if (!f.length) return;
+  const i = f.indexOf(document.activeElement);
+  if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+});
+
+/* =========================================================================
+   10. NAVIGATION
+   ========================================================================= */
+const VIEWS = ["ask", "item", "answer", "coverage", "settings", "privacy"];
+const TITLE_FOR = { ask: "ask-title", item: "item-title", answer: "answer-title", coverage: "cov-title", settings: "set-title", privacy: "priv-title" };
+function updateBack() {
+  const back = $("back");
+  back.hidden = currentView === "ask";
+  $("brand").hidden = currentView !== "ask";
+  $("back-label").textContent = currentView === "answer" ? t("back_ask") : t("back_home");
+}
+function show(view, push, extra) {
   if (view === "answer" && !current) view = "ask";
+  if (view === "item" && !currentItem) view = "ask";
   if (view !== "ask") stopListening();
-  if (view !== currentView) lastView = currentView;
+  stopReading();
+  closeSheet();
   currentView = view;
   for (const v of VIEWS) $("view-" + v).hidden = v !== view;
   if (view === "coverage") renderCoverage();
   if (view === "settings") renderSettings();
+  if (view === "item") renderItem();
   if (view === "ask") { renderRecent(); renderPlan(); }
-  const sticky = view === "answer";
-  $("sticky-bar").hidden = !sticky;
-  document.body.classList.toggle("has-sticky", sticky);
-  if (push !== false) { try { history.pushState({ view }, ""); } catch (e) {} }
+  updateBack();
+  if (push !== false) { try { history.pushState({ view, item: currentItem }, ""); } catch (e) {} }
   window.scrollTo(0, 0);
   const h = $(TITLE_FOR[view]);
   if (h) h.focus({ preventScroll: true });
 }
-window.addEventListener("popstate", e => show((e.state && e.state.view) || "ask", false));
-document.addEventListener("click", e => {
+window.addEventListener("popstate", e => {
+  const s = e.state || {};
+  if (s.view === "item") currentItem = s.item || currentItem;
+  show(s.view || "ask", false);
+});
+on(document, "click", e => {
   const b = e.target.closest("[data-go]");
   if (!b) return;
-  let go = b.dataset.go;
-  if (go === "back") { try { history.back(); return; } catch (err) { go = lastView || "ask"; } }
-  if (go === "ask") {
-    if (currentView === "ask") { window.scrollTo(0, 0); return; }
-    input.value = ""; askBtn.disabled = true;
-  }
+  const go = b.dataset.go;
+  if (go === "back") { if (history.state && history.state.view && history.state.view !== "ask" && history.length > 1) history.back(); else show("ask"); return; }
+  if (go === "ask" && currentView === "ask") { window.scrollTo(0, 0); return; }
   show(go);
 });
-
 function refreshLanguage() {
   applyI18n();
   if (currentView === "coverage") renderCoverage();
-  if (currentView === "settings") renderSettings();
-  if (current) renderAnswer();
+  if (currentView === "item") renderItem();
+  if (currentView === "answer" && current) renderAnswer();
   renderRecent();
 }
 
 /* =========================================================================
-   10. CHECK-UP PLAN
-   What the plan already pays for this year, and when to do it.
+   11. CHECK-UP PLAN
    Dental cleanings: 2 a plan year (Sep 1 to Aug 31), 6 months apart.
    Eye exam: every 2 years. Flu shot: every fall, free in BC.
-   "Already done?" answers are rough on purpose (no exact dates), so the plan
-   speaks in months ("around May") and lets the clinic confirm.
+   Answers are rough on purpose (no exact dates). "Yes, booked" marks an item
+   done that day; Undo puts back whatever was there before.
    ========================================================================= */
-const CK_ITEMS = [
-  { key: "doctor", cat: "doctor_visit", title: "ck_doctor", meta: "ck_doctor_meta", q: "q_doctor",
-    opts: [["yes", "o_doc_yes"], ["no", "o_doc_no"]], need: { category: "doctor_visit" } },
-  { key: "dental", cat: "dental", title: "ck_dental", meta: "ck_dental_meta", q: "q_dental",
-    opts: [["lt3", "o_lt3"], ["3to6", "o_3to6"], ["gt6", "o_gt6"], ["unknown", "o_unknown"]], need: { category: "dental", dental_type: "preventive" }, net: "dental" },
-  { key: "eye", cat: "vision", title: "ck_eye", meta: "ck_eye_meta", q: "q_eye",
-    opts: [["this", "o_this"], ["last", "o_last"], ["longer", "o_longer"], ["unknown", "o_unknown"]], need: { category: "vision" }, net: "vision" },
-  { key: "flu", cat: "vaccine", title: "ck_flu", meta: "ck_flu_meta", q: "q_flu",
-    opts: [["yes", "o_flu_yes"], ["no", "o_flu_no"]], need: { category: "vaccine" }, net: "prescription" },
-];
-const openAsk = {};   // which item's "Already done?" is open (this visit only)
-
+const CK_ITEMS = {
+  dental: { title: "ck_dental", cat: "dental", q: "q_dental", bk: "bk_q_dental",
+    opts: [["lt3", "o_lt3"], ["3to6", "o_3to6"], ["gt6", "o_gt6"], ["unknown", "o_unknown"]] },
+  eye: { title: "ck_eye", cat: "vision", q: "q_eye", bk: "bk_q_eye",
+    opts: [["this", "o_this"], ["last", "o_last"], ["longer", "o_longer"], ["unknown", "o_unknown"]] },
+  flu: { title: "ck_flu", cat: "vaccine", q: "q_flu", bk: "bk_q_flu",
+    opts: [["yes", "o_flu_yes"], ["no", "o_flu_no"]] },
+  doctor: { title: "ck_doctor_short", cat: "doctor_visit", q: "q_doctor", bk: "bk_q_doctor",
+    opts: [["yes", "o_doc_yes"], ["no", "o_doc_no"]] },
+};
+const CK_ORDER = ["dental", "eye", "flu", "doctor"];
 function lateAugust() { return (planEnd(TODAY) - TODAY) / DAY <= 14; }
 function planYearIndex(d) { return planStart(d).getFullYear(); }
 
-/* Returns { pill: "due"|"done"|"soon"|null, pillText, text, done, canAsk } */
+/* -> { kind: "due"|"done"|"soon"|"none", label, text, canAsk } */
 function ckStatus(key) {
   const a = state.ck[key];
   const at = a ? parseIso(a.at) : null;
   if (key === "doctor") {
-    if (a && a.v === "yes") return { pill: "done", text: t("ck_doctor_yes"), done: true, canAsk: true };
-    return { pill: null, text: null, done: false, canAsk: true };
+    if (a && (a.v === "yes" || a.v === "booked")) return { kind: "done", label: t("st_done"), text: t("ck_doctor_yes"), canAsk: true };
+    return { kind: "none", label: t("st_setup"), text: t("ck_doctor_text"), canAsk: true };
   }
   if (key === "dental") {
-    if (a && a.v === "unknown") return { pill: "due", text: t("ck_unknown"), canAsk: true };
-    const ago = a ? { lt3: 45, "3to6": 135, gt6: 270 }[a.v] : null;
-    const last = ago ? addDays(at, -ago) : null;
+    if (a && a.v === "unknown") return { kind: "due", label: t("st_due"), text: t("ck_unknown"), canAsk: true };
+    const ago = a ? { booked: 0, lt3: 45, "3to6": 135, gt6: 270 }[a.v] : null;
+    const last = ago != null ? addDays(at, -ago) : null;
     const next = last ? addDays(last, 182) : null;
-    if (next && next > TODAY) return { pill: "done", text: t("ck_dental_next", { month: monthName(next) }), done: true, canAsk: true };
-    if (lateAugust()) return { pill: "soon", pillText: t("pill_sep"), text: t("ck_dental_newyear"), canAsk: true };
+    if (next && next > TODAY) return { kind: "done", label: t("st_done"), text: t("ck_dental_next", { month: monthName(next) }), canAsk: true };
+    if (lateAugust()) return { kind: "soon", label: t("pill_sep"), text: t("ck_dental_newyear"), canAsk: true };
     const usedThisYear = last && last >= planStart(TODAY);
     const second = addDays(TODAY, 182);
-    if (!usedThisYear && second <= planEnd(TODAY)) return { pill: "due", text: t("ck_dental_two", { month: monthName(second) }), canAsk: true };
-    return { pill: "due", text: t("ck_dental_one"), canAsk: true };
+    if (!usedThisYear && second <= planEnd(TODAY)) return { kind: "due", label: t("st_due"), text: t("ck_dental_two", { month: monthName(second) }), canAsk: true };
+    return { kind: "due", label: t("st_due"), text: t("ck_dental_one"), canAsk: true };
   }
   if (key === "eye") {
-    if (a && a.v === "unknown") return { pill: "due", text: t("ck_unknown"), canAsk: true };
-    if (a && (a.v === "this" || a.v === "last")) {
+    if (a && a.v === "unknown") return { kind: "due", label: t("st_due"), text: t("ck_unknown"), canAsk: true };
+    if (a && (a.v === "this" || a.v === "last" || a.v === "booked")) {
       const yearsAgo = planYearIndex(TODAY) - planYearIndex(at) + (a.v === "last" ? 1 : 0);
-      if (yearsAgo === 0) return { pill: "done", text: t("ck_eye_this"), done: true, canAsk: true };
-      if (yearsAgo === 1) return { pill: "done", text: t("ck_eye_last"), done: true, canAsk: true };
+      if (yearsAgo === 0) return { kind: "done", label: t("st_done"), text: t("ck_eye_this"), canAsk: true };
+      if (yearsAgo === 1) return { kind: "done", label: t("st_done"), text: t("ck_eye_last"), canAsk: true };
     }
-    return { pill: "due", text: t("ck_eye_due"), canAsk: true };
+    return { kind: "due", label: t("st_due"), text: t("ck_eye_due"), canAsk: true };
   }
   // flu: season runs Sep to Aug; shots are given from October.
   const m = TODAY.getMonth();
-  if (a && a.v === "yes" && planYearIndex(at) === planYearIndex(TODAY)) return { pill: "done", text: t("ck_flu_done"), done: true, canAsk: true };
-  if (m === 8) return { pill: "soon", pillText: t("pill_october"), text: t("ck_flu_october"), canAsk: !!a };
-  if (m >= 3 && m <= 7) return { pill: "soon", pillText: t("pill_fall"), text: t("ck_flu_fall"), canAsk: !!a };
-  return { pill: "due", text: t("ck_flu_due"), canAsk: true };
+  if (a && (a.v === "yes" || a.v === "booked") && planYearIndex(at) === planYearIndex(TODAY)) return { kind: "done", label: t("st_done"), text: t("ck_flu_done"), canAsk: true };
+  if (m === 8) return { kind: "soon", label: t("pill_october"), text: t("ck_flu_october"), canAsk: false };
+  if (m >= 3 && m <= 7) return { kind: "soon", label: t("pill_fall"), text: t("ck_flu_fall"), canAsk: false };
+  return { kind: "due", label: t("st_due"), text: t("ck_flu_due"), canAsk: true };
 }
 
-function pillEl(st) {
-  if (!st.pill) return null;
-  const text = st.pillText || (st.pill === "due" ? t("pill_due") : t("pill_done"));
-  return el("span", { class: "pill " + st.pill }, st.pill === "done" ? icon("check") : null, text);
+function openItem(key) { currentItem = key; show("item"); }
+
+function renderPlan() {
+  const list = $("plan-list");
+  list.replaceChildren(...CK_ORDER.map(key => {
+    const st = ckStatus(key);
+    return on(el("button", { class: "row", type: "button" },
+      el("span", { class: "row-name" }, t(CK_ITEMS[key].title)),
+      el("span", { class: "row-st" + (st.kind === "due" ? " due" : "") }, st.label),
+      el("span", { class: "chev", "aria-hidden": "true" })), "click", () => openItem(key));
+  }), on(el("button", { class: "row", type: "button" },
+    el("span", { class: "row-name" }, t("ck_counsel")),
+    el("span", { class: "row-st" }, t("st_anytime")),
+    el("span", { class: "chev", "aria-hidden": "true" })), "click", () => openNeed({ category: "counselling" })));
 }
 
-function ckPlace(item) {
-  if (item.key === "doctor") return { ...STUDENT_HEALTH, dist: km(locPoint(), STUDENT_HEALTH) };
-  if (item.key === "flu") return { n: t("ck_flu_place"), sub: t("ck_flu_place_sub"), p: GET_VACCINATED.p, w: GET_VACCINATED.url, gv: true, dist: null };
-  return closest(item.net);
+function setCk(key, v) {
+  const prev = state.ck[key];
+  if (v === "booked") state.ck[key] = { v, at: isoDate(TODAY), prev: prev && prev.v !== "booked" ? { v: prev.v, at: prev.at } : undefined };
+  else state.ck[key] = { v, at: isoDate(TODAY) };
+  if (!state.ck[key].prev) delete state.ck[key].prev;
+  if (!state.remember) nudgeShown = true;
+  save();
+}
+function undoCk(key) {
+  const a = state.ck[key];
+  if (a && a.prev) state.ck[key] = a.prev; else delete state.ck[key];
+  save();
 }
 
-function placeRow(item, p) {
-  if (!p) return null;
-  const info = el("div", { class: "ck-pinfo" },
-    el("p", { class: "ck-pname" }, p.n),
-    el("p", { class: "tiny" }, [p.sub || null, p.dist != null ? kmText(p.dist) : null, p.p].filter(Boolean).join(" · ")));
-  const btns = el("div", { class: "ck-btns" });
-  const web = p.gv ? { url: p.w, book: true } : webFor(p, item.cat);
-  if (item.key === "doctor") {
-    if (p.p) btns.append(el("a", { class: "btn-sm solid", href: telHref(p.p), "aria-label": t("call_name", { name: p.n }) + ", " + p.p }, icon("nurse"), t("res_call")));
-    btns.append(el("a", { class: "btn-sm line", href: mapsHref(p), target: "_blank", rel: "noopener" }, icon("pin"), t("res_directions")));
-  } else if (web && web.book) {
-    btns.append(el("a", { class: "btn-sm solid", href: web.url, target: "_blank", rel: "noopener", "aria-label": t("book_online") + ": " + p.n }, icon("link"), t("book_online")));
-  } else if (p.p) {
-    btns.append(el("a", { class: "btn-sm solid", href: telHref(p.p), "aria-label": t("call_name", { name: p.n }) + ", " + p.p }, icon("nurse"), t("res_call")));
-  }
-  return el("div", { class: "ck-place" }, info, btns);
+function askAlready(key) {
+  const item = CK_ITEMS[key], a = state.ck[key];
+  const opts = el("div", { class: "opts" });
+  item.opts.forEach(([v, label]) => opts.append(on(el("button", { class: "opt", type: "button", "aria-pressed": String(!!a && a.v === v) }, t(label)), "click", () => {
+    setCk(key, v); closeSheet(); refreshAfterCk(key);
+  })));
+  const body = [opts];
+  if (key === "dental" || key === "eye") body.push(el("p", { class: "grey", style: "margin-top:1rem" }, t("already_note")));
+  openSheet(t(item.q), body);
 }
 
-function openNeed(need) {
-  current = { result: { emergency: null, nurse: false, language: uiLang(), needs: [cleanNeed(need)] }, needIndex: 0 };
-  renderAnswer(); show("answer");
+/* "Did you book?" after a Call or Book online tap, when they come back. */
+let pendingBook = null, pendingHidden = false, pendingTimer = null;
+on(document, "click", e => {
+  const a = e.target.closest("[data-book]");
+  if (!a || !a.dataset.book || !CK_ITEMS[a.dataset.book]) return;
+  pendingBook = a.dataset.book; pendingHidden = false;
+  clearTimeout(pendingTimer);
+  // If the page never goes to the background (e.g. a laptop), ask after a few seconds.
+  pendingTimer = setTimeout(() => { if (pendingBook && !pendingHidden && document.visibilityState === "visible") askBooked(); }, 4000);
+});
+on(document, "visibilitychange", () => {
+  if (!pendingBook) return;
+  if (document.visibilityState === "hidden") pendingHidden = true;
+  else if (pendingHidden) { clearTimeout(pendingTimer); setTimeout(askBooked, 400); }
+});
+function askBooked() {
+  const key = pendingBook; pendingBook = null; clearTimeout(pendingTimer);
+  if (!key || !$("sheet").hidden || !$("safety").hidden) return;
+  const st = ckStatus(key);
+  if (st.kind === "done") return;
+  const yes = on(el("button", { class: "opt primary", type: "button" }, t("bk_yes")), "click", () => { setCk(key, "booked"); closeSheet(); refreshAfterCk(key); });
+  const no = on(el("button", { class: "opt center", type: "button" }, t("bk_no")), "click", closeSheet);
+  openSheet(t(CK_ITEMS[key].bk), [el("div", { class: "opts" }, yes, no), el("p", { class: "grey", style: "margin-top:1rem" }, t("bk_note"))]);
+}
+function refreshAfterCk(key) {
+  if (currentView === "item") { renderItem(); const h = $("item-title"); if (h) h.focus({ preventScroll: true }); }
+  else if (currentView === "ask") renderPlan();
+  else if (currentView === "answer" && current) renderAnswer();
 }
 
-function renderCk(item) {
-  const st = ckStatus(item.key);
-  const a = state.ck[item.key];
-  const titleId = "ck-h-" + item.key;
-  const li = el("li", { class: "ck", "data-ck": item.key });
-  li.append(el("div", { class: "ck-head" }, catIcon(item.cat, true),
-    el("div", {}, el("h3", { id: titleId, tabindex: "-1" }, t(item.title)), el("p", { class: "ck-meta" }, t(item.meta)))));
-  const body = el("div", { class: "ck-body" });
-  if (item.key === "doctor" && !st.done) {
-    body.append(el("p", { class: "ck-text" }, t("ck_doctor_text")), placeRow(item, ckPlace(item)), el("p", { class: "tiny ck-after" }, t("ck_doctor_after")));
-  } else {
-    body.append(el("p", { class: "ck-status" }, pillEl(st), st.text));
-    if (!st.done) body.append(placeRow(item, ckPlace(item)));
-  }
-  const links = el("div", { class: "ck-links" });
-  if (st.canAsk) {
-    const label = a ? t("change_answer") : (item.key === "doctor" ? t("already_doc") : t("already"));
-    const askBtnEl = el("button", { class: "text-link", type: "button", "aria-expanded": String(!!openAsk[item.key]), "aria-controls": "ck-ask-" + item.key }, label);
-    askBtnEl.addEventListener("click", () => { openAsk[item.key] = !openAsk[item.key]; renderPlanList(item.key); });
-    links.append(askBtnEl);
-  }
-  if (!st.done) {
-    const more = el("button", { class: "text-link", type: "button" }, t("more_places"));
-    more.addEventListener("click", () => openNeed(item.need));
-    links.append(more);
-  }
-  body.append(links);
-  if (openAsk[item.key]) {
-    const opts = el("div", { class: "opts", role: "group", "aria-labelledby": "ck-q-" + item.key });
-    item.opts.forEach(([v, label]) => {
-      const b = el("button", { class: "opt", type: "button", "aria-pressed": String(!!a && a.v === v) }, t(label));
-      b.addEventListener("click", () => {
-        state.ck[item.key] = { v, at: isoDate(TODAY) };
-        openAsk[item.key] = false;
-        save();
-        if (!state.remember) nudgeShown = true;
-        renderNudge();
-        renderPlanList(item.key);
-      });
-      opts.append(b);
-    });
-    body.append(el("div", { class: "ck-ask", id: "ck-ask-" + item.key }, el("p", { id: "ck-q-" + item.key }, t(item.q)), opts));
-  }
-  li.append(body);
-  return li;
-}
-
-function renderPlanList(focusKey) {
-  $("ck-list").replaceChildren(...CK_ITEMS.map(renderCk));
-  if (focusKey) {
-    const target = openAsk[focusKey] ? document.querySelector('#ck-ask-' + focusKey + ' .opt') : $("ck-h-" + focusKey);
-    if (target) target.focus({ preventScroll: true });
-  }
-}
-
-function renderNudge() {
-  const box = $("save-nudge");
-  if (!nudgeShown) { box.hidden = true; return; }
-  box.hidden = false;
+function nudgeEl() {
+  if (!nudgeShown) return null;
   const sw = el("input", { type: "checkbox", role: "switch", id: "save-switch" });
   sw.checked = state.remember;
-  sw.addEventListener("change", () => {
-    state.remember = sw.checked;
-    if (state.remember) save(); else forget();
-    note.hidden = !state.remember;
-  });
-  const note = el("p", { class: "tiny", style: "margin-top:0.25rem" }, t("saved_note"));
+  const note = el("p", { class: "tiny", style: "margin-top:0.25rem;color:inherit" }, t("saved_note"));
   note.hidden = !state.remember;
-  box.replaceChildren(el("label", { class: "switch" }, el("span", {}, t("save_q")), sw), note);
+  on(sw, "change", () => { state.remember = sw.checked; if (state.remember) save(); else forget(); note.hidden = !state.remember; });
+  return el("div", { class: "nudge" }, el("label", { class: "switch" }, el("span", {}, t("save_q")), sw), note);
 }
 
-let planPicker = null;
-function renderPlan() {
-  $("plan-newyear").hidden = !lateAugust();
-  $("plan-near").textContent = t("plan_near", { place: locLabel() });
-  const pickerBox = $("plan-picker");
-  if (!pickerBox.hidden) pickerBox.replaceChildren(buildLocPicker(onPlanLoc));
-  const also = $("also-counselling");
-  also.replaceChildren(catIcon("counselling"), el("span", { class: "txt" }, t("plan_also")), el("span", { class: "chev-r", "aria-hidden": "true" }));
-  renderNudge();
-  renderPlanList();
+function renderItem() {
+  const key = currentItem, item = CK_ITEMS[key];
+  const box = $("view-item");
+  if (!item) { box.replaceChildren(); return; }
+  const st = ckStatus(key), a = state.ck[key];
+  const head = el("div", { class: "detail-head enter" }, el("h1", { class: "title", id: "item-title", tabindex: "-1" }, t(item.title)));
+  let lead = st.text;
+  if (st.kind === "due" && key === "dental") lead += " " + t("ck_dental_cost");
+  if (st.kind === "due" && key === "eye") lead += " " + t("ck_eye_cost");
+  head.append(el("p", { class: "lead" }, lead));
+  box.replaceChildren(head);
+
+  if (st.kind === "done") {
+    const when = a && parseIso(a.at) ? shortDate(parseIso(a.at)) : "";
+    let card;
+    if (a && a.v === "booked") {
+      card = el("div", { class: "card rows done-card" }, el("div", { class: "row place" },
+        el("div", { class: "place-info" }, el("span", { class: "place-name" }, t("marked_done", { date: when })), el("span", { class: "row-sub" }, t("didnt_go"))),
+        on(el("button", { class: "pill-btn", type: "button" }, t("undo")), "click", () => { undoCk(key); refreshAfterCk(key); })));
+    } else {
+      const opt = item.opts.find(o => a && o[0] === a.v);
+      card = el("div", { class: "card rows done-card" }, el("div", { class: "row place" },
+        el("div", { class: "place-info" }, el("span", { class: "place-name" }, t("your_answer", { answer: opt ? t(opt[1]) : "" }))),
+        on(el("button", { class: "pill-btn", type: "button" }, t("change_answer")), "click", () => askAlready(key))));
+    }
+    box.append(card);
+  } else if (key === "flu") {
+    if (st.kind === "due") {
+      box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
+        el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
+    }
+  } else if (key === "doctor") {
+    const p = STUDENT_HEALTH;
+    box.append(el("a", { class: "big", href: telHref(p.p), "data-book": "doctor" }, t("call_name", { name: p.n })),
+      el("p", { class: "meta" }, [kmText(km(locPoint(), p)), t("free_msp")].join(" · "), el("span", { class: "desk" }, " · " + p.p)),
+      el("div", { class: "links" }, el("a", { class: "link", href: mapsHref(p), target: "_blank", rel: "noopener" }, t("res_directions"))));
+  } else {
+    box.append(placeBlock(item.cat === "vision" ? "vision" : "dental", { bookKey: key }));
+  }
+  const links = el("div", { class: "links" });
+  if (st.canAsk && st.kind !== "done") links.append(on(el("button", { class: "link", type: "button" }, key === "doctor" ? t("already_doc") : t("already_had")), "click", () => askAlready(key)));
+  if (links.childNodes.length) box.append(links);
+  const n = nudgeEl(); if (n) box.append(n);
 }
-function onPlanLoc() { $("plan-near").textContent = t("plan_near", { place: locLabel() }); renderPlanList(); }
-$("plan-loc-btn").addEventListener("click", () => {
-  const box = $("plan-picker");
-  box.hidden = !box.hidden;
-  $("plan-loc-btn").setAttribute("aria-expanded", String(!box.hidden));
-  if (!box.hidden) { box.replaceChildren(buildLocPicker(onPlanLoc)); const b = box.querySelector(".area"); if (b) b.focus(); }
-});
-$("also-counselling").addEventListener("click", () => openNeed({ category: "counselling" }));
 
 /* =========================================================================
-   11. ANSWER
-   Order: who to see -> next step (one big button) -> what it costs ->
-   places near you -> details.
+   12. ANSWER
+   Order: who to see -> what the plan pays (one sentence) -> one big button
+   -> two other places -> small links.
    ========================================================================= */
 function needHeadline(n) {
-  if (n.category === "other_practitioner" || (n.category === "other" && n.practitioner)) return n.practitioner || tc(n.category, "go");
+  if (n.category === "other_practitioner" || (n.category === "other" && n.practitioner)) return n.practitioner ? capital(n.practitioner) : tc(n.category, "go");
   return tc(n.category, "go");
 }
-function needShort(n) { return n.practitioner && (n.category === "other_practitioner" || n.category === "other") ? n.practitioner : tc(n.category, "title"); }
-
-function moneyBlock(n) {
+function capital(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function needShort(n) { return n.practitioner ? capital(n.practitioner) : tc(n.category, "title"); }
+function paySentence(n) {
   const c = COVERAGE[n.category] || {};
-  const wrap = el("div", { class: "money" });
-  // When a condition card is shown, it carries the details: keep this part to the headline number.
-  const quiet = !!(n.condition && tcond(n.condition)) && ["prescription", "hearing", "medical_equipment"].includes(n.category);
-  if (quiet && n.category === "medical_equipment") return null;
-  const fig = (label, value, unit, notes) => {
-    wrap.append(el("p", { class: "money-label" }, label),
-      el("p", { class: "money-figure" }, value, unit ? el("span", { class: "money-unit" }, unit) : null));
-    if (!quiet) (notes || []).filter(Boolean).forEach(x => wrap.append(el("p", { class: "money-note" }, x)));
-  };
   switch (n.category) {
-    case "physio": case "massage": case "chiropractor": case "other_practitioner": {
-      const pv = n.per_visit != null ? n.per_visit : c.per_visit, py = n.per_year != null ? n.per_year : c.annual_max;
-      fig(t("res_pays_back"), money(pv), t("unit_visit"), [t("res_rest") + " " + t("cost_year_max", { amt: money(py) })]); break;
-    }
-    case "counselling": fig(t("res_plan_pays"), money(1250), t("cost_counsel_unit"), [t("cost_counsel_note")]); break;
-    case "dental":
-      if (n.dental_type === "accidental") { wrap.append(el("p", {}, t("cost_dental_accidental"))); break; }
-      fig(t("res_plan_pays"), DENTAL[n.dental_type].percent + "%", t("unit_cost"), [t("cost_dental_" + n.dental_type), t("cost_dental_max")]); break;
-    case "vision": fig(t("res_plan_pays"), money(50), t("cost_vision_unit"), [t("cost_vision_note")]); break;
-    case "prescription": fig(t("res_plan_pays"), "80%", t("unit_cost"), [t("cost_rx_note"), t("cost_pharmacare")]); break;
-    case "vaccine": fig(t("res_plan_pays"), money(150), t("cost_vacc_unit"), [t("cost_vacc_note")]); break;
-    case "hearing": fig(t("res_plan_pays"), money(500), t("cost_hearing_unit"), [t("cost_ask_alumo")]); break;
-    case "medical_equipment":
-      wrap.append(el("ul", { class: "money-list" }, el("li", {}, t("cost_equip_1")), el("li", {}, t("cost_equip_2")), el("li", {}, t("cost_equip_3"))),
-        el("p", { class: "money-note" }, t("cost_ask_alumo"))); break;
-    default: fig(t("res_cost_you"), "$0", null, [t("res_msp")]);
+    case "physio": case "massage": case "chiropractor": case "other_practitioner":
+      return t("pay_visit", { amt: money(n.per_visit != null ? n.per_visit : c.per_visit), max: money(n.per_year != null ? n.per_year : c.annual_max) });
+    case "counselling": return t("pay_counsel");
+    case "dental": return t("pay_dental_" + (n.dental_type || "basic"));
+    case "vision": return t("pay_vision");
+    case "prescription": return t("pay_rx");
+    case "vaccine": return t("pay_vaccine");
+    case "hearing": return t("pay_hearing");
+    case "medical_equipment": return t("pay_equip");
+    default: return t("pay_msp");
   }
-  return wrap;
 }
-
 function conditionBox(n) {
   if (!n.condition) return null;
   const c = tcond(n.condition);
@@ -3289,188 +3481,118 @@ function conditionBox(n) {
   if (DRUG_CONDITIONS.includes(n.condition)) lines.push(t("cost_pharmacare"));
   return el("div", { class: "cond" }, el("p", { class: "cond-title" }, c.t), el("ul", {}, ...lines.map(x => el("li", {}, x))));
 }
-
-function leftRow(n) {
-  const c = COVERAGE[n.category] || {};
-  const annual = n.per_year != null ? n.per_year : c.annual_max;
-  if (!hasNum(annual) || !c.track) return null;
-  const body = [];
-  const left = remainingFor(n.category, annual);
-  if (left !== null) {
-    const label = t("res_left_of", { left: money(left), total: money(annual) });
-    const pct = annual > 0 ? Math.max(0, Math.min(100, (left / annual) * 100)) : 0;
-    body.push(el("p", { class: "bar-label" }, label),
-      el("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(annual), "aria-valuenow": String(left), "aria-label": label }, el("span", { style: "width:" + pct + "%" })));
-  } else {
-    body.push(el("div", { class: "stat-line" }, el("span", {}, t("res_yearly_max")), el("span", {}, money(annual))),
-      el("button", { class: "text-link", type: "button", "data-go": "coverage" }, t("res_add_used")));
-  }
-  const reset = planReset();
-  body.push(el("p", { class: "small", style: "margin-top:0.5rem" }, t("res_resets", { date: reset.label, days: daysText(reset.days) })));
-  return detailsRow(t("row_left"), body);
+function nurseBlock() {
+  return [el("a", { class: "big", href: "tel:811" }, t("res_call_811")),
+    el("p", { class: "meta" }, t("next_811_line") + " " + t("nurse_lang")),
+    el("p", { class: "meta" }, t("tty")),
+    el("div", { class: "links" }, el("a", { class: "link", href: telHref(STUDENT_HEALTH.p) }, t("or_student_health"), el("span", { class: "desk" }, " · " + STUDENT_HEALTH.p)))];
 }
-function detailsRow(title, body) { return el("details", { class: "row" }, el("summary", {}, title), el("div", { class: "row-body" }, ...body)); }
-
-/* Which place the big button calls. */
-function nextTarget(n, r, groups) {
-  if (!groups.length) return null;
-  if (n.category === "doctor_visit" && n.see_today) {
-    const walkIn = groups.flatMap(g => g.list.map(p => ({ p, g }))).find(x => /walk-in/i.test(x.p.n));
-    if (walkIn) return walkIn;
-  }
-  for (const g of groups) { const p = g.list.find(x => x.p && !x.online); if (p) return { p, g }; }
-  return null;
-}
-const NO_811 = ["vision", "vaccine", "counselling", "prescription", "hearing"];
-
-function renderNextStep(box, n, r) {
-  box.replaceChildren(el("p", { class: "eyebrow" }, t("next_step")));
-  const nurseFirst = !n || (r.nurse && (n.category === "doctor_visit" || n.category === "other"));
-  if (nurseFirst) {
-    box.append(el("a", { class: "primary next-btn", href: "tel:811" }, icon("nurse"), el("span", {}, t("res_call_811"))),
-      el("p", { class: "next-line" }, t("next_811_line")),
-      el("div", { class: "next-links" }, el("a", { class: "text-link", href: telHref(STUDENT_HEALTH.p) }, t("or_student_health"), el("span", { style: "font-weight:600" }, " · " + STUDENT_HEALTH.p))));
-    return;
-  }
-  const cat = n.category;
-  if (cat === "vaccine") {
-    box.append(el("a", { class: "primary next-btn", href: GET_VACCINATED.url, target: "_blank", rel: "noopener" }, icon("link"), el("span", {}, t("next_vacc_btn"))),
-      el("p", { class: "next-line" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:700;color:var(--accent);white-space:nowrap" }, GET_VACCINATED.p) })));
-  } else if (cat === "medical_equipment") {
-    const p = STUDENT_HEALTH;
-    box.append(el("p", { class: "next-text" }, t("next_equip")),
-      el("a", { class: "primary next-btn", href: telHref(p.p), style: "margin-top:0.75rem" }, icon("nurse"), el("span", {}, t("call_name", { name: p.n }))),
-      el("p", { class: "next-line" }, p.p));
-  } else {
-    const target = nextTarget(n, r, placesFor(cat));
-    if (target) {
-      const p = target.p, deal = dealLine(p, target.g.kind, target.g.cat);
-      box.append(el("a", { class: "primary next-btn", href: telHref(p.p), "aria-label": t("call_name", { name: p.n }) + ", " + p.p }, icon("nurse"), el("span", {}, t("call_name", { name: p.n }))),
-        el("p", { class: "next-line" }, [p.dist != null ? kmText(p.dist) : null, p.p].filter(Boolean).join(" · "), " · ", el("strong", { lang: deal.english ? "en" : null }, deal.text)));
-      const links = el("div", { class: "next-links" });
-      const web = webFor(p, cat);
-      if (web) links.append(el("a", { class: "text-link", href: web.url, target: "_blank", rel: "noopener" }, icon("link"), web.book ? t("book_online") : t("website")));
-      if (p.a) links.append(el("a", { class: "text-link", href: mapsHref(p), target: "_blank", rel: "noopener" }, icon("pin"), t("res_directions")));
-      if (links.childNodes.length) box.append(links);
-    } else {
-      let who = n.practitioner || tc(cat, "who");
-      if (uiLang() === "en") who = who.toLowerCase();
-      box.append(el("p", { class: "next-text" }, t("next_find", { who })));
-    }
-  }
-  if (cat === "counselling") box.append(el("a", { class: "backup", href: "tel:988" }, icon("nurse"), el("span", {}, t("backup_988"))));
-  else if (!NO_811.includes(cat) && !(cat === "dental" && n.dental_type === "preventive")) box.append(el("a", { class: "backup", href: "tel:811" }, icon("nurse"), el("span", {}, t("backup_811"))));
+function openNeed(need) {
+  current = { result: { emergency: null, nurse: false, language: uiLang(), needs: [cleanNeed(need)] }, needIndex: 0, q: null };
+  renderAnswer(); show("answer");
 }
 
-function renderPlaces(sec, n) {
-  sec.querySelectorAll(".group").forEach(g => g.remove());
-  const cat = n ? n.category : "doctor_visit";
-  const groups = placesFor(cat);
-  groups.forEach(g => {
-    const title = g.kind === "deal" ? t("places_deal") : g.kind === "free" ? t("places_free") : t("places_other");
-    const groupEl = el("div", { class: "group" }, el("h2", { class: "group-title" }, title));
-    if (g.kind === "other") groupEl.append(el("p", { class: "small places-note" }, t(cat === "doctor_visit" ? "places_other_note_msp" : "places_other_note")));
-    groupEl.append(el("div", { class: "scroller" }, ...g.list.map((p, i) => placeCard(p, g.kind, g.cat, i === 0))));
-    sec.append(groupEl);
-  });
-  return groups;
+let reading = false;
+function stopReading() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} reading = false; }
+function readAloud(btn, text, lang) {
+  if (!window.speechSynthesis) return;
+  if (reading) { stopReading(); btn.lastChild.textContent = t("read_aloud"); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.onend = u.onerror = () => { reading = false; if (btn.isConnected) btn.lastChild.textContent = t("read_aloud"); };
+  reading = true; btn.lastChild.textContent = t("read_stop");
+  speechSynthesis.speak(u);
 }
 
 function renderAnswer() {
   const r = current.result;
-  const box = $("answer");
+  const box = $("view-answer");
   box.replaceChildren();
-
-  const tabs = $("needs-tabs");
-  tabs.replaceChildren();
-  tabs.hidden = r.needs.length < 2;
-  if (r.needs.length > 1) {
-    tabs.setAttribute("aria-label", t("needs_label"));
-    r.needs.forEach((n, i) => {
-      const b = el("button", { class: "need-tab", type: "button", role: "tab", "aria-selected": String(i === current.needIndex) }, catIcon(n.category, true), needShort(n));
-      b.addEventListener("click", () => { current.needIndex = i; renderAnswer(); $("answer-title").focus({ preventScroll: true }); });
-      tabs.append(b);
-    });
-  }
-
+  stopReading();
   const n = r.needs.length ? r.needs[Math.min(current.needIndex, r.needs.length - 1)] : null;
-  const cat = n ? n.category : "nurse";
 
-  // 1. Who to see + next step + cost
-  const head = el("section", { class: "glass a-head enter tint-" + cat });
-  if (n) {
-    head.append(el("div", { class: "a-band" }, catIcon(cat),
-      el("div", {}, el("p", { class: "eyebrow" }, t("res_who")), el("h1", { id: "answer-title", tabindex: "-1" }, needHeadline(n)))));
-    if (n.why) head.append(el("p", { class: "why", lang: r.language, dir: "auto" }, n.why));
-    if (n.see_today) head.append(el("p", { class: "today" }, icon("clock"), t("see_today")));
-  } else {
-    head.append(el("div", { class: "a-band" }, catIcon("nurse"), el("div", {}, el("h1", { id: "answer-title", tabindex: "-1" }, t("res_nurse_title")))));
+  if (r.needs.length > 1) {
+    const tabs = el("div", { class: "tabs", role: "tablist", "aria-label": t("needs_label") });
+    r.needs.forEach((x, i) => tabs.append(on(el("button", { class: "tab", type: "button", role: "tab", "aria-selected": String(i === current.needIndex) }, needShort(x)), "click", () => {
+      current.needIndex = i; renderAnswer(); $("answer-title").focus({ preventScroll: true });
+    })));
+    box.append(tabs);
   }
-  const next = el("div", { class: "next" });
-  renderNextStep(next, n, r);
-  head.append(next);
-  if (n) head.append(el("div", { class: "a-body" }, el("div", { class: "cost" }, el("p", { class: "eyebrow" }, t("cost_title")), moneyBlock(n), conditionBox(n))));
-  else head.append(el("div", { style: "height:1.375rem" }));
+
+  const head = el("div", { class: "detail-head enter" });
+  if (current.q) head.append(el("p", { class: "asked", dir: "auto" }, current.q));
   box.append(head);
 
-  // 2. Places, with the location picker on top
-  let groups = [];
-  if (!n || placesFor(cat).length) {
-    const sec = el("section", { class: "a-places enter-2", "aria-label": t("places_deal") });
-    const picker = buildLocPicker(() => { renderNextStep(next, n, r); groups = renderPlaces(sec, n); });
-    sec.append(el("div", { class: "glass loc-card" }, picker));
-    groups = renderPlaces(sec, n);
-    box.append(sec);
+  // Not about health: say so, offer examples, keep 811 as a safety net.
+  if (n && isOffTopic(n)) {
+    head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, t("off_title")), el("p", { class: "lead" }, t("off_text")));
+    const chips = el("div", { class: "chips" });
+    ["ankle", "stress", "asthma"].forEach(k => chips.append(on(el("button", { class: "chip", type: "button" }, t("chip_" + k)), "click", () => {
+      show("ask"); input.value = t("ex_" + k); askBtn.disabled = busy;
+    })));
+    box.append(chips, el("div", { class: "links" }, el("a", { class: "link", href: "tel:811" }, t("off_811"))));
+    return;
+  }
+  // Nothing specific came back: the nurse line is the next step.
+  if (!n) {
+    head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, t("res_nurse_title")));
+    box.append(...nurseBlock(), el("p", { class: "tiny fine" }, t("not_med")));
+    return;
   }
 
-  // 3. Details
-  if (n) {
-    const more = el("section", { class: "glass a-more enter-3" });
-    const lr = leftRow(n);
-    if (lr) more.append(lr);
-    const script = n.what_to_say || (cat !== "doctor_visit" && cat !== "other" && cat !== "medical_equipment" ? CALL_SCRIPT : "");
-    if (script) {
-      const copyBtn = el("button", { class: "copy-btn", type: "button", "aria-label": t("copy_label") }, icon("copy"), el("span", {}, t("copy")));
-      copyBtn.addEventListener("click", () => copyText(script, copyBtn));
-      more.append(detailsRow(t("res_say"), [el("p", { class: "say-text", lang: "en", dir: "ltr" }, script), copyBtn]));
-    }
-    const share = el("button", { class: "text-link", type: "button" }, icon("share"), t("save_share"));
-    share.addEventListener("click", () => shareAnswer(n, placesFor(cat), script));
-    more.append(el("div", { class: "more-actions" }, share, el("button", { class: "text-link", type: "button", "data-go": "coverage" }, t("see_all"))));
-    box.append(more);
+  const cat = n.category;
+  head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, needHeadline(n)), el("p", { class: "lead" }, paySentence(n)));
+  if (n.see_today) head.append(el("p", { class: "today" }, icon("clock"), t("see_today")));
+  const cond = conditionBox(n); if (cond) head.append(cond);
+
+  if (r.nurse && (cat === "doctor_visit" || cat === "other")) {
+    box.append(...nurseBlock());
+  } else if (cat === "vaccine") {
+    box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
+      el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
+  } else if (cat === "medical_equipment") {
+    box.append(el("p", { class: "next-text" }, t("next_equip")),
+      el("a", { class: "big", href: telHref(STUDENT_HEALTH.p), style: "margin-top:0.75rem" }, t("call_name", { name: STUDENT_HEALTH.n })),
+      el("p", { class: "meta" }, t("free_msp"), el("span", { class: "desk" }, " · " + STUDENT_HEALTH.p)));
+  } else if (placesFor(cat).length) {
+    box.append(placeBlock(cat, { seeToday: n.see_today, bookKey: bookKeyFor(cat, n.dental_type) }));
+  } else {
+    let who = n.practitioner || tc(cat, "who");
+    if (uiLang() === "en") who = who.toLowerCase();
+    box.append(el("p", { class: "next-text" }, t("next_find", { who })));
   }
+
+  const links = el("div", { class: "links" });
+  const script = n.what_to_say || (cat !== "doctor_visit" && cat !== "other" && cat !== "medical_equipment" ? CALL_SCRIPT : "");
+  if (script) links.append(on(el("button", { class: "link", type: "button" }, t("say_link")), "click", () => {
+    const copy = el("button", { class: "opt center", type: "button" }, t("copy"));
+    on(copy, "click", () => copyText(script).then(ok => { copy.textContent = ok ? t("copied") : t("copy_failed"); }));
+    openSheet(t("say_link"), [el("p", { class: "grey", style: "margin-top:0.25rem" }, t("say_sub")), el("p", { class: "say", lang: "en", dir: "ltr" }, script), el("div", { class: "opts" }, copy)]);
+  }));
+  if (window.speechSynthesis) {
+    const rb = el("button", { class: "link", type: "button" }, icon("speaker"), el("span", {}, t("read_aloud")));
+    on(rb, "click", () => {
+      const parts = [needHeadline(n), paySentence(n)];
+      const big = box.querySelector(".big"); if (big) parts.push(big.textContent);
+      readAloud(rb, parts.join(". "), langInfo(uiLang()).speech || "en-CA");
+    });
+    links.append(rb);
+  }
+  box.append(links);
+  if (cat === "counselling") box.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:988" }, t("backup_988"))));
+  else if (!(r.nurse && (cat === "doctor_visit" || cat === "other")) && !["vision", "vaccine", "prescription", "hearing"].includes(cat) && !(cat === "dental" && n.dental_type === "preventive")) {
+    box.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:811" }, t("backup_811"))));
+  }
+  box.append(el("p", { class: "tiny fine" }, t("not_med")));
 }
 
-async function copyText(text, btn) {
-  let ok = false;
-  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {
     const ta = el("textarea", { class: "sr-only", "aria-hidden": "true" }); ta.value = text;
     document.body.append(ta); ta.select();
-    try { ok = document.execCommand("copy"); } catch (e2) {}
-    ta.remove();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {}
+    ta.remove(); return ok;
   }
-  if (btn) {
-    const label = btn.querySelector("span");
-    label.textContent = ok ? t("copied") : t("copy_failed");
-    setTimeout(() => { label.textContent = t("copy"); }, 2000);
-  }
-  return ok;
-}
-
-function shareAnswer(n, groups, script) {
-  const lines = ["PlanPal: " + needHeadline(n)];
-  const m = $("answer").querySelector(".money");
-  if (m) lines.push(m.innerText.replace(/\n+/g, " ").trim());
-  const deal = groups.find(g => g.kind === "deal") || groups[0];
-  if (deal) {
-    lines.push("");
-    deal.list.forEach(p => lines.push("• " + p.n + (p.p ? " · " + p.p : "") + (p.a ? " · " + p.a : "")));
-  }
-  if (script) lines.push("", script);
-  const text = lines.join("\n");
-  const touch = window.matchMedia("(pointer: coarse)").matches;
-  if (navigator.share && touch) { navigator.share({ title: "PlanPal", text }).catch(() => {}); return; }
-  copyText(text).then(ok => toast(ok ? t("share_copied") : t("copy_failed")));
 }
 
 /* ---------- Recent questions (this visit only, never saved) ---------- */
@@ -3478,34 +3600,31 @@ function renderRecent() {
   const wrap = $("recent"), list = $("recent-list");
   list.replaceChildren();
   wrap.hidden = !recent.length;
-  recent.forEach(item => {
-    const n = item.result.needs[0];
-    const b = el("button", { type: "button" }, n ? catIcon(n.category, true) : catIcon("nurse", true),
-      el("span", { class: "recent-q", dir: "auto" }, item.q),
-      el("span", { class: "recent-cat" }, n ? needShort(n) : "811"));
-    b.addEventListener("click", () => { current = { result: item.result, needIndex: 0 }; renderAnswer(); show("answer"); });
-    list.append(el("li", {}, b));
-  });
+  recent.forEach(item => list.append(on(el("button", { class: "row", type: "button" },
+    el("span", { class: "row-name", dir: "auto" }, item.q),
+    el("span", { class: "chev", "aria-hidden": "true" })), "click", () => {
+      current = { result: item.result, needIndex: 0, q: item.q }; renderAnswer(); show("answer");
+    })));
 }
 
 /* =========================================================================
-   12. COVERAGE SCREEN
+   13. COVERAGE SCREEN
    ========================================================================= */
 const REMINDER_ORDER = ["dental", "vision", "physio", "massage", "chiropractor", "counselling"];
 function renderReminder() {
   const box = $("reminder");
   const reset = planReset();
-  box.replaceChildren(el("h2", { id: "reminder-title", class: "eyebrow" }, t("rem_title", { date: reset.short })),
-    el("p", { class: "countdown" }, daysText(reset.days)), el("p", { class: "small" }, t("rem_until", { date: reset.label })));
-  if (!state.usageKnown) { box.append(el("p", { class: "small", style: "margin-top:0.75rem" }, t("cov_banner"))); return; }
+  box.replaceChildren(el("p", { class: "grey" }, t("rem_title", { date: reset.short })),
+    el("p", { class: "countdown" }, daysText(reset.days)), el("p", { class: "grey" }, t("rem_until", { date: reset.label })));
+  if (!state.usageKnown) { box.append(el("p", { class: "grey", style: "margin-top:0.75rem" }, t("cov_banner"))); return; }
   const items = [];
   for (const cat of REMINDER_ORDER) {
     const c = COVERAGE[cat];
     if (c.track === "flag") { if (!state.eyeUsed) items.push([tc(cat, "title"), t("rem_not_used")]); continue; }
     if (c.track === "money" && Number(state.used[cat] || 0) === 0) items.push([tc(cat, "title"), t("rem_unused", { amt: money(c.annual_max) })]);
   }
-  if (!items.length) { box.append(el("p", { class: "small", style: "margin-top:0.75rem" }, t("rem_all"))); return; }
-  box.append(el("p", { class: "sub-head" }, t("rem_not_yet")), el("ul", { class: "unused" }, ...items.map(([a, b]) => el("li", {}, el("span", {}, a), el("span", {}, b)))));
+  if (!items.length) { box.append(el("p", { class: "grey", style: "margin-top:0.75rem" }, t("rem_all"))); return; }
+  box.append(el("ul", { class: "unused" }, ...items.map(([a, b]) => el("li", {}, el("span", {}, a), el("span", { style: "font-weight:700" }, b)))));
 }
 function covKey(cat) {
   const c = COVERAGE[cat];
@@ -3533,7 +3652,7 @@ function renderCoverage() {
       inp.value = state.usageKnown ? String(state.used[cat] || 0) : "";
       const leftLine = el("p", { class: "left-line", "aria-live": "polite" });
       const updateLeft = () => { const left = remainingFor(cat, c.annual_max); leftLine.textContent = left === null ? "" : t("cov_left", { amt: money(left) }); };
-      inp.addEventListener("input", () => {
+      on(inp, "input", () => {
         let v = Number(inp.value); if (!isFinite(v) || v < 0 || inp.value === "") v = 0;
         state.used[cat] = v; state.usageKnown = true; save(); updateLeft(); renderReminder();
       });
@@ -3542,42 +3661,37 @@ function renderCoverage() {
     } else if (c.track === "flag") {
       const cb = el("input", { type: "checkbox", id: "used-" + cat });
       cb.checked = state.eyeUsed;
-      cb.addEventListener("change", () => { state.eyeUsed = cb.checked; state.usageKnown = true; save(); renderReminder(); });
+      on(cb, "change", () => { state.eyeUsed = cb.checked; state.usageKnown = true; save(); renderReminder(); });
       body.push(el("label", { class: "check", style: "margin-top:0.5rem" }, cb, el("span", {}, t("cov_had_one"))));
     }
-    const groups = placesFor(cat);
-    const deal = groups.find(g => g.kind === "deal") || groups[0];
-    if (deal) body.push(el("p", { class: "sub-head" }, (deal.kind === "deal" ? t("places_deal") : deal.kind === "free" ? t("places_free") : t("places_other")) + " · " + t("plan_near", { place: locLabel() })),
-      el("div", { class: "scroller" }, ...deal.list.map((p, i) => placeCard(p, deal.kind, deal.cat, i === 0))));
-    const summary = el("summary", {}, el("span", { class: "cov-sum" }, catIcon(cat, true), el("span", {}, tc(cat, "title")), el("span", { class: "cov-key" }, covKey(cat))));
-    list.append(el("details", { class: "row" }, summary, el("div", { class: "row-body" }, ...body)));
+    list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", {}, tc(cat, "title")), el("span", { class: "cov-key" }, covKey(cat))), el("div", { class: "row-body" }, ...body)));
   }
-  list.append(el("div", { class: "travel" }, catIcon("travel", true), el("div", {}, el("p", { style: "font-weight:600" }, t("travel_title")), el("p", { class: "small" }, t("travel_text")))));
+  list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", {}, t("travel_title"))), el("div", { class: "row-body" }, el("p", {}, t("travel_text")))));
 }
 
 /* =========================================================================
-   13. SETTINGS + PRIVACY
+   14. SETTINGS + PRIVACY
    ========================================================================= */
 function renderSettings() {
   $("lang-settings").value = state.language;
   document.querySelector(`input[name="textsize"][value="${state.large ? "large" : "std"}"]`).checked = true;
   $("remember").checked = state.remember;
 }
-document.querySelectorAll('input[name="textsize"]').forEach(r => r.addEventListener("change", () => { state.large = r.value === "large" && r.checked; applyLarge(); save(); }));
+document.querySelectorAll('input[name="textsize"]').forEach(r => on(r, "change", () => { state.large = r.value === "large" && r.checked; applyLarge(); save(); }));
 function applyLarge() { document.documentElement.classList.toggle("large", state.large); }
-$("remember").addEventListener("change", e => { state.remember = e.target.checked; if (state.remember) save(); else forget(); renderNudge(); });
-for (const id of ["lang-header", "lang-settings"]) $(id).addEventListener("change", e => { state.language = e.target.value; save(); refreshLanguage(); });
+on($("remember"), "change", e => { state.remember = e.target.checked; if (state.remember) save(); else forget(); });
+for (const id of ["lang-header", "lang-settings"]) on($(id), "change", e => { state.language = e.target.value; save(); refreshLanguage(); });
 function renderPrivacy() {
-  const icons = ["lock", "share", "other", "check", "pin", "check", "nurse"];
+  const icons = ["lock", "share", "info", "check", "pin", "check", "phone"];
   $("priv-list").replaceChildren(...[1, 2, 3, 4, 5, 6, 7].map((i, k) => el("li", {}, icon(icons[k]), el("p", {}, t("priv_" + i)))));
 }
 
 /* =========================================================================
-   14. SAFETY SCREEN
+   15. SAFETY SCREEN
    ========================================================================= */
 const safetyEl = $("safety");
 function showSafety(type) {
-  stopListening();
+  stopListening(); stopReading(); closeSheet();
   const heading = $("safety-heading"), actions = $("safety-actions");
   actions.replaceChildren();
   if (type === "988") {
@@ -3588,35 +3702,31 @@ function showSafety(type) {
     actions.append(el("a", { class: "safety-btn main", href: "tel:911" }, t("s911_call")), el("p", {}, t("s911_note")));
   }
   safetyEl.hidden = false;
-  $("theme-color").setAttribute("content", "#B00020");
   $("app").setAttribute("aria-hidden", "true");
-  $("sticky-bar").setAttribute("aria-hidden", "true");
   document.body.style.overflow = "hidden";
   heading.focus();
 }
-$("safety-back").addEventListener("click", () => {
+on($("safety-back"), "click", () => {
   safetyEl.hidden = true;
-  $("theme-color").setAttribute("content", "#EEF3EF");
   $("app").removeAttribute("aria-hidden");
-  $("sticky-bar").removeAttribute("aria-hidden");
   document.body.style.overflow = "";
   input.value = ""; askBtn.disabled = true;
   if (currentView !== "ask") show("ask");
-  if (!window.matchMedia("(pointer: coarse)").matches) input.focus();
+  if (finePointer()) input.focus();
 });
 
 /* =========================================================================
-   15. SPEAK
+   16. SPEAK
    ========================================================================= */
 const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 const speakBtn = $("speak"), speakStatus = $("ask-status");
 let rec = null, listening = false;
 function speechCode() { return state.language === "auto" ? uiLang() : state.language; }
-function setSpeakStatus(msg) { speakStatus.textContent = msg || ""; speakStatus.hidden = !msg; }
+function setStatus(msg) { speakStatus.textContent = msg || ""; speakStatus.hidden = !msg; }
 function updateSpeakButton() { speakBtn.setAttribute("aria-label", listening ? t("speak_stop") : t("speak")); speakBtn.setAttribute("aria-pressed", String(listening)); }
 function stopListening() { if (rec && listening) { try { rec.stop(); } catch (e) {} } }
-speakBtn.addEventListener("click", () => {
-  if (!SpeechRec) { setSpeakStatus(t("speak_unsupported")); return; }
+on(speakBtn, "click", () => {
+  if (!SpeechRec) { setStatus(t("speak_unsupported")); return; }
   if (listening) { stopListening(); return; }
   const base = input.value.trim() ? input.value.trim() + " " : "";
   let heard = false;
@@ -3631,39 +3741,38 @@ speakBtn.addEventListener("click", () => {
     askBtn.disabled = busy || !input.value.trim();
   };
   rec.onerror = e => {
-    if (e.error === "not-allowed" || e.error === "service-not-allowed") setSpeakStatus(t("speak_denied"));
-    else if (e.error !== "aborted") setSpeakStatus(t("speak_nothing"));
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") setStatus(t("speak_denied"));
+    else if (e.error !== "aborted") setStatus(t("speak_nothing"));
   };
   rec.onend = () => {
     const wasListening = speakStatus.textContent === t("speak_listening", { lang: langInfo(speechCode()).name });
     listening = false; updateSpeakButton();
-    if (heard) setSpeakStatus(""); else if (wasListening) setSpeakStatus(t("speak_nothing"));
+    if (heard) setStatus(""); else if (wasListening) setStatus(t("speak_nothing"));
   };
-  try { rec.start(); listening = true; updateSpeakButton(); setSpeakStatus(t("speak_listening", { lang: langInfo(speechCode()).name })); }
-  catch (e) { listening = false; updateSpeakButton(); setSpeakStatus(t("speak_nothing")); }
+  try { rec.start(); listening = true; updateSpeakButton(); setStatus(t("speak_listening", { lang: langInfo(speechCode()).name })); }
+  catch (e) { listening = false; updateSpeakButton(); setStatus(t("speak_nothing")); }
 });
 
 /* =========================================================================
-   16. ASK
+   17. ASK
    ========================================================================= */
 const input = $("message"), askBtn = $("ask"), askError = $("ask-error");
 let busy = false;
-const coarse = () => window.matchMedia("(pointer: coarse)").matches;
-document.querySelectorAll("[data-example]").forEach(b => b.addEventListener("click", () => {
+document.querySelectorAll("[data-example]").forEach(b => on(b, "click", () => {
   stopListening(); input.value = t(b.dataset.example); askBtn.disabled = busy; askError.hidden = true;
-  if (!coarse()) input.focus();
+  if (finePointer()) input.focus();
 }));
-input.addEventListener("input", () => { askBtn.disabled = busy || !input.value.trim(); askError.hidden = true; });
-input.addEventListener("keydown", e => {
+on(input, "input", () => { askBtn.disabled = busy || !input.value.trim(); askError.hidden = true; });
+on(input, "keydown", e => {
   if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); if (!askBtn.disabled) onAsk(); }
 });
-askBtn.addEventListener("click", onAsk);
-function setLoading(on) {
-  busy = on;
-  askBtn.disabled = on || !input.value.trim();
-  askBtn.setAttribute("aria-busy", String(on));
-  if (on) { askBtn.replaceChildren(el("span", { class: "spinner", "aria-hidden": "true" }), el("span", {}, t("ask_btn"))); setSpeakStatus(t("ask_loading")); }
-  else { askBtn.replaceChildren(t("ask_btn")); }
+on(askBtn, "click", onAsk);
+function setLoading(isOn) {
+  busy = isOn;
+  askBtn.disabled = isOn || !input.value.trim();
+  askBtn.setAttribute("aria-busy", String(isOn));
+  if (isOn) { askBtn.replaceChildren(el("span", { class: "spinner", "aria-hidden": "true" }), el("span", {}, t("ask_btn"))); setStatus(t("ask_loading")); }
+  else askBtn.replaceChildren(t("ask_btn"));
 }
 async function onAsk() {
   const text = input.value.trim();
@@ -3673,25 +3782,26 @@ async function onAsk() {
   const local = detectSafety(text);
   if (local) { showSafety(local); return; }
   setLoading(true);
-  const slow = setTimeout(() => { if (busy) setSpeakStatus(t("ask_waking")); }, SLOW_NOTICE_MS);
+  const slow = setTimeout(() => { if (busy) setStatus(t("ask_waking")); }, SLOW_NOTICE_MS);
   try {
     const r = await askServer(text);
-    setSpeakStatus("");
+    setStatus("");
     if (r.emergency) { showSafety(r.emergency); return; }
     input.blur();
-    current = { result: r, needIndex: 0 };
+    current = { result: r, needIndex: 0, q: text };
     recent.unshift({ q: text, result: r });
-    if (recent.length > 5) recent.pop();
+    if (recent.length > 3) recent.pop();
     renderAnswer();
     show("answer");
+    input.value = "";
   } catch (e) {
-    setSpeakStatus("");
+    setStatus("");
     askError.textContent = t("err_server"); askError.hidden = false;
   } finally { clearTimeout(slow); setLoading(false); }
 }
 
 /* =========================================================================
-   17. START
+   18. START
    ========================================================================= */
 load();
 applyLarge();
