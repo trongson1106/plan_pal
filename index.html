@@ -4168,7 +4168,7 @@ function readAloud(btn, text, lang) {
 function urgencyBadge(urgency) {
   const cls = urgency === "today" ? "today" : urgency === "self_care" ? "self-care" : "this-week";
   const ico = urgency === "today" ? "clock" : urgency === "self_care" ? "home" : "calendar";
-  return el("span", { class: "urgency-badge " + cls }, icon(ico), t("urgency_" + urgency));
+  return el("span", { class: "urgency-badge " + cls }, t("urgency_" + urgency));
 }
 function erCard(cat, urgency) {
   const signs = erSignsFor(cat);
@@ -4231,7 +4231,7 @@ function renderAnswer() {
   const cat = n.category;
   head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, needHeadline(n)), el("p", { class: "lead" }, paySentence(n)));
   // Urgency badge + why line.
-  if (r.urgency) head.append(urgencyBadge(r.urgency));
+  if (r.urgency && !n.see_today) head.append(urgencyBadge(r.urgency));
   if (r.why) head.append(el("p", { class: "why-line", dir: "auto" }, r.why));
   if (n.see_today) head.append(el("p", { class: "today" }, icon("clock"), t("see_today")));
   const cond = conditionBox(n); if (cond) head.append(cond);
