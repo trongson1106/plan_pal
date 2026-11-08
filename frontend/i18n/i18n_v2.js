@@ -1,0 +1,96 @@
+/* Labels added for the redesign (merged into I18N above). */
+(function () {
+  const EXTRA = {
+    en: {
+      chip_ankle: "Sprained ankle", chip_stress: "Exam stress", chip_teeth: "Dental cleaning",
+      back_ask: "Ask something else", back: "Back",
+      ans_call: "Call {name}", ans_more_places: "Other places nearby",
+      row_left: "How much I have left", row_save: "Ways to pay less",
+      ans_811: "Not sure how serious? Call 811 to talk to a nurse",
+      ans_confirm: "Double-check this in the Pacific Blue Cross app.",
+      place_direct: "Bills Blue Cross directly",
+      set_title: "Settings", set_text: "Text size", set_text_std: "Standard", set_text_large: "Larger",
+      set_remember_note: "Saves your language and what you've used on this device. Never what you type.",
+      lang_auto_short: "Auto",
+      go: { physio: "See a physiotherapist", massage: "See a registered massage therapist", counselling: "Talk to a counsellor",
+            dental_cleaning: "Book a dental cleaning", eye_exam: "Book an eye exam", prescription: "Ask a pharmacist", doctor_visit: "See a doctor" },
+    },
+    "zh-Hans": {
+      chip_ankle: "脚踝扭伤", chip_stress: "考试压力", chip_teeth: "洗牙",
+      back_ask: "问别的问题", back: "返回",
+      ans_call: "打电话给{name}", ans_more_places: "附近其他地方",
+      row_left: "我还剩多少额度", row_save: "省钱的方法",
+      ans_811: "不确定严不严重？拨打811和护士通话",
+      ans_confirm: "请在Pacific Blue Cross应用里再确认一下。",
+      place_direct: "直接向Blue Cross收费",
+      set_title: "设置", set_text: "字体大小", set_text_std: "标准", set_text_large: "放大",
+      set_remember_note: "在这台设备上保存你的语言和已用额度。不会保存你输入的内容。",
+      lang_auto_short: "自动",
+      go: { physio: "去看物理治疗师", massage: "去看注册按摩治疗师", counselling: "找心理咨询师聊聊",
+            dental_cleaning: "预约洗牙", eye_exam: "预约眼科检查", prescription: "咨询药剂师", doctor_visit: "去看医生" },
+    },
+    "zh-Hant": {
+      chip_ankle: "腳踝扭傷", chip_stress: "考試壓力", chip_teeth: "洗牙",
+      back_ask: "問別的問題", back: "返回",
+      ans_call: "打電話給{name}", ans_more_places: "附近其他地方",
+      row_left: "我還剩多少額度", row_save: "省錢的方法",
+      ans_811: "不確定嚴不嚴重？撥打811和護士通話",
+      ans_confirm: "請在Pacific Blue Cross應用程式裡再確認一下。",
+      place_direct: "直接向Blue Cross收費",
+      set_title: "設定", set_text: "字體大小", set_text_std: "標準", set_text_large: "放大",
+      set_remember_note: "在這部裝置上儲存你的語言和已用額度。不會儲存你輸入的內容。",
+      lang_auto_short: "自動",
+      go: { physio: "去看物理治療師", massage: "去看註冊按摩治療師", counselling: "找心理諮詢師聊聊",
+            dental_cleaning: "預約洗牙", eye_exam: "預約眼科檢查", prescription: "諮詢藥劑師", doctor_visit: "去看醫生" },
+    },
+    pa: {
+      chip_ankle: "ਗਿੱਟੇ ਦੀ ਮੋਚ", chip_stress: "ਇਮਤਿਹਾਨਾਂ ਦਾ ਤਣਾਅ", chip_teeth: "ਦੰਦਾਂ ਦੀ ਸਫ਼ਾਈ",
+      back_ask: "ਕੁਝ ਹੋਰ ਪੁੱਛੋ", back: "ਵਾਪਸ",
+      ans_call: "{name} ਨੂੰ ਕਾਲ ਕਰੋ", ans_more_places: "ਨੇੜੇ ਹੋਰ ਥਾਵਾਂ",
+      row_left: "ਮੇਰੇ ਕੋਲ ਕਿੰਨਾ ਬਾਕੀ ਹੈ", row_save: "ਘੱਟ ਖ਼ਰਚੇ ਦੇ ਤਰੀਕੇ",
+      ans_811: "ਪਤਾ ਨਹੀਂ ਕਿੰਨਾ ਗੰਭੀਰ ਹੈ? ਨਰਸ ਨਾਲ ਗੱਲ ਕਰਨ ਲਈ 811 'ਤੇ ਕਾਲ ਕਰੋ",
+      ans_confirm: "Pacific Blue Cross ਐਪ ਵਿੱਚ ਇਹ ਜ਼ਰੂਰ ਦੇਖ ਲਓ।",
+      place_direct: "Blue Cross ਨੂੰ ਸਿੱਧਾ ਬਿੱਲ ਕਰਦੇ ਹਨ",
+      set_title: "ਸੈਟਿੰਗਾਂ", set_text: "ਅੱਖਰਾਂ ਦਾ ਆਕਾਰ", set_text_std: "ਆਮ", set_text_large: "ਵੱਡੇ",
+      set_remember_note: "ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਅਤੇ ਵਰਤੀ ਰਕਮ ਸੰਭਾਲਦਾ ਹੈ। ਜੋ ਤੁਸੀਂ ਲਿਖਦੇ ਹੋ ਉਹ ਕਦੇ ਨਹੀਂ।",
+      lang_auto_short: "ਆਟੋ",
+      go: { physio: "ਫਿਜ਼ੀਓਥੈਰੇਪਿਸਟ ਨੂੰ ਮਿਲੋ", massage: "ਰਜਿਸਟਰਡ ਮਸਾਜ ਥੈਰੇਪਿਸਟ ਨੂੰ ਮਿਲੋ", counselling: "ਕਾਊਂਸਲਰ ਨਾਲ ਗੱਲ ਕਰੋ",
+            dental_cleaning: "ਦੰਦਾਂ ਦੀ ਸਫ਼ਾਈ ਬੁੱਕ ਕਰੋ", eye_exam: "ਅੱਖਾਂ ਦੀ ਜਾਂਚ ਬੁੱਕ ਕਰੋ", prescription: "ਫਾਰਮਾਸਿਸਟ ਨੂੰ ਪੁੱਛੋ", doctor_visit: "ਡਾਕਟਰ ਨੂੰ ਦਿਖਾਓ" },
+    },
+    hi: {
+      chip_ankle: "टखने में मोच", chip_stress: "परीक्षा का तनाव", chip_teeth: "दाँतों की सफ़ाई",
+      back_ask: "कुछ और पूछें", back: "वापस",
+      ans_call: "{name} को कॉल करें", ans_more_places: "पास की दूसरी जगहें",
+      row_left: "मेरे पास कितना बचा है", row_save: "कम खर्च के तरीके",
+      ans_811: "पता नहीं कितना गंभीर है? नर्स से बात करने के लिए 811 पर कॉल करें",
+      ans_confirm: "Pacific Blue Cross ऐप में इसे ज़रूर जाँच लें।",
+      place_direct: "Blue Cross को सीधे बिल करते हैं",
+      set_title: "सेटिंग्स", set_text: "अक्षरों का आकार", set_text_std: "सामान्य", set_text_large: "बड़े",
+      set_remember_note: "इस डिवाइस पर आपकी भाषा और इस्तेमाल की गई रकम सेव करता है। आप जो लिखते हैं, वह कभी नहीं।",
+      lang_auto_short: "ऑटो",
+      go: { physio: "फ़िज़ियोथेरेपिस्ट को दिखाएँ", massage: "रजिस्टर्ड मसाज थेरेपिस्ट को दिखाएँ", counselling: "काउंसलर से बात करें",
+            dental_cleaning: "दाँतों की सफ़ाई बुक करें", eye_exam: "आँखों की जाँच बुक करें", prescription: "फ़ार्मासिस्ट से पूछें", doctor_visit: "डॉक्टर को दिखाएँ" },
+    },
+    ko: {
+      chip_ankle: "발목 삠", chip_stress: "시험 스트레스", chip_teeth: "스케일링",
+      back_ask: "다른 질문하기", back: "뒤로",
+      ans_call: "{name}에 전화하기", ans_more_places: "근처 다른 곳",
+      row_left: "남은 금액 보기", row_save: "비용을 줄이는 방법",
+      ans_811: "얼마나 심각한지 모르겠나요? 811에 전화해 간호사와 상담하세요",
+      ans_confirm: "Pacific Blue Cross 앱에서 꼭 다시 확인해 주세요.",
+      place_direct: "Blue Cross 직접 청구 가능",
+      set_title: "설정", set_text: "글자 크기", set_text_std: "기본", set_text_large: "크게",
+      set_remember_note: "이 기기에 언어와 사용한 금액을 저장해요. 입력한 내용은 절대 저장하지 않아요.",
+      lang_auto_short: "자동",
+      go: { physio: "물리치료사에게 가 보세요", massage: "등록 마사지 치료사에게 가 보세요", counselling: "상담사와 이야기해 보세요",
+            dental_cleaning: "스케일링을 예약하세요", eye_exam: "눈 검사를 예약하세요", prescription: "약사에게 물어보세요", doctor_visit: "의사에게 진료를 받으세요" },
+    },
+  };
+  for (const [lang, add] of Object.entries(EXTRA)) {
+    const target = I18N[lang];
+    for (const [k, v] of Object.entries(add)) {
+      if (k === "go") { for (const [cat, txt] of Object.entries(v)) target.cat[cat].go = txt; }
+      else target[k] = v;
+    }
+  }
+})();

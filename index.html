@@ -66,6 +66,7 @@
   .top-right { display: flex; align-items: center; gap: 0.25rem; }
   .top-link { display: none; min-height: 2.75rem; padding: 0 0.75rem; background: none; border: 0; color: var(--muted); font-size: 0.9375rem; font-weight: 600; border-radius: 999px; }
   .lang { position: relative; display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.875rem; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: 0.9375rem; font-weight: 600; }
+  .to-en { min-height: 2.75rem; padding: 0 0.75rem; border-radius: 999px; border: 0; background: none; color: var(--link); font-size: 0.9375rem; font-weight: 700; }
   .lang select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 1rem; }
   .lang:focus-within { outline: 3px solid var(--link); outline-offset: 2px; }
 
@@ -124,6 +125,10 @@
   .plan-sec { margin-top: 2rem; }
   .plan-sec .card { margin-top: 0.75rem; }
   .foot { display: flex; flex-direction: column; align-items: center; margin-top: 1.5rem; }
+  .privacy-note { display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 1rem; font-size: 0.875rem; line-height: 1.45; color: var(--muted); }
+  .privacy-note .icon { width: 1rem; height: 1rem; margin-top: 0.125rem; color: var(--link); }
+  .privacy-note strong { color: var(--text); }
+  .privacy-note button { display: inline; padding: 0; border: 0; background: none; color: var(--link); font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
   .private { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.75rem; background: none; border: 0; color: var(--muted); font-size: 0.875rem; font-weight: 600; }
   .private .icon { width: 0.9375rem; height: 0.9375rem; }
   .foot-links { display: flex; gap: 0 1.25rem; }
@@ -152,6 +157,11 @@
   .loc-msg { margin-top: 0.375rem; }
   .loc-msg.err { color: var(--err); font-weight: 600; }
   .done-card { margin-top: 1.5rem; }
+  .checklist { margin-top: 0.25rem; }
+  .mark { width: 1.75rem; height: 1.75rem; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--border); }
+  .mark .icon { width: 1rem; height: 1rem; }
+  .mark.done { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
+  .mark.booked { border-color: var(--btn); color: var(--link); }
   .next-text { padding: 1rem 1.125rem; border-radius: 1.125rem; background: var(--card); font-weight: 600; }
   .fine { text-align: center; margin-top: 1.25rem; }
   .nudge { margin-top: 1.25rem; padding: 0.75rem 1rem; border-radius: 1.125rem; background: var(--soft); color: var(--soft-text); }
@@ -192,6 +202,8 @@
   details.row-d summary::-webkit-details-marker { display: none; }
   details.row-d summary::after { content: ""; width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin-right: 0.25rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(45deg) translateY(-2px); }
   details.row-d[open] summary::after { transform: rotate(-135deg) translate(-2px, 0); }
+  .cov-sum { flex: 1; min-width: 0; padding: 0.625rem 0; }
+  details.row-d .row-body > p:first-child { color: var(--muted); font-size: 0.9375rem; }
   .cov-key { margin-left: auto; color: var(--muted); font-size: 0.9375rem; white-space: nowrap; }
   .row-body { padding: 0 0 1.125rem; }
   .used-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.75rem; }
@@ -267,6 +279,7 @@
       <div class="top-right">
         <button class="top-link" type="button" data-go="coverage" data-i18n="tab_coverage"></button>
         <button class="top-link" type="button" data-go="settings" data-i18n="top_settings"></button>
+        <button class="to-en" type="button" id="to-en" lang="en" hidden>English</button>
         <span class="lang">
           <span id="lang-current" aria-hidden="true"></span>
           <label class="sr-only" for="lang-header" data-i18n="top_language"></label>
@@ -299,6 +312,10 @@
             <button class="chip" type="button" data-chip="chip_stress" data-example="ex_stress"></button>
             <button class="chip" type="button" data-chip="chip_asthma" data-example="ex_asthma"></button>
           </div>
+          <p class="privacy-note">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span><strong data-i18n="private_link"></strong> <span data-i18n="private_text"></span> <button type="button" data-go="privacy" data-i18n="how_works"></button></span>
+          </p>
           <section class="recent" id="recent" hidden>
             <h2 class="grey" data-i18n="recent_title"></h2>
             <div class="card rows" id="recent-list" style="margin-top:0.5rem"></div>
@@ -312,10 +329,6 @@
         </section>
       </div>
       <div class="foot">
-        <button class="private" type="button" data-go="privacy">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <span data-i18n="private_link"></span>
-        </button>
         <nav class="foot-links">
           <button type="button" data-go="coverage" data-i18n="tab_coverage"></button>
           <button type="button" data-go="settings" data-i18n="top_settings"></button>
@@ -357,6 +370,7 @@
         <div class="setting">
           <label class="switch"><span data-i18n="remember"></span><input type="checkbox" role="switch" id="remember"></label>
           <p class="grey" data-i18n="set_remember_note"></p>
+          <button class="link" type="button" data-go="privacy" data-i18n="privacy_link"></button>
         </div>
       </section>
     </main>
@@ -2339,6 +2353,41 @@ const I18N_V5_EN = {
   off_811: "Not feeling well? Call 811",
   set_text: "Text size",
   set_access: "Text size and accessibility",
+  st_next: "Next: {when}",
+  st_booked: "Booked: {when}",
+  st_done_year: "Done this year",
+  word_fall: "fall",
+  dental_lead: "{n} covered this plan year.",
+  dental_all_done: "All set for this plan year. Your next one is covered from Sep 1.",
+  slot_n: "Cleaning {n}",
+  slot_done_ans: "Done: {answer}",
+  slot_done_month: "Done in {month}",
+  slot_booked: "Booked for {month}",
+  slot_ask: "Book ahead: ask for a cleaning in {range}.",
+  slot_note: "Months are estimates. The clinic knows your exact date.",
+  which_month: "Which month is it in?",
+  bk_q_dental_next: "Did you book your next cleaning?",
+  change_last: "Update your last cleaning",
+  from_month: "From {month}",
+  private_text: "PlanPal doesn't save what you type, and your postal code never leaves your phone.",
+  how_works: "How it works",
+  cov_dental: "Cleanings $0 at a network dentist. Fillings 50–70%. Up to $750 a year.",
+  cov_doctor: "Costs you nothing. BC's MSP pays, not this plan.",
+  cov_equip: "Orthotics up to $300 a year. Crutches and braces with a doctor's note.",
+  cov_travel: "Emergency care up to $5M, 120 days a trip.",
+  eye_lead: "Covered once every 2 years. Your plan pays $50.",
+  eye_last: "Last exam",
+  eye_next: "Next exam",
+  flu_season: "This season's flu shot",
+  doc_first: "First visit with UBC Student Health",
+  nothing_yet: "Nothing to book yet. The button shows up here when it's close.",
+  slot_ask_dental: "Book ahead: ask for a cleaning in {range}.",
+  slot_ask_eye: "Book ahead: ask for an exam in {range}.",
+  update_answer: "Update your answer",
+  book_online_at: "Book online at {name}",
+  visit_site: "Go to {name}'s website",
+  or_call: "Or call {phone}",
+  book_short: "Book",
 };
 
 /* Version 5 labels in the other page languages (merged into I18N). */
@@ -2398,6 +2447,41 @@ const I18N_V5 = {
     off_811: "身体不舒服？拨打811",
     set_text: "字体大小",
     set_access: "字体大小和无障碍",
+    st_next: "下次：{when}",
+    st_booked: "已预约：{when}",
+    st_done_year: "今年已完成",
+    word_fall: "秋天",
+    dental_lead: "本保险年度包含{n}次。",
+    dental_all_done: "本保险年度已全部完成。下一次从9月1日起包含。",
+    slot_n: "第{n}次洗牙",
+    slot_done_ans: "已完成：{answer}",
+    slot_done_month: "{month}已完成",
+    slot_booked: "已约在{month}",
+    slot_ask: "可以提前预约：请约在{range}。",
+    slot_note: "月份是估算的。诊所知道你的准确日期。",
+    which_month: "约在哪个月？",
+    bk_q_dental_next: "你预约下一次洗牙了吗？",
+    change_last: "更新上次洗牙时间",
+    from_month: "{month}起",
+    private_text: "PlanPal不保存你输入的内容，你的邮编也不会离开你的手机。",
+    how_works: "了解原理",
+    cov_dental: "网络内牙医洗牙$0。补牙50–70%。每年最多$750。",
+    cov_doctor: "你不用付钱。由BC省MSP支付，不是这个保险。",
+    cov_equip: "矫形鞋垫每年最多$300。拐杖和护具需要医生证明。",
+    cov_travel: "紧急医疗最高$5M，每次旅行120天。",
+    eye_lead: "每2年包含一次。保险支付$50。",
+    eye_last: "上次检查",
+    eye_next: "下次检查",
+    flu_season: "本季流感疫苗",
+    doc_first: "在UBC Student Health的第一次就诊",
+    nothing_yet: "现在还不用预约。快到时间时按钮会出现在这里。",
+    slot_ask_dental: "可以提前预约：请约在{range}洗牙。",
+    slot_ask_eye: "可以提前预约：请约在{range}检查。",
+    update_answer: "修改你的回答",
+    book_online_at: "在{name}网上预约",
+    visit_site: "前往{name}的网站",
+    or_call: "或拨打{phone}",
+    book_short: "预约",
   },
   "zh-Hant": {
     ask_placeholder: "用任何語言輸入或說出來",
@@ -2454,6 +2538,41 @@ const I18N_V5 = {
     off_811: "身體不舒服？撥打811",
     set_text: "字體大小",
     set_access: "字體大小和無障礙",
+    st_next: "下次：{when}",
+    st_booked: "已預約：{when}",
+    st_done_year: "今年已完成",
+    word_fall: "秋天",
+    dental_lead: "本保險年度包含{n}次。",
+    dental_all_done: "本保險年度已全部完成。下一次從9月1日起包含。",
+    slot_n: "第{n}次洗牙",
+    slot_done_ans: "已完成：{answer}",
+    slot_done_month: "{month}已完成",
+    slot_booked: "已約在{month}",
+    slot_ask: "可以提前預約：請約在{range}。",
+    slot_note: "月份是估算的。診所知道你的準確日期。",
+    which_month: "約在哪個月？",
+    bk_q_dental_next: "你預約下一次洗牙了嗎？",
+    change_last: "更新上次洗牙時間",
+    from_month: "{month}起",
+    private_text: "PlanPal不儲存你輸入的內容，你的郵遞區號也不會離開你的手機。",
+    how_works: "了解原理",
+    cov_dental: "網絡內牙醫洗牙$0。補牙50–70%。每年最多$750。",
+    cov_doctor: "你不用付錢。由BC省MSP給付，不是這個保險。",
+    cov_equip: "矯正鞋墊每年最多$300。拐杖和護具需要醫生證明。",
+    cov_travel: "緊急醫療最高$5M，每次旅行120天。",
+    eye_lead: "每2年包含一次。保險給付$50。",
+    eye_last: "上次檢查",
+    eye_next: "下次檢查",
+    flu_season: "本季流感疫苗",
+    doc_first: "在UBC Student Health的第一次就診",
+    nothing_yet: "現在還不用預約。快到時間時按鈕會出現在這裡。",
+    slot_ask_dental: "可以提前預約：請約在{range}洗牙。",
+    slot_ask_eye: "可以提前預約：請約在{range}檢查。",
+    update_answer: "修改你的回答",
+    book_online_at: "在{name}網上預約",
+    visit_site: "前往{name}的網站",
+    or_call: "或撥打{phone}",
+    book_short: "預約",
   },
   pa: {
     ask_placeholder: "ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ ਲਿਖੋ ਜਾਂ ਬੋਲੋ",
@@ -2510,6 +2629,41 @@ const I18N_V5 = {
     off_811: "ਤਬੀਅਤ ਠੀਕ ਨਹੀਂ? 811 'ਤੇ ਕਾਲ ਕਰੋ",
     set_text: "ਅੱਖਰਾਂ ਦਾ ਆਕਾਰ",
     set_access: "ਅੱਖਰਾਂ ਦਾ ਆਕਾਰ ਅਤੇ ਪਹੁੰਚਯੋਗਤਾ",
+    st_next: "ਅਗਲੀ: {when}",
+    st_booked: "ਬੁੱਕ: {when}",
+    st_done_year: "ਇਸ ਸਾਲ ਹੋ ਗਿਆ",
+    word_fall: "ਪਤਝੜ",
+    dental_lead: "ਇਸ ਪਲਾਨ ਸਾਲ ਵਿੱਚ {n} ਕਵਰ।",
+    dental_all_done: "ਇਸ ਪਲਾਨ ਸਾਲ ਲਈ ਸਭ ਹੋ ਗਿਆ। ਅਗਲੀ 1 ਸਤੰਬਰ ਤੋਂ ਕਵਰ ਹੈ।",
+    slot_n: "ਸਫ਼ਾਈ {n}",
+    slot_done_ans: "ਹੋ ਗਿਆ: {answer}",
+    slot_done_month: "{month} ਵਿੱਚ ਹੋ ਗਿਆ",
+    slot_booked: "{month} ਲਈ ਬੁੱਕ",
+    slot_ask: "ਪਹਿਲਾਂ ਹੀ ਬੁੱਕ ਕਰੋ: {range} ਵਿੱਚ ਸਫ਼ਾਈ ਮੰਗੋ।",
+    slot_note: "ਮਹੀਨੇ ਅੰਦਾਜ਼ਾ ਹਨ। ਕਲੀਨਿਕ ਨੂੰ ਪੱਕੀ ਤਾਰੀਖ਼ ਪਤਾ ਹੈ।",
+    which_month: "ਇਹ ਕਿਹੜੇ ਮਹੀਨੇ ਵਿੱਚ ਹੈ?",
+    bk_q_dental_next: "ਕੀ ਤੁਸੀਂ ਅਗਲੀ ਸਫ਼ਾਈ ਬੁੱਕ ਕਰ ਲਈ?",
+    change_last: "ਆਖ਼ਰੀ ਸਫ਼ਾਈ ਅੱਪਡੇਟ ਕਰੋ",
+    from_month: "{month} ਤੋਂ",
+    private_text: "PlanPal ਤੁਹਾਡਾ ਲਿਖਿਆ ਸੇਵ ਨਹੀਂ ਕਰਦਾ, ਅਤੇ ਤੁਹਾਡਾ ਪੋਸਟਲ ਕੋਡ ਕਦੇ ਤੁਹਾਡੇ ਫ਼ੋਨ ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।",
+    how_works: "ਇਹ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ",
+    cov_dental: "ਨੈੱਟਵਰਕ ਡੈਂਟਿਸਟ ਕੋਲ ਸਫ਼ਾਈ $0। ਫ਼ਿਲਿੰਗ 50–70%। ਸਾਲ ਵਿੱਚ $750 ਤੱਕ।",
+    cov_doctor: "ਤੁਹਾਡਾ ਕੋਈ ਖ਼ਰਚਾ ਨਹੀਂ। BC ਦਾ MSP ਦਿੰਦਾ ਹੈ, ਇਹ ਪਲਾਨ ਨਹੀਂ।",
+    cov_equip: "ਆਰਥੋਟਿਕਸ ਸਾਲ ਵਿੱਚ $300 ਤੱਕ। ਫੌੜੀਆਂ ਅਤੇ ਬ੍ਰੇਸ ਡਾਕਟਰ ਦੇ ਨੋਟ ਨਾਲ।",
+    cov_travel: "ਐਮਰਜੈਂਸੀ ਇਲਾਜ $5M ਤੱਕ, ਹਰ ਯਾਤਰਾ 120 ਦਿਨ।",
+    eye_lead: "ਹਰ 2 ਸਾਲ ਵਿੱਚ ਇੱਕ ਵਾਰ ਕਵਰ। ਪਲਾਨ $50 ਦਿੰਦਾ ਹੈ।",
+    eye_last: "ਪਿਛਲੀ ਜਾਂਚ",
+    eye_next: "ਅਗਲੀ ਜਾਂਚ",
+    flu_season: "ਇਸ ਸੀਜ਼ਨ ਦਾ ਫਲੂ ਟੀਕਾ",
+    doc_first: "UBC Student Health ਵਿੱਚ ਪਹਿਲੀ ਮੁਲਾਕਾਤ",
+    nothing_yet: "ਅਜੇ ਬੁੱਕ ਕਰਨ ਲਈ ਕੁਝ ਨਹੀਂ। ਸਮਾਂ ਨੇੜੇ ਆਉਣ 'ਤੇ ਬਟਨ ਇੱਥੇ ਆ ਜਾਵੇਗਾ।",
+    slot_ask_dental: "ਪਹਿਲਾਂ ਹੀ ਬੁੱਕ ਕਰੋ: {range} ਵਿੱਚ ਸਫ਼ਾਈ ਮੰਗੋ।",
+    slot_ask_eye: "ਪਹਿਲਾਂ ਹੀ ਬੁੱਕ ਕਰੋ: {range} ਵਿੱਚ ਜਾਂਚ ਮੰਗੋ।",
+    update_answer: "ਆਪਣਾ ਜਵਾਬ ਬਦਲੋ",
+    book_online_at: "{name} ਨਾਲ ਔਨਲਾਈਨ ਬੁੱਕ ਕਰੋ",
+    visit_site: "{name} ਦੀ ਵੈੱਬਸਾਈਟ 'ਤੇ ਜਾਓ",
+    or_call: "ਜਾਂ {phone} 'ਤੇ ਕਾਲ ਕਰੋ",
+    book_short: "ਬੁੱਕ",
   },
   hi: {
     ask_placeholder: "किसी भी भाषा में लिखें या बोलें",
@@ -2566,6 +2720,41 @@ const I18N_V5 = {
     off_811: "तबीयत ठीक नहीं? 811 पर कॉल करें",
     set_text: "अक्षरों का आकार",
     set_access: "अक्षरों का आकार और सुलभता",
+    st_next: "अगली: {when}",
+    st_booked: "बुक: {when}",
+    st_done_year: "इस साल हो गया",
+    word_fall: "पतझड़",
+    dental_lead: "इस प्लान वर्ष में {n} कवर।",
+    dental_all_done: "इस प्लान वर्ष के लिए सब हो गया। अगली 1 सितंबर से कवर है।",
+    slot_n: "सफ़ाई {n}",
+    slot_done_ans: "हो गया: {answer}",
+    slot_done_month: "{month} में हो गया",
+    slot_booked: "{month} के लिए बुक",
+    slot_ask: "पहले से बुक करें: {range} में सफ़ाई माँगें।",
+    slot_note: "महीने अनुमान हैं। क्लिनिक को सही तारीख़ पता है।",
+    which_month: "यह किस महीने में है?",
+    bk_q_dental_next: "क्या आपने अगली सफ़ाई बुक कर ली?",
+    change_last: "पिछली सफ़ाई अपडेट करें",
+    from_month: "{month} से",
+    private_text: "PlanPal आपका लिखा सेव नहीं करता, और आपका पोस्टल कोड कभी आपके फ़ोन से बाहर नहीं जाता।",
+    how_works: "यह कैसे काम करता है",
+    cov_dental: "नेटवर्क डेंटिस्ट के पास सफ़ाई $0। फ़िलिंग 50–70%। साल में $750 तक।",
+    cov_doctor: "आपका कोई ख़र्च नहीं। BC का MSP देता है, यह प्लान नहीं।",
+    cov_equip: "ऑर्थोटिक्स साल में $300 तक। बैसाखी और ब्रेस डॉक्टर के नोट के साथ।",
+    cov_travel: "इमरजेंसी इलाज $5M तक, हर यात्रा 120 दिन।",
+    eye_lead: "हर 2 साल में एक बार कवर। प्लान $50 देता है।",
+    eye_last: "पिछली जाँच",
+    eye_next: "अगली जाँच",
+    flu_season: "इस सीज़न का फ़्लू टीका",
+    doc_first: "UBC Student Health में पहली मुलाक़ात",
+    nothing_yet: "अभी बुक करने को कुछ नहीं। समय पास आने पर बटन यहाँ आ जाएगा।",
+    slot_ask_dental: "पहले से बुक करें: {range} में सफ़ाई माँगें।",
+    slot_ask_eye: "पहले से बुक करें: {range} में जाँच माँगें।",
+    update_answer: "अपना जवाब बदलें",
+    book_online_at: "{name} पर ऑनलाइन बुक करें",
+    visit_site: "{name} की वेबसाइट पर जाएँ",
+    or_call: "या {phone} पर कॉल करें",
+    book_short: "बुक",
   },
   ko: {
     ask_placeholder: "어떤 언어로든 입력하거나 말하세요",
@@ -2622,6 +2811,41 @@ const I18N_V5 = {
     off_811: "몸이 안 좋나요? 811에 전화하세요",
     set_text: "글자 크기",
     set_access: "글자 크기와 접근성",
+    st_next: "다음: {when}",
+    st_booked: "예약: {when}",
+    st_done_year: "올해 완료",
+    word_fall: "가을",
+    dental_lead: "이번 보험 연도에 {n}회 보장돼요.",
+    dental_all_done: "이번 보험 연도는 모두 완료했어요. 다음은 9월 1일부터 보장돼요.",
+    slot_n: "스케일링 {n}",
+    slot_done_ans: "완료: {answer}",
+    slot_done_month: "{month} 완료",
+    slot_booked: "{month} 예약됨",
+    slot_ask: "미리 예약하세요: {range}에 스케일링을 요청하세요.",
+    slot_note: "월은 추정치예요. 정확한 날짜는 병원이 알아요.",
+    which_month: "몇 월인가요?",
+    bk_q_dental_next: "다음 스케일링 예약했나요?",
+    change_last: "마지막 스케일링 수정",
+    from_month: "{month}부터",
+    private_text: "PlanPal은 입력한 내용을 저장하지 않고, 우편번호는 휴대폰 밖으로 나가지 않아요.",
+    how_works: "작동 방식",
+    cov_dental: "네트워크 치과에서 스케일링 $0. 충전 치료 50–70%. 연 $750까지.",
+    cov_doctor: "비용이 없어요. 이 보험이 아니라 BC의 MSP가 지불해요.",
+    cov_equip: "교정 깔창 연 $300까지. 목발과 보조기는 의사 소견서가 있으면 보장.",
+    cov_travel: "응급 치료 최대 $5M, 여행당 120일.",
+    eye_lead: "2년에 한 번 보장돼요. 보험이 $50 지급해요.",
+    eye_last: "지난 검사",
+    eye_next: "다음 검사",
+    flu_season: "이번 시즌 독감 예방접종",
+    doc_first: "UBC Student Health 첫 진료",
+    nothing_yet: "아직 예약할 게 없어요. 때가 되면 여기에 버튼이 나타나요.",
+    slot_ask_dental: "미리 예약하세요: {range}에 스케일링을 요청하세요.",
+    slot_ask_eye: "미리 예약하세요: {range}에 검사를 요청하세요.",
+    update_answer: "답변 수정",
+    book_online_at: "{name} 온라인 예약",
+    visit_site: "{name} 웹사이트로 가기",
+    or_call: "또는 {phone}로 전화",
+    book_short: "예약",
   },
 };
 
@@ -2635,18 +2859,20 @@ function mergeI18n(lang, add) {
   }
 }
 mergeI18n("en", I18N_V3_EN);
-if (typeof I18N_V3 !== "undefined") for (const [lang, add] of Object.entries(I18N_V3)) mergeI18n(lang, add);
+for (const [lang, add] of Object.entries(I18N_V3)) mergeI18n(lang, add);
 mergeI18n("en", I18N_V4_EN);
-if (typeof I18N_V4 !== "undefined") for (const [lang, add] of Object.entries(I18N_V4)) mergeI18n(lang, add);
+for (const [lang, add] of Object.entries(I18N_V4)) mergeI18n(lang, add);
 mergeI18n("en", I18N_V5_EN);
-if (typeof I18N_V5 !== "undefined") for (const [lang, add] of Object.entries(I18N_V5)) mergeI18n(lang, add);
+for (const [lang, add] of Object.entries(I18N_V5)) mergeI18n(lang, add);
 
-/* ===== Places data (built from the team's ubc_student_health_deals.json; locations from postal codes) ===== */
+/* Places that don't come from the deals JSON: area shortcuts, BC postal-code
+   centroids (first 3 characters), and free campus services. */
 const AREAS = {"ubc": {"lat": 49.2611, "lng": -123.2502}, "wesbrook": {"lat": 49.2533, "lng": -123.2222}, "downtown": {"lat": 49.2827, "lng": -123.1207}, "kits": {"lat": 49.2651, "lng": -123.1621}};
 const FSA = {"V0A":[50.90391,-116.45063],"V0B":[49.55216,-115.94277],"V0C":[56.6202,-121.90765],"V0E":[50.87838,-119.36181],"V0G":[49.67188,-117.49754],"V0H":[49.32407,-119.2832],"V0J":[54.71252,-125.55783],"V0K":[51.31072,-121.44104],"V0L":[52.16025,-123.26579],"V0M":[49.29892,-121.99918],"V0N":[49.80127,-124.11541],"V0P":[50.1869,-125.8271],"V0R":[49.01396,-124.19519],"V0S":[48.53957,-124.17606],"V0T":[53.22312,-129.85173],"V0V":[54.17396,-130.04299],"V0W":[59.58974,-133.94364],"V0X":[49.44614,-120.72267],"V1A":[49.67769,-115.97823],"V1B":[50.25072,-119.23334],"V1C":[49.50939,-115.76467],"V1E":[50.6946,-119.27253],"V1G":[55.75861,-120.2393],"V1H":[50.24078,-119.36337],"V1J":[56.24168,-120.83794],"V1K":[50.11843,-120.79445],"V1L":[49.49892,-117.27799],"V1M":[49.16744,-122.62357],"V1N":[49.30937,-117.65037],"V1P":[49.88034,-119.32052],"V1R":[49.09786,-117.70735],"V1S":[50.64648,-120.37946],"V1T":[50.26497,-119.26985],"V1V":[49.92666,-119.4361],"V1W":[49.83307,-119.47003],"V1X":[49.89428,-119.3928],"V1Y":[49.88407,-119.47909],"V1Z":[49.87862,-119.552],"V2A":[49.48544,-119.58346],"V2B":[50.71594,-120.3702],"V2C":[50.66993,-120.28531],"V2E":[50.65541,-120.3284],"V2G":[52.13128,-122.13684],"V2H":[50.7313,-120.29362],"V2J":[52.97532,-122.48765],"V2K":[53.98026,-122.79012],"V2L":[53.90732,-122.7493],"V2M":[53.92091,-122.79279],"V2N":[53.86999,-122.76899],"V2P":[49.17243,-121.94766],"V2R":[49.11093,-121.97676],"V2S":[49.0472,-122.28451],"V2T":[49.04945,-122.34002],"V2V":[49.14544,-122.30817],"V2W":[49.19937,-122.5213],"V2X":[49.21932,-122.61932],"V2Y":[49.1299,-122.64787],"V2Z":[49.0587,-122.60098],"V3A":[49.08822,-122.65606],"V3B":[49.27683,-122.76616],"V3C":[49.25439,-122.78621],"V3E":[49.30032,-122.78706],"V3G":[49.06145,-122.20932],"V3H":[49.28544,-122.85358],"V3J":[49.25981,-122.86619],"V3K":[49.24124,-122.8552],"V3L":[49.21912,-122.90523],"V3M":[49.1999,-122.93379],"V3N":[49.22279,-122.93326],"V3R":[49.18994,-122.81612],"V3S":[49.116,-122.76768],"V3T":[49.19003,-122.84991],"V3V":[49.17942,-122.87159],"V3W":[49.1374,-122.85661],"V3X":[49.10989,-122.85775],"V3Y":[49.2221,-122.68741],"V3Z":[49.19455,-122.65393],"V4A":[49.03658,-122.83261],"V4B":[49.02521,-122.80246],"V4C":[49.15479,-122.90861],"V4E":[49.1239,-122.90396],"V4G":[49.13809,-123.00477],"V4K":[49.0913,-123.07162],"V4L":[49.02147,-123.05877],"V4M":[49.01858,-123.0818],"V4N":[49.16977,-122.75278],"V4P":[49.0564,-122.82598],"V4R":[49.22937,-122.56607],"V4S":[49.17885,-122.36537],"V4T":[49.84542,-119.62485],"V4V":[50.05456,-119.40625],"V4W":[49.06725,-122.4961],"V4X":[49.07251,-122.40669],"V4Z":[49.12228,-121.84424],"V5A":[49.26463,-122.94126],"V5B":[49.27416,-122.97746],"V5C":[49.2765,-123.00792],"V5E":[49.22658,-122.95736],"V5G":[49.24735,-123.00085],"V5H":[49.23023,-122.99854],"V5J":[49.21341,-122.99563],"V5K":[49.27934,-123.04105],"V5L":[49.27805,-123.06545],"V5M":[49.25979,-123.04221],"V5N":[49.25577,-123.06668],"V5P":[49.22387,-123.06789],"V5R":[49.23997,-123.04034],"V5S":[49.21969,-123.04156],"V5T":[49.26169,-123.09325],"V5V":[49.24895,-123.09073],"V5W":[49.23258,-123.09183],"V5X":[49.21697,-123.09504],"V5Y":[49.25138,-123.11007],"V5Z":[49.25162,-123.11927],"V6A":[49.27882,-123.09121],"V6B":[49.27947,-123.11248],"V6C":[49.28552,-123.11654],"V6E":[49.28387,-123.12759],"V6G":[49.28884,-123.13562],"V6H":[49.25676,-123.13085],"V6J":[49.25863,-123.13999],"V6K":[49.26507,-123.16209],"V6L":[49.25026,-123.16245],"V6M":[49.2345,-123.14606],"V6N":[49.23414,-123.17923],"V6P":[49.21649,-123.13405],"V6R":[49.26522,-123.19523],"V6S":[49.25033,-123.18812],"V6T":[49.26779,-123.23899],"V6V":[49.18485,-123.05191],"V6W":[49.15228,-123.05007],"V6X":[49.18316,-123.11898],"V6Y":[49.15863,-123.12951],"V6Z":[49.2771,-123.12532],"V7A":[49.13902,-123.11816],"V7B":[49.19115,-123.15885],"V7C":[49.15986,-123.16914],"V7E":[49.13508,-123.17365],"V7G":[49.31787,-122.9564],"V7H":[49.31804,-122.99724],"V7J":[49.32472,-123.03393],"V7K":[49.34391,-123.03876],"V7L":[49.31754,-123.06135],"V7M":[49.32127,-123.07997],"V7N":[49.3404,-123.07381],"V7P":[49.32337,-123.10982],"V7R":[49.34832,-123.09947],"V7S":[49.35054,-123.15542],"V7T":[49.32848,-123.14493],"V7V":[49.33777,-123.18388],"V7W":[49.35691,-123.26365],"V7X":[49.25954,-123.1121],"V7Y":[49.28184,-123.12392],"V7Z":[49.47244,-123.78963],"V8A":[49.84496,-124.52149],"V8B":[49.71381,-123.14169],"V8C":[54.0576,-128.64815],"V8E":[49.40396,-123.22603],"V8G":[54.51574,-128.58305],"V8J":[54.31318,-130.31496],"V8K":[48.84941,-123.50267],"V8L":[48.64699,-123.41502],"V8M":[48.58218,-123.42789],"V8N":[48.47608,-123.31614],"V8P":[48.45832,-123.33548],"V8R":[48.4362,-123.32317],"V8S":[48.41814,-123.326],"V8T":[48.43816,-123.35631],"V8V":[48.4176,-123.36357],"V8W":[48.43646,-123.36457],"V8X":[48.47055,-123.36776],"V8Y":[48.51595,-123.37265],"V8Z":[48.47988,-123.39765],"V9A":[48.43782,-123.40073],"V9B":[48.45422,-123.48599],"V9C":[48.42249,-123.48847],"V9E":[48.51636,-123.43381],"V9G":[49.00092,-123.81714],"V9H":[49.95021,-125.21516],"V9J":[49.79221,-125.07617],"V9K":[49.34747,-124.4708],"V9L":[48.78493,-123.70138],"V9M":[49.68336,-124.92437],"V9N":[49.68728,-124.9899],"V9P":[49.31481,-124.30097],"V9R":[49.15777,-123.94975],"V9S":[49.18619,-123.96552],"V9T":[49.21373,-124.00391],"V9V":[49.23944,-124.02531],"V9W":[50.00514,-125.24625],"V9X":[49.10015,-123.88299],"V9Y":[49.25051,-124.80909],"V9Z":[48.38405,-123.69982]};
-const NETWORK = [{"c":"dental","n":"Scotia Tower Dental Group","a":"1010 - 650 Georgia St W, Vancouver, BC V6B 4N9","p":"604-669-7467","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2821,"lng":-123.11733,"campus":false},{"c":"vision","n":"LASIK MD","a":"HSBC Tower, 110a - 885 West Georgia St, Vancouver, BC V6C 3E8","p":"604-639-8088","d":"Save up to $600 on Custom LASIK","lat":49.28373,"lng":-123.1197,"campus":false},{"c":"prescription","n":"Rexall","a":"1055 West Georgia Street, Unit 122, Vancouver, BC V6E 3P3","p":"604-684-8204","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.2865,"lng":-123.12093,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Dr. Shahin Jessa","a":"570 - 1090 West Georgia Street, Vancouver, BC V6E 3V7","p":"604-681-5911","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28544,"lng":-123.12285,"campus":false},{"c":"dental","n":"Smilestone Dental","a":"Library Square, 345 Robson St #204, Vancouver, BC V6B 6B3","p":"604-423-4190","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27926,"lng":-123.11624,"campus":false},{"c":"prescription","n":"Rexall","a":"499 Granville Street, Vancouver, BC V6C 1T1","p":"604-801-6991","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28447,"lng":-123.11517,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Harbour Centre Dental","a":"L19 - 555 West Hastings Street, Vancouver, BC V6B 4N4","p":"604-669-1195","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28436,"lng":-123.11209,"campus":false},{"c":"dental","n":"Terminal City Dental","a":"875 West Hastings, Vancouver, BC V6C 3N9","p":"604-670-9700","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28651,"lng":-123.11536,"campus":false},{"c":"prescription","n":"Rexall","a":"200 Burrard Street, Unit R007A, Vancouver, BC V6C 3L6","p":"604-681-2195","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28812,"lng":-123.11557,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Alberni Family Dental","a":"1308 Alberni Street, Vancouver, BC V6E 4N9","p":"604-689-9772","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28785,"lng":-123.1274,"campus":false},{"c":"dental","n":"Expo Yaletown Dentist Orthodontist & Implants","a":"903 Expo Boulevard, Vancouver, BC V6Z 2W1","p":"604-983-8889","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27467,"lng":-123.11824,"campus":false},{"c":"dental","n":"Vancouver Stadium Community Dentist","a":"1-590 Beatty St., Vancouver, BC V6B 2L3","p":"604-694-9088","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28104,"lng":-123.10882,"campus":false},{"c":"chiropractor","n":"Chiropractic Corporation","a":"1065 Cambie Street, Vancouver, BC V6B 5L7","p":"604-687-2900","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27598,"lng":-123.1183,"campus":false},{"c":"chiropractor","n":"Be Chiropractic Wellness","a":"1168 Hamilton Street, Vancouver, BC V6B 2S2","p":"604-688-5437","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27501,"lng":-123.12247,"campus":false},{"c":"chiropractor","n":"MSK Health & Performance (Downtown)","a":"1033 Davie St Unit 410, Vancouver, BC V6E1M7","p":"604-659-9308","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2797,"lng":-123.12971,"campus":false},{"c":"chiropractor","n":"MSK Health and Performance Clinic","a":"1033 Davie St Unit 410, Vancouver, BC V6E1M7","p":"604-689-9308","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2797,"lng":-123.12971,"campus":false},{"c":"dental","n":"The Art of Smile Dental Clinic","a":"1437 West Pender Street, Vancouver, BC V6G2S3","p":"604-250-9000","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28996,"lng":-123.12878,"campus":false},{"c":"dental","n":"O2 Dental","a":"1358 West Georgia Street, Vancouver, BC V6E 4S2","p":"604-684-4420","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28893,"lng":-123.12795,"campus":false},{"c":"chiropractor","n":"Yaletown Chiropractic","a":"3 – 1238 Homer Street, Vancouver, BC V6B 2Y5","p":"604-688-1500","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27428,"lng":-123.12471,"campus":false},{"c":"dental","n":"Atlantis Dental Roundhouse","a":"219-179 Davie Street, Vancouver, BC V6Z 2Y1","p":"604-224-6262","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27396,"lng":-123.12119,"campus":false},{"c":"dental","n":"Howe Dental","a":"797 Drake St, Vancouver, BC V6Z 2N7","p":"604-558-4242","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27677,"lng":-123.12859,"campus":false},{"c":"prescription","n":"Rexall","a":"1173 - 88 West Pender, St,, Vancouver, BC V6B 6N9","p":"604-683-4244","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28089,"lng":-123.10715,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Dental Clinic @ Robson","a":"1506 Robson St, Vancouver, BC V6G 1C2","p":"604-683-6565","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28877,"lng":-123.1311,"campus":false},{"c":"dental","n":"Crosstown Dental Clinic","a":"615 Main Street, Vancouver, BC V6A 2V4","p":"604-979-8828","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28034,"lng":-123.09967,"campus":false},{"c":"vision","n":"Specsavers","a":"1040 Denman St, Vancouver, BC V6G 2M5","p":"778-372-9630","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.28934,"lng":-123.13863,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"False Creek Pure Dental Care","a":"303 W 2nd Avenue, Vancouver, BC V5Y 1C9","p":"604-877-1712","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26792,"lng":-123.1122,"campus":false},{"c":"physio","n":"Physiolab Olympic Village","a":"1635 Main Street, Vancouver, BC V6A 2W5","p":"604-428-7848","d":"Max $75 initial assessment, $65 follow-ups","lat":49.27277,"lng":-123.1002,"campus":false},{"c":"dental","n":"Atlantis Dental Cambie","a":"2160 Cambie St., Vancouver, BC V5Z 4T1","p":"604-565-1990","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26556,"lng":-123.11465,"campus":false},{"c":"physio","n":"Rebounce Physio - Olympic Village","a":"150 - 1877 Main St., Vancouver, BC V5T 3C1","p":"604-696-7426","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26821,"lng":-123.10078,"campus":false},{"c":"dental","n":"LPP Dentistry","a":"1003-805 W. Broadway, Vancouver, BC V5Z 1k1","p":"604-874-1003","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26356,"lng":-123.12297,"campus":false},{"c":"dental","n":"Dr. Wayne Lin","a":"110 - 2425 Oak Street, Vancouver, BC V6H 3S7","p":"604-718-5388","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26407,"lng":-123.12653,"campus":false},{"c":"dental","n":"West 8th Dental Care","a":"408 W 8th Ave, Vancouver, BC V5Y 4A8","p":"604-738-5051","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26362,"lng":-123.11288,"campus":false},{"c":"vision","n":"Specsavers","a":"716 West Broadway, Vancouver, BC V5Z 1G8","p":"604-874-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26318,"lng":-123.12154,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Berant Family Dentistry","a":"1107 - 750 West Broadway, Vancouver, BC V5Z 1J1","p":"604-872-0021","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26335,"lng":-123.12083,"campus":false},{"c":"dental","n":"943 Dental","a":"538- 943 W Broadway, Vancouver, BC V5Z4G1","p":"604-736-6230","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22995,"lng":-123.11952,"campus":false},{"c":"dental","n":"Pure Dental Hygiene & Teeth Whitening","a":"640 West Broadway unit #206, Vancouver, BC V5Z 1G4","p":"778-807-8811","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2632,"lng":-123.11839,"campus":false},{"c":"dental","n":"Dolce Dental","a":"303-1055 W Broadway, Vancouver, BC V6H 1E2","p":"604-687-6480","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26347,"lng":-123.12878,"campus":false},{"c":"dental","n":"101 Dental","a":"101 – 1245 West Broadway, Vancouver, BC V6H 1G2","p":"604-428-2168","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25676,"lng":-123.13085,"campus":false},{"c":"physio","n":"Health Craft Clinic","a":"111 West Broadway, Vancouver, BC V5Y1P4","p":"604-563-4411","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26306,"lng":-123.10922,"campus":false},{"c":"dental","n":"Aqua Blue Dental","a":"7 - 111 W Broadway, Vancouver, BC V5Y 1P4","p":"604-559-5759","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26306,"lng":-123.10922,"campus":false},{"c":"chiropractor","n":"Foundation Body Lab","a":"2260 Main Street, Vancouver, BC V5T 0J2","p":"604-842-3325","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26466,"lng":-123.10038,"campus":false},{"c":"dental","n":"Luxe Dental Hygiene","a":"1529 W 6th Ave, Vancouver, BC V6J 1R1","p":"604-704-8493","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26634,"lng":-123.13846,"campus":false},{"c":"dental","n":"Hemlock Dental Clinic","a":"1262 W Broadway, Vancouver, BC V6H 1G6","p":"604-738-9202","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26345,"lng":-123.13348,"campus":false},{"c":"dental","n":"Aarm Dental Group on Main","a":"2270 Main Street, Vancouver, BC V5T 0J2","p":"604-255-0060","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26466,"lng":-123.10038,"campus":false},{"c":"chiropractor","n":"West 1st Chiropractic","a":"3-1864 West 1st Ave, Vancouver, BC V6J 1G5","p":"604-736-8353","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27074,"lng":-123.14774,"campus":false},{"c":"dental","n":"ADG Dental","a":"1555 West Broadway, Vancouver, BC V6J1W6","p":"604-738-3803","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26366,"lng":-123.1407,"campus":false},{"c":"dental","n":"Burrard Dental Care","a":"303-1770 W 7th Ave., Vancouver, BC V6J 4Y6","p":"604-733-6721","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2655,"lng":-123.1449,"campus":false},{"c":"dental","n":"Kingsgate Dental","a":"112 - 370 East Broadway Street, Vancouver, BC V5T 4G5","p":"604-879-9999","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26272,"lng":-123.0971,"campus":false},{"c":"dental","n":"Broadway Family Dental Centre","a":"383 East Broadway, Vancouver, BC V5T 1W6","p":"604-283-2216","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26277,"lng":-123.09657,"campus":false},{"c":"vision","n":"Specsavers","a":"370 East Broadway, Vancouver, BC V5T 4G5","p":"604-636-8798","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26272,"lng":-123.0971,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Arbutus Station Dental","a":"560 - 2184 West Broadway, Vancouver, BC V6K 2E1","p":"604-738-4223","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26375,"lng":-123.15482,"campus":false},{"c":"chiropractor","n":"Broadway at Yew Chiropractic and Massage","a":"2221 West Broadway, Vancouver, BC V6K 2E4","p":"604-738-1021","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26388,"lng":-123.15755,"campus":false,"w":"https://vancouverbackpain.com/"},{"c":"dental","n":"Enhance Dental Centre","a":"2219 W Broadway, Vancouver, BC V6K 2E4","p":"604-733-1022","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26388,"lng":-123.15755,"campus":false},{"c":"dental","n":"Align Dental Care","a":"3401 Fraser St, Vancouver, BC V5V 4C3","p":"604-566-6288","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25469,"lng":-123.09004,"campus":false},{"c":"dental","n":"Shaughnessy Family Dental","a":"1035 W King Edward Avenue, Vancouver, BC V6H 1Z3","p":"604-737-7231","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.24939,"lng":-123.12759,"campus":false},{"c":"dental","n":"Loft 19 Dental","a":"3511 Fraser St, Vancouver, BC V5V 4C5","p":"604-322-6612","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25363,"lng":-123.08995,"campus":false},{"c":"dental","n":"Monalisa Dental Centre","a":"2866 West 4th Ave, Vancouver, BC V6K 1R2","p":"778-379-7575","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26835,"lng":-123.16881,"campus":false},{"c":"chiropractor","n":"Nelson Chiropractic","a":"211 - 2678 West Broadway, Vancouver, BC V6K 2G3","p":"604-734-1980","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2639,"lng":-123.16621,"campus":false},{"c":"dental","n":"Regent Dental Centre","a":"2681 West Broadway, Vancouver, BC V6K 2G2","p":"604-733-3431","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26403,"lng":-123.16644,"campus":false},{"c":"physio","n":"Level 10 Fitness & Physiotherapy","a":"890 Harbourside Drive #140, North Vancouver, BC V7P 3T7","p":"604-265-7236","d":"Max $75 initial assessment, $65 follow-ups","lat":49.31438,"lng":-123.09705,"campus":false},{"c":"dental","n":"9th Dental Clinic","a":"205 – 2760 West Broadway Street, Vancouver, BC V6K 4M2","p":"604-734-1144","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26399,"lng":-123.16746,"campus":false},{"c":"chiropractor","n":"MSK Health and Performance Clinic","a":"101 - 2880 West 4th Avenue, Vancouver, BC V6K 1R2","p":"604-224-7325","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26835,"lng":-123.16881,"campus":false},{"c":"physio","n":"Base Physio + Wellness","a":"3865 Fraser St, Vancouver, BC V5V 4E3","p":"604-262-3789","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25059,"lng":-123.09005,"campus":false},{"c":"physio","n":"Physiolab Hastings","a":"2105 E Hastings St, Vancouver, BC V5L 1V2","p":"604-901-3888","d":"Max $75 initial assessment, $65 follow-ups","lat":49.28133,"lng":-123.06049,"campus":false},{"c":"vision","n":"Hollyburn Eye Clinic","a":"101 - 252 Esplanade W, North Vancouver, BC V7M 0E9","p":"604-984-2020","d":"$60 eye exam, $75 off select glasses","lat":49.21113,"lng":-123.07494,"campus":false},{"c":"vision","n":"Specsavers","a":"3049 West Broadway, Vancouver, BC V6K 2G9","p":"604-332-8897","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26418,"lng":-123.17376,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Commercial Station Dental Centre","a":"211-2460 Commercial Dr, Vancouver, BC V5N 4B9","p":"604-708-6111","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.263,"lng":-123.07001,"campus":false},{"c":"dental","n":"U Dental Clinic","a":"2933 West Broadway, Vancouver, BC V6K 2G6","p":"604-423-3839","d":"30% off preventive, basic AND major restorative","lat":49.26421,"lng":-123.17081,"campus":false},{"c":"chiropractor","n":"Tonume Integrated Health","a":"2655 Commercial Dr, Vancouver, BC V5N 4C3","p":"604-428-1399","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26123,"lng":-123.06973,"campus":false,"w":"https://www.tonume.com/"},{"c":"dental","n":"Peak Dental Arts","a":"250 Lonsdale Avenue, North Vancouver, BC V7M 2G1","p":"604-770-2222","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31273,"lng":-123.0776,"campus":false},{"c":"dental","n":"Sunrise Village Dental","a":"2538 East Hastings Street, Vancouver, BC V5K 1Z3","p":"604-253-2433","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28118,"lng":-123.05253,"campus":false},{"c":"physio","n":"Seva Physiotherapy","a":"3649 West Broadway, Vancouver, BC V6R 2B8","p":"604-874-7382","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26421,"lng":-123.18552,"campus":false},{"c":"vision","n":"Specsavers","a":"908 Park Royal South, West Vancouver, BC V7T 1A1","p":"604-990-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.32685,"lng":-123.14689,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"2534 East Hastings Street, Vancouver, BC V5K 1Z2","p":"604-251-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.2813,"lng":-123.05202,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Cedar Cottage Dental","a":"3935 Knight St, Vancouver, BC V5N 3L8","p":"604-684-7717","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25022,"lng":-123.07599,"campus":false},{"c":"dental","n":"Alma Dental Centre","a":"265 - 2083 Alma Street, Vancouver, BC V6R 4N6","p":"604-222-8430","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.268,"lng":-123.18571,"campus":false},{"c":"dental","n":"Kits Family Dental Care","a":"2083 Alma St - 311, Vancouver, BC V6R 4N6","p":"604-222-1299","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.268,"lng":-123.18571,"campus":false},{"c":"dental","n":"Family Care Dental Clinic","a":"205 - 1200 Lonsdale Avenue, North Vancouver, BC V7M 2H6","p":"604-987-3545","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31998,"lng":-123.07255,"campus":false},{"c":"dental","n":"Lonsdale Place Dental","a":"302 - 1200 Lonsdale Avenue, North Vancouver, BC V7M 3H6","p":"604-770-3114","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31897,"lng":-123.07257,"campus":false},{"c":"physio","n":"Go! Physiotherapy Sports + Wellness Centre","a":"2 - 3657 West 16th Avenue, Vancouver, BC V6R 3C3","p":"604-568-4628","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25819,"lng":-123.18584,"campus":false},{"c":"physio","n":"Physiolab Little Mountain","a":"181 East 41 Avenue, Vancouver, BC V5W 0E2","p":"604-585-2828","d":"Max $75 initial assessment, $65 follow-ups","lat":49.23755,"lng":-123.08468,"campus":false},{"c":"dental","n":"West Point Dental Clinic","a":"5403 West Boulevard, Vancouver, BC V6M 3W5","p":"604-267-1688","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23724,"lng":-123.15543,"campus":false},{"c":"dental","n":"604 Dental @ Main 41","a":"5733 Main Street, Vancouver, BC V5W 4C7","p":"604-322-7483","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23307,"lng":-123.10166,"campus":false},{"c":"prescription","n":"Rexall","a":"575 16th Street, West Vancouver, BC V7V 4Y1","p":"604-922-4174","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.32963,"lng":-123.15895,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"chiropractor","n":"Life Integrative","a":"4168 Dunbar Street, Vancouver, BC V6S 2E7","p":"604-742-0702","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2494,"lng":-123.1852,"campus":false},{"c":"chiropractor","n":"Backs in Action Rehab & Wellness","a":"2917 Hebb Ave, Vancouver, BC V5M 0C4","p":"604-876-9977","d":"Max $75 initial assessment, $45 follow-ups","lat":49.25747,"lng":-123.04196,"campus":false},{"c":"vision","n":"Specsavers","a":"2348 W 41st Ave, Vancouver, BC V6M 2A4","p":"778-373-7748","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23471,"lng":-123.16093,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"2029 Lonsdale Ave, North Vancouver, BC V7M 2K4","p":"604-227-8270","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.32726,"lng":-123.07239,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Fraser Dental Centre","a":"103 - 5990 Fraser Street, Vancouver, BC V5W 2Z7","p":"604-326-8411","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23095,"lng":-123.0908,"campus":false},{"c":"dental","n":"Bel Canto Dental","a":"1892 Marine Drive, West Vancouver, BC V7V 1J6","p":"604-926-7621","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.32883,"lng":-123.16438,"campus":false},{"c":"dental","n":"Aegis Dental","a":"204-5704 Balsam St, Vancouver, BC V6M 4B9","p":"604-261-2332","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23468,"lng":-123.16139,"campus":false},{"c":"dental","n":"Fraser Street Dental","a":"6192 Fraser St, Vancouver, BC V5W 3A1","p":"604-325-3414","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22828,"lng":-123.09085,"campus":false},{"c":"dental","n":"Imagine Dental Group","a":"6482 Main Street, Vancouver, BC V5W 2V4","p":"604-428-2880","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22654,"lng":-123.10159,"campus":false},{"c":"vision","n":"Specsavers","a":"3185 Grandview Hwy., Vancouver, BC V5M 2E9","p":"778-374-1609","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.25832,"lng":-123.03819,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"chiropractor","n":"East Van Medical Clinic","a":"5449 Victoria Drive, Vancouver, BC V5P 3V9","p":"604-876-1376","d":"Max $75 initial assessment, $45 follow-ups","lat":49.23485,"lng":-123.06547,"campus":false},{"c":"vision","n":"Point Grey Eyecare","a":"4466 West 10th Avenue, Vancouver, BC V6R 2H9","p":"604-224-3937","d":"$70 eye exam, $75 off select glasses","lat":49.26369,"lng":-123.20847,"campus":false},{"c":"dental","n":"Dr. Pako Cheung Inc.","a":"5583 Victoria Drive, Vancouver, BC V5P 3W3","p":"604-325-9339","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22387,"lng":-123.06789,"campus":false},{"c":"chiropractor","n":"Dr. Huan-Wei Chen","a":"5636 Victoria Drive, Vancouver, BC V5P 3W4","p":"604-323-8900","d":"Max $75 initial assessment, $45 follow-ups","lat":49.23271,"lng":-123.0657,"campus":false},{"c":"prescription","n":"Rexall","a":"6580 Fraser Street, Vancouver, BC V5X 3T4","p":"604-235-2115","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.22538,"lng":-123.09078,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Sasamat Dental","a":"202-4545 W 10 Avenue, Vancouver, BC V6R 4N2","p":"604-224-3288","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.264,"lng":-123.21046,"campus":false},{"c":"dental","n":"All Smiles Dental","a":"5775 Victoria Road, Vancouver, BC V5P 3W5","p":"604-325-1231","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2327,"lng":-123.0657,"campus":false},{"c":"chiropractor","n":"Healing Sense Chiropractic","a":"101 A - 3701 Hastings Street, Burnaby, BC V5C 2H6","p":"778-379-5086","d":"Max $75 initial assessment, $45 follow-ups","lat":49.28123,"lng":-123.0235,"campus":false},{"c":"dental","n":"Blooming Dental","a":"5505 Dunbar Street, Vancouver, BC V6N 1W5","p":"778-504-5555","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23635,"lng":-123.18525,"campus":false},{"c":"dental","n":"Norburn Dental Centre","a":"3976 E Hastings St., Burnaby, BC V5C 6C7","p":"604-336-4411","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28118,"lng":-123.01813,"campus":false},{"c":"dental","n":"Craft Dentistry","a":"3898 Rupert Street, Vancouver, BC V5R 6E4","p":"604-283-9575","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.24989,"lng":-123.03387,"campus":false},{"c":"dental","n":"Vancouver Grace Dental Clinic","a":"6441 Victoria Drive, Vancouver, BC V5P 3X5","p":"604-323-0773","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2254,"lng":-123.06585,"campus":false},{"c":"vision","n":"Specsavers","a":"333 Seymour Blvd., North Vancouver, BC V7J 2J4","p":"778-375-4896","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.30777,"lng":-123.02386,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"physio","n":"Ion Performance and Wellness Inc.","a":"106 - 3787 Canada Way, Burnaby, BC V5G 1G5","p":"604-683-3185","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25473,"lng":-123.02113,"campus":false},{"c":"dental","n":"South Granville Dentistry","a":"7937 Granville Street, Vancouver, BC V6P 4Z3","p":"604-266-5300","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.21352,"lng":-123.1403,"campus":false},{"c":"dental","n":"Smiley Kids Dental","a":"200 - 4233 Hastings Street, Burnaby, BC V5C 2J5","p":"604-298-1966","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28107,"lng":-123.01078,"campus":false},{"c":"dental","n":"Love My Smile Dental","a":"8307 Oak Street, Vancouver, BC V6P 4A9","p":"604-647-6453","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.21063,"lng":-123.13017,"campus":false},{"c":"dental","n":"Joyce Station Dental Clinic","a":"5258 Joyce Street, Vancouver, BC V5R 6C9","p":"604-437-7073","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2371,"lng":-123.03288,"campus":false},{"c":"dental","n":"Marine Cambie Dental","a":"482 SW Marine Drive, Vancouver, BC V5X 0C4","p":"604-428-8078","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22273,"lng":-123.10177,"campus":false},{"c":"dental","n":"Marine Cambie Dental","a":"482 SW Marine Drive, Vancouver, BC V5X0C4","p":"604-482-8078","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22273,"lng":-123.10177,"campus":false},{"c":"dental","n":"Dr Francisca Valdes inc.","a":"5301 Joyce Street, Vancouver, BC V5R 4H3","p":"604-434-4412","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23638,"lng":-123.03371,"campus":false},{"c":"vision","n":"Specsavers","a":"350 S.E. Marine Dr, Vancouver, BC V5X 2S5","p":"236-826-4439","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.21062,"lng":-123.09918,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"3353 Kingsway, Vancouver, BC V5R 5K6","p":"604-438-6122","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23341,"lng":-123.03404,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Champlain Dental","a":"230 - 3150 East 54th Avenue, Vancouver, BC V5S 1Z1","p":"604-430-2178","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22017,"lng":-123.03955,"campus":false},{"c":"dental","n":"West Kits Dental","a":"3641 West Broadway, Vancouver, BC V6R 2B8","p":"604-734-2114","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26421,"lng":-123.18552,"campus":false},{"c":"physio","n":"Rebounce Physio","a":"3589 Kingsway, Vancouver, BC V5R 4P5","p":"604-696-7426","d":"Max $75 initial assessment, $65 follow-ups","lat":49.23381,"lng":-123.02589,"campus":false},{"c":"dental","n":"Happy Family Dental Centre","a":"3638 Kingsway, Vancouver, BC V5R 5M2","p":"604-336-2050","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23207,"lng":-123.0257,"campus":false},{"c":"dental","n":"Pacific Dental Centre","a":"104 - 2025 W. Broadway, Vancouver, BC V6J 1Z6","p":"604-336-9636","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26376,"lng":-123.15274,"campus":false},{"c":"vision","n":"Wesbrook Eyecare","a":"3339 Wesbrook Mall, Vancouver, BC V6S 0B1","p":"604-558-3937","d":"Eye exam max $60; $75 off glasses over $250 / 30% off under $250; up to 25% off contacts","lat":49.24869,"lng":-123.22497,"campus":true},{"c":"dental","n":"Wesbrook Village Dental Centre","a":"3328 Wesbrook Mall, Vancouver, BC V5N 0A8","p":"604-221-7600","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25779,"lng":-123.06744,"campus":true},{"c":"dental","n":"University Village Medical and Dental","a":"228 - 2155 Allison Road, Vancouver, BC V6T 1T5","p":"604-222-2273","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2664,"lng":-123.24183,"campus":true},{"c":"dental","n":"University Village Dental","a":"5933 Birney Ave, Vancouver, BC V6T 1W5","p":"604-222-2273 ext. 1","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25987,"lng":-123.2513,"campus":true},{"c":"dental","n":"Campus Dentist","a":"4 - 5958 Webber Lane, Vancouver, BC V6S 0J9","p":"604-559-5781","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2538,"lng":-123.23717,"campus":true},{"c":"dental","n":"West 41st Dentistry at Yew","a":"5687 Yew St #210, Vancouver, BC V6M 3Y2","p":"604-266-4046","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23547,"lng":-123.15768,"campus":false},{"c":"physio","n":"UBC Physical Therapy and Research Clinic","a":"244 - 2177 Wesbrook Mall, Vancouver, BC V6T 1Z3","p":"604-827-6959","d":"Max $70 initial assessment, $60 follow-ups","lat":49.25738,"lng":-123.2382,"campus":true,"w":"https://physioclinic.med.ubc.ca/"},{"c":"dental","n":"Focal Dental","a":"105- 6111 University Blvd., Vancouver, BC V6T 2A1","p":"604-423-9383","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26442,"lng":-123.24426,"campus":true},{"c":"chiropractor","n":"MSK Health & Performance Clinic","a":"700-4555 Kingsway, Burnaby, BC V5H 4T8","p":"604-438-6106","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2298,"lng":-123.00346,"campus":false},{"c":"dental","n":"Orawell Dental","a":"501-4538 Kingsway, Burnaby, BC V5H 4T9","p":"604-430-2112","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2297,"lng":-123.00319,"campus":false},{"c":"chiropractor","n":"Riverside Chiropractic Inc.","a":"3025 Anson Ave, UNIT 201, Coquitlam, BC V3B 2H6","p":"604-220-3394","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27728,"lng":-122.7916,"campus":false},{"c":"prescription","n":"Rexall","a":"140-6200 McKay Ave, Burnaby, BC V5H 4L7","p":"604-438-9370","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.22791,"lng":-123.00442,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"vision","n":"Specsavers","a":"1105 Eaton Ctr 4700 Kingsway, Burnaby, BC V5H 4M1","p":"236-826-3119","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.22827,"lng":-122.99934,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Asthetic Dental Group","a":"4731 Kingsway, Burnaby, BC V5H 2C3","p":"604-433-0168","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22838,"lng":-122.99891,"campus":false},{"c":"dental","n":"The Dentists At Metrotown","a":"396 - 4800 Kingsway, Burnaby, BC V5H 4P1","p":"604-558-3636","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22737,"lng":-122.99595,"campus":false},{"c":"vision","n":"Specsavers","a":"4820 Kingsway, Burnaby, BC V5H 4P1","p":"604-630-2266","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.22737,"lng":-122.99595,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Fang's Dental Clinic","a":"6411 Nelson Ave, Burnaby, BC V5H 4H3","p":"604-416-5115","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22587,"lng":-122.9942,"campus":false},{"c":"dental","n":"Burnaby Gentle Dental","a":"4980 Kingsway #111, Burnaby, BC V5H 4K7","p":"604-434-3020","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22635,"lng":-122.99301,"campus":false},{"c":"dental","n":"Kensington Square Dental Centre","a":"6562 Hastings Street, Burnaby, BC V5B 1S2","p":"604-298-5595","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28027,"lng":-122.96991,"campus":false},{"c":"dental","n":"Golden Smile Dental","a":"110 - 5021 Kingsway, Burnaby, BC V5H 4A5","p":"604-432-9291","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22659,"lng":-122.99345,"campus":false,"w":"https://www.goldensmiledental.ca/"},{"c":"dental","n":"Seymour Dental Centre","a":"200-3650 Mt. Seymour Pkwy, North Vancouver, BC V7H 2Y5","p":"604-924-8289","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31602,"lng":-122.97058,"campus":false},{"c":"vision","n":"Specsavers","a":"4651 Number 3 Rd, Richmond, BC V6X 2C4","p":"236-266-0050","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.17966,"lng":-123.13686,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Chiu Shing Tse Inc","a":"170- 8291 Alexandra Road, Richmond, BC V6X 1C3","p":"604-821-1918","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17832,"lng":-123.13097,"campus":false},{"c":"dental","n":"Richmond Community Dentist","a":"#3652 - 9251 Alderbridge Way, Richmond, BC V6X0N1","p":"604-285-7770","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17382,"lng":-123.13667,"campus":false},{"c":"dental","n":"Alderbridge Dental Centre","a":"135 - 4940 no 3 Road, Richmond, BC V6X 3A5","p":"604-273-0797","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17794,"lng":-123.13627,"campus":false},{"c":"dental","n":"Dentudio Dentists","a":"145 - 5555 Gilbert Road, Richmond, BC V7C 0B8","p":"604-370-1450","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.14674,"lng":-123.14785,"campus":false},{"c":"dental","n":"Richmond Central Dental Clinic","a":"110 - 6060 No.3 Road, Richmond, BC V6Y 2B3","p":"604-821-0886","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16986,"lng":-123.13634,"campus":false},{"c":"dental","n":"Dr. Edward Zhang","a":"130 - 8191 Saba Road, Richmond, BC V6Y 4B4","p":"604-304-1088","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16935,"lng":-123.1334,"campus":false},{"c":"dental","n":"Dr. Katherine Wong","a":"680 - 6091 Gilbert Road, Richmond, BC V7C 5L9","p":"604-273-9381","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16993,"lng":-123.14796,"campus":false},{"c":"dental","n":"Dr. Florence Co Uy Inc.","a":"Suite 100-6480 Buswell Street, Richmond, BC V6Y 2E9","p":"604-278-9877","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16665,"lng":-123.13374,"campus":false},{"c":"dental","n":"TUTH Dental","a":"180-8119 Park Rd, Richmond, BC V6Y0M5","p":"604-796-4888","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.15863,"lng":-123.12951,"campus":false},{"c":"vision","n":"Specsavers","a":"3675 Westminster Hwy, Richmond, BC V7C 5V2","p":"236-266-1078","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.17012,"lng":-123.18256,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Dr. Gloria K. Yan","a":"110 - 8033 Saba Road, Richmond, BC V6Y 4M8","p":"604-270-7504","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16934,"lng":-123.13618,"campus":false},{"c":"dental","n":"DTC Dental Treatment Center","a":"6011 No. 1 Road, Unit #120, Richmond, BC V7C 1T4","p":"604-238-6666","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16284,"lng":-123.18092,"campus":false},{"c":"chiropractor","n":"Strength Through Motion","a":"150-2251 No 5 Rd, Richmond, BC V6X 2S8","p":"604-630-8815","d":"Max $75 initial assessment, $45 follow-ups","lat":49.19616,"lng":-123.09145,"campus":false},{"c":"dental","n":"Richmond Bonita Dental Centre","a":"6180 Blundell Road #240, Richmond, BC V7C 4W7","p":"604-271-1440","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.1556,"lng":-123.15123,"campus":false},{"c":"dental","n":"Simon Fraser Dental Center","a":"140 - 8960 University High Street, Burnaby, BC V5A 4X6","p":"604-267-3368","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27912,"lng":-122.90713,"campus":false},{"c":"dental","n":"Dental on 6th","a":"7610 6th street, Burnaby, BC V3N 0G6","p":"604-553-4699","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.19868,"lng":-123.00381,"campus":false},{"c":"dental","n":"Dr. Alvin Choi Inc.","a":"130 - 3920 Francis Road, Richmond, BC V7C 1J7","p":"604-277-3533","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.14832,"lng":-123.185,"campus":false},{"c":"chiropractor","n":"LWC Health Inc. (Lougheed Wellness Centre)","a":"Tower West 9304 Salish Court, Burnaby, BC V3J 7J8","p":"604-559-9355","d":"Max $75 initial assessment, $45 follow-ups","lat":49.25261,"lng":-122.90393,"campus":false},{"c":"dental","n":"Royal Square Dental Centre","a":"14 - 800 McBride Boulevard, New Westminster, BC V3L 2B8","p":"604-526-1216","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22243,"lng":-122.912,"campus":false},{"c":"vision","n":"Specsavers","a":"9855 Austin Avenue, Burnaby, BC V3J 1N4","p":"604-220-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.24911,"lng":-122.89563,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"11700 Steveston Highway, Richmond, BC V7A 1N6","p":"778-234-0863","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.13327,"lng":-123.09719,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Columbia Square Dental","a":"111-1015 Columbia Street, New Westminster, BC V3M 6H6","p":"604-529-9393","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.20042,"lng":-122.91611,"campus":false},{"c":"vision","n":"The EyeSite Doctors of Optometry","a":"108 – 301 East Columbia Street, New Westminster, BC V3L 3W5","p":"604-553-3900","d":"$75 eye exam (+$20 contacts), $75 off select glasses","lat":49.22574,"lng":-122.89278,"campus":false,"w":"https://www.theeyesitenw.com/"},{"c":"dental","n":"NeWest Smile Dental","a":"293 Nelson's Court, New Westminster, BC V3L 0E3","p":"604-544-6544","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22411,"lng":-122.89239,"campus":false},{"c":"physio","n":"Pure Motion Physiotherapy","a":"105-6033 London Rd, Richmond, BC V7E 0A7","p":"604-499-0778","d":"Max $75 initial assessment, $65 follow-ups","lat":49.11781,"lng":-123.15839,"campus":false},{"c":"physio","n":"Pure Motion Physiotherapy","a":"6033 London Rd Unit 105, Richmond, BC V7E 0A7","p":"604-285-5949","d":"Max $75 initial assessment, $65 follow-ups","lat":49.11781,"lng":-123.15839,"campus":false},{"c":"prescription","n":"Rexall","a":"108 1015 Austin Avenue, Coquitlam, BC V3K 3N9","p":"604-937-3122","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.24917,"lng":-122.86932,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Vitacare Dental Centre","a":"101 - 1655 Como Lake Ave, Coquitlam, BC V3J 0E9","p":"778-355-3535","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26348,"lng":-122.85599,"campus":false},{"c":"vision","n":"Specsavers","a":"1301 Lougheed Hwy., Coquitlam, BC V3K 6P9","p":"236-947-0674","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23324,"lng":-122.85548,"campus":false,"w":"https://www.specsavers.ca/student-offers"}];
 const CAMPUS = {"doctor_visit": [{"n": "UBC Student Health Service", "a": "UBC Hospital, Koerner Pavilion, Room M334, 2211 Wesbrook Mall, Vancouver, BC V6T 2B5", "p": "604-822-7011", "lat": 49.2645, "lng": -123.2453, "free": true, "w": "https://students.ubc.ca/health/student-health-service"}, {"n": "UBC Urgent and Primary Care Centre (walk-in)", "a": "6165 Agronomy Road, Vancouver, BC V6T 1Z3", "p": "236-466-6196", "lat": 49.2574, "lng": -123.2382, "free": true}], "counselling": [{"n": "UBC Counselling Services", "a": "Gateway Building, 5955 University Blvd, Vancouver, BC V6T 1Z3", "p": "604-822-3811", "lat": 49.265, "lng": -123.2468, "free": true}, {"n": "PsyVitaliti (Alumo network)", "a": "", "p": "1-844-337-2473", "online": true, "deal": true, "url": "https://psyvitaliti.ca"}]};
-const OTHER_CLINICS = [{"c":"doctor_visit","n":"Pure Medical Clinic Lelem","a":"130-2320 Acadia Road, Vancouver, BC V6T 1L5","p":"604-635-1819","lat":49.26559,"lng":-123.23778},{"c":"doctor_visit","n":"Khatsahlano Medical Clinic","a":"2685 West Broadway, Vancouver, BC V6K 2G2","p":"604-731-9187","lat":49.26403,"lng":-123.16644},{"c":"doctor_visit","n":"MD 4 ME","a":"103-2025 West Broadway, Vancouver, BC V6J 1Z6","p":"604-900-8494","lat":49.26376,"lng":-123.15274},{"c":"doctor_visit","n":"Choice Medical Clinic","a":"817 W Hastings Street, Vancouver, BC V6C 3N9","p":"604-969-8900","lat":49.28651,"lng":-123.11536},{"c":"doctor_visit","n":"Yaletown Medical Clinic","a":"1296 Pacific Boulevard, Vancouver, BC V6Z 2V1","p":"604-633-2474","lat":49.27333,"lng":-123.12331},{"c":"doctor_visit","n":"Coal Harbour Health Centre","a":"622 Bute Street, Vancouver, BC V6E 3M1","p":"604-558-3313","lat":49.2888,"lng":-123.12279},{"c":"massage","n":"Kitsilano Massage Therapy & Health","a":"2085 West 4th Ave, Vancouver, BC V6J 1N3","p":"604-732-7272","lat":49.2683,"lng":-123.15261},{"c":"massage","n":"Do Well Therapy Kitsilano","a":"2906 West 4th Ave, Vancouver, BC V6K 1R2","p":"604-249-4702","lat":49.26835,"lng":-123.16881},{"c":"massage","n":"West End Wellness","a":"#501-1033 Davie St, Vancouver, BC V6E 1M7","p":"604-428-9355","lat":49.2797,"lng":-123.12971},{"c":"massage","n":"Everest Therapeutics","a":"MZ2-970 Burrard Street, Vancouver, BC V6Z 2R4","p":"604-633-9593","lat":49.28194,"lng":-123.12509},{"c":"massage","n":"RMT Corner","a":"#308-1160 Burrard Street, Vancouver, BC V6Z 2E8","p":"604-341-9060","lat":49.27963,"lng":-123.1283},{"c":"counselling","n":"Jericho Counselling - West 4th","a":"3369 W 4th Ave, Vancouver, BC V6R 1N6","p":"604-537-4246","lat":49.26858,"lng":-123.17953},{"c":"counselling","n":"Haven Wellness Collective","a":"1892 W Broadway, Vancouver, BC V6J 1Y9","p":"778-819-8429","lat":49.26371,"lng":-123.14796},{"c":"counselling","n":"ARC: Anxiety Relief Centre","a":"#922-470 Granville St, Vancouver, BC V6C 1V5","p":"604-828-9508","lat":49.28408,"lng":-123.11579},{"c":"counselling","n":"Avery Therapy Centre","a":"Suite 303-700 West Pender St, Vancouver, BC V6C 1G8","p":"604-838-0327","lat":49.28458,"lng":-123.11491}];
+
+const NETWORK = [{"c":"dental","n":"Scotia Tower Dental Group","a":"1010 - 650 Georgia St W, Vancouver, BC V6B 4N9","p":"604-669-7467","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2821,"lng":-123.11733,"campus":false,"w":"https://scotiatowerdental.com/"},{"c":"vision","n":"LASIK MD","a":"HSBC Tower, 110a - 885 West Georgia St, Vancouver, BC V6C 3E8","p":"604-639-8088","d":"Save up to $600 on Custom LASIK","lat":49.28373,"lng":-123.1197,"campus":false,"w":"https://www.lasikmd.com/promotions/book-online/info.php?p_language=en","b":1},{"c":"prescription","n":"Rexall","a":"1055 West Georgia Street, Unit 122, Vancouver, BC V6E 3P3","p":"604-684-8204","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.2865,"lng":-123.12093,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Dr. Shahin Jessa","a":"570 - 1090 West Georgia Street, Vancouver, BC V6E 3V7","p":"604-681-5911","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28544,"lng":-123.12285,"campus":false,"w":"https://brightsmilesongeorgia.com/"},{"c":"dental","n":"Smilestone Dental","a":"Library Square, 345 Robson St #204, Vancouver, BC V6B 6B3","p":"604-423-4190","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27926,"lng":-123.11624,"campus":false,"w":"https://smilestonedental.myformsathome.com/TrackerCloud/NewBooking/","b":1},{"c":"prescription","n":"Rexall","a":"499 Granville Street, Vancouver, BC V6C 1T1","p":"604-801-6991","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28447,"lng":-123.11517,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Harbour Centre Dental","a":"L19 - 555 West Hastings Street, Vancouver, BC V6B 4N4","p":"604-669-1195","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28436,"lng":-123.11209,"campus":false},{"c":"dental","n":"Terminal City Dental","a":"875 West Hastings, Vancouver, BC V6C 3N9","p":"604-670-9700","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28651,"lng":-123.11536,"campus":false},{"c":"prescription","n":"Rexall","a":"200 Burrard Street, Unit R007A, Vancouver, BC V6C 3L6","p":"604-681-2195","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28812,"lng":-123.11557,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Alberni Family Dental","a":"1308 Alberni Street, Vancouver, BC V6E 4N9","p":"604-689-9772","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28785,"lng":-123.1274,"campus":false},{"c":"dental","n":"Expo Yaletown Dentist Orthodontist & Implants","a":"903 Expo Boulevard, Vancouver, BC V6Z 2W1","p":"604-983-8889","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27467,"lng":-123.11824,"campus":false},{"c":"dental","n":"Vancouver Stadium Community Dentist","a":"1-590 Beatty St., Vancouver, BC V6B 2L3","p":"604-694-9088","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28104,"lng":-123.10882,"campus":false},{"c":"chiropractor","n":"Chiropractic Corporation","a":"1065 Cambie Street, Vancouver, BC V6B 5L7","p":"604-687-2900","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27598,"lng":-123.1183,"campus":false,"w":"https://www.thebackdoc.ca/"},{"c":"chiropractor","n":"Be Chiropractic Wellness","a":"1168 Hamilton Street, Vancouver, BC V6B 2S2","p":"604-688-5437","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27501,"lng":-123.12247,"campus":false},{"c":"chiropractor","n":"MSK Health & Performance (Downtown)","a":"1033 Davie St Unit 410, Vancouver, BC V6E1M7","p":"604-659-9308","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2797,"lng":-123.12971,"campus":false,"w":"https://mskdowntown.janeapp.com/","b":1},{"c":"chiropractor","n":"MSK Health and Performance Clinic","a":"1033 Davie St Unit 410, Vancouver, BC V6E1M7","p":"604-689-9308","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2797,"lng":-123.12971,"campus":false,"w":"https://mskdowntown.janeapp.com/","b":1},{"c":"dental","n":"The Art of Smile Dental Clinic","a":"1437 West Pender Street, Vancouver, BC V6G2S3","p":"604-250-9000","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28996,"lng":-123.12878,"campus":false},{"c":"dental","n":"O2 Dental","a":"1358 West Georgia Street, Vancouver, BC V6E 4S2","p":"604-684-4420","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28893,"lng":-123.12795,"campus":false},{"c":"chiropractor","n":"Yaletown Chiropractic","a":"3 – 1238 Homer Street, Vancouver, BC V6B 2Y5","p":"604-688-1500","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27428,"lng":-123.12471,"campus":false},{"c":"dental","n":"Atlantis Dental Roundhouse","a":"219-179 Davie Street, Vancouver, BC V6Z 2Y1","p":"604-224-6262","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27396,"lng":-123.12119,"campus":false},{"c":"dental","n":"Howe Dental","a":"797 Drake St, Vancouver, BC V6Z 2N7","p":"604-558-4242","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27677,"lng":-123.12859,"campus":false},{"c":"prescription","n":"Rexall","a":"1173 - 88 West Pender, St,, Vancouver, BC V6B 6N9","p":"604-683-4244","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.28089,"lng":-123.10715,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Dental Clinic @ Robson","a":"1506 Robson St, Vancouver, BC V6G 1C2","p":"604-683-6565","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28877,"lng":-123.1311,"campus":false},{"c":"dental","n":"Crosstown Dental Clinic","a":"615 Main Street, Vancouver, BC V6A 2V4","p":"604-979-8828","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28034,"lng":-123.09967,"campus":false},{"c":"vision","n":"Specsavers","a":"1040 Denman St, Vancouver, BC V6G 2M5","p":"778-372-9630","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.28934,"lng":-123.13863,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"False Creek Pure Dental Care","a":"303 W 2nd Avenue, Vancouver, BC V5Y 1C9","p":"604-877-1712","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26792,"lng":-123.1122,"campus":false},{"c":"physio","n":"Physiolab Olympic Village","a":"1635 Main Street, Vancouver, BC V6A 2W5","p":"604-428-7848","d":"Max $75 initial assessment, $65 follow-ups","lat":49.27277,"lng":-123.1002,"campus":false,"w":"https://thephysiolab.janeapp.com","b":1},{"c":"dental","n":"Atlantis Dental Cambie","a":"2160 Cambie St., Vancouver, BC V5Z 4T1","p":"604-565-1990","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26556,"lng":-123.11465,"campus":false},{"c":"physio","n":"Rebounce Physio - Olympic Village","a":"150 - 1877 Main St., Vancouver, BC V5T 3C1","p":"604-696-7426","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26821,"lng":-123.10078,"campus":false,"w":"https://rebouncephysio.janeapp.com/locations/rebounce-physio-olympic-village/book","b":1},{"c":"dental","n":"LPP Dentistry","a":"1003-805 W. Broadway, Vancouver, BC V5Z 1k1","p":"604-874-1003","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26356,"lng":-123.12297,"campus":false},{"c":"dental","n":"Dr. Wayne Lin","a":"110 - 2425 Oak Street, Vancouver, BC V6H 3S7","p":"604-718-5388","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26407,"lng":-123.12653,"campus":false},{"c":"dental","n":"West 8th Dental Care","a":"408 W 8th Ave, Vancouver, BC V5Y 4A8","p":"604-738-5051","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26362,"lng":-123.11288,"campus":false},{"c":"vision","n":"Specsavers","a":"716 West Broadway, Vancouver, BC V5Z 1G8","p":"604-874-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26318,"lng":-123.12154,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Berant Family Dentistry","a":"1107 - 750 West Broadway, Vancouver, BC V5Z 1J1","p":"604-872-0021","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26335,"lng":-123.12083,"campus":false},{"c":"dental","n":"943 Dental","a":"538- 943 W Broadway, Vancouver, BC V5Z4G1","p":"604-736-6230","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22995,"lng":-123.11952,"campus":false},{"c":"dental","n":"Pure Dental Hygiene & Teeth Whitening","a":"640 West Broadway unit #206, Vancouver, BC V5Z 1G4","p":"778-807-8811","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2632,"lng":-123.11839,"campus":false},{"c":"dental","n":"Dolce Dental","a":"303-1055 W Broadway, Vancouver, BC V6H 1E2","p":"604-687-6480","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26347,"lng":-123.12878,"campus":false},{"c":"dental","n":"101 Dental","a":"101 – 1245 West Broadway, Vancouver, BC V6H 1G2","p":"604-428-2168","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25676,"lng":-123.13085,"campus":false},{"c":"physio","n":"Health Craft Clinic","a":"111 West Broadway, Vancouver, BC V5Y1P4","p":"604-563-4411","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26306,"lng":-123.10922,"campus":false,"w":"https://healthcraftclinic.janeapp.com/","b":1},{"c":"dental","n":"Aqua Blue Dental","a":"7 - 111 W Broadway, Vancouver, BC V5Y 1P4","p":"604-559-5759","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26306,"lng":-123.10922,"campus":false},{"c":"chiropractor","n":"Foundation Body Lab","a":"2260 Main Street, Vancouver, BC V5T 0J2","p":"604-842-3325","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26466,"lng":-123.10038,"campus":false},{"c":"dental","n":"Luxe Dental Hygiene","a":"1529 W 6th Ave, Vancouver, BC V6J 1R1","p":"604-704-8493","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26634,"lng":-123.13846,"campus":false},{"c":"dental","n":"Hemlock Dental Clinic","a":"1262 W Broadway, Vancouver, BC V6H 1G6","p":"604-738-9202","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26345,"lng":-123.13348,"campus":false},{"c":"dental","n":"Aarm Dental Group on Main","a":"2270 Main Street, Vancouver, BC V5T 0J2","p":"604-255-0060","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26466,"lng":-123.10038,"campus":false},{"c":"chiropractor","n":"West 1st Chiropractic","a":"3-1864 West 1st Ave, Vancouver, BC V6J 1G5","p":"604-736-8353","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27074,"lng":-123.14774,"campus":false},{"c":"dental","n":"ADG Dental","a":"1555 West Broadway, Vancouver, BC V6J1W6","p":"604-738-3803","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26366,"lng":-123.1407,"campus":false},{"c":"dental","n":"Burrard Dental Care","a":"303-1770 W 7th Ave., Vancouver, BC V6J 4Y6","p":"604-733-6721","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2655,"lng":-123.1449,"campus":false},{"c":"dental","n":"Kingsgate Dental","a":"112 - 370 East Broadway Street, Vancouver, BC V5T 4G5","p":"604-879-9999","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26272,"lng":-123.0971,"campus":false},{"c":"dental","n":"Broadway Family Dental Centre","a":"383 East Broadway, Vancouver, BC V5T 1W6","p":"604-283-2216","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26277,"lng":-123.09657,"campus":false},{"c":"vision","n":"Specsavers","a":"370 East Broadway, Vancouver, BC V5T 4G5","p":"604-636-8798","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26272,"lng":-123.0971,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Arbutus Station Dental","a":"560 - 2184 West Broadway, Vancouver, BC V6K 2E1","p":"604-738-4223","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26375,"lng":-123.15482,"campus":false},{"c":"chiropractor","n":"Broadway at Yew Chiropractic and Massage","a":"2221 West Broadway, Vancouver, BC V6K 2E4","p":"604-738-1021","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26388,"lng":-123.15755,"campus":false,"w":"https://vancouverbackpain.com/"},{"c":"dental","n":"Enhance Dental Centre","a":"2219 W Broadway, Vancouver, BC V6K 2E4","p":"604-733-1022","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26388,"lng":-123.15755,"campus":false,"w":"https://vancouverdentistbc.ca/dentist-vancouver-appointments/"},{"c":"dental","n":"Align Dental Care","a":"3401 Fraser St, Vancouver, BC V5V 4C3","p":"604-566-6288","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25469,"lng":-123.09004,"campus":false},{"c":"dental","n":"Shaughnessy Family Dental","a":"1035 W King Edward Avenue, Vancouver, BC V6H 1Z3","p":"604-737-7231","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.24939,"lng":-123.12759,"campus":false},{"c":"dental","n":"Loft 19 Dental","a":"3511 Fraser St, Vancouver, BC V5V 4C5","p":"604-322-6612","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25363,"lng":-123.08995,"campus":false},{"c":"dental","n":"Monalisa Dental Centre","a":"2866 West 4th Ave, Vancouver, BC V6K 1R2","p":"778-379-7575","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26835,"lng":-123.16881,"campus":false},{"c":"chiropractor","n":"Nelson Chiropractic","a":"211 - 2678 West Broadway, Vancouver, BC V6K 2G3","p":"604-734-1980","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2639,"lng":-123.16621,"campus":false,"w":"https://nelsonchiropractic.janeapp.com/","b":1},{"c":"dental","n":"Regent Dental Centre","a":"2681 West Broadway, Vancouver, BC V6K 2G2","p":"604-733-3431","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26403,"lng":-123.16644,"campus":false,"w":"https://www.regentdentalcentre.com/contact-us/"},{"c":"physio","n":"Level 10 Fitness & Physiotherapy","a":"890 Harbourside Drive #140, North Vancouver, BC V7P 3T7","p":"604-265-7236","d":"Max $75 initial assessment, $65 follow-ups","lat":49.31438,"lng":-123.09705,"campus":false},{"c":"dental","n":"9th Dental Clinic","a":"205 – 2760 West Broadway Street, Vancouver, BC V6K 4M2","p":"604-734-1144","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26399,"lng":-123.16746,"campus":false,"w":"https://www.flexbook.me/west9th/Google/1","b":1},{"c":"chiropractor","n":"MSK Health and Performance Clinic","a":"101 - 2880 West 4th Avenue, Vancouver, BC V6K 1R2","p":"604-224-7325","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26835,"lng":-123.16881,"campus":false,"w":"https://mskhealthandperformance.janeapp.com/locations/kitsilano-vancouver/book","b":1},{"c":"physio","n":"Base Physio + Wellness","a":"3865 Fraser St, Vancouver, BC V5V 4E3","p":"604-262-3789","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25059,"lng":-123.09005,"campus":false},{"c":"physio","n":"Physiolab Hastings","a":"2105 E Hastings St, Vancouver, BC V5L 1V2","p":"604-901-3888","d":"Max $75 initial assessment, $65 follow-ups","lat":49.28133,"lng":-123.06049,"campus":false},{"c":"vision","n":"Hollyburn Eye Clinic","a":"101 - 252 Esplanade W, North Vancouver, BC V7M 0E9","p":"604-984-2020","d":"$60 eye exam, $75 off select glasses","lat":49.21113,"lng":-123.07494,"campus":false},{"c":"vision","n":"Specsavers","a":"3049 West Broadway, Vancouver, BC V6K 2G9","p":"604-332-8897","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.26418,"lng":-123.17376,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Commercial Station Dental Centre","a":"211-2460 Commercial Dr, Vancouver, BC V5N 4B9","p":"604-708-6111","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.263,"lng":-123.07001,"campus":false},{"c":"dental","n":"U Dental Clinic","a":"2933 West Broadway, Vancouver, BC V6K 2G6","p":"604-423-3839","d":"30% off preventive, basic AND major restorative","lat":49.26421,"lng":-123.17081,"campus":false},{"c":"chiropractor","n":"Tonume Integrated Health","a":"2655 Commercial Dr, Vancouver, BC V5N 4C3","p":"604-428-1399","d":"Max $75 initial assessment, $45 follow-ups","lat":49.26123,"lng":-123.06973,"campus":false,"w":"https://www.tonume.com/"},{"c":"dental","n":"Peak Dental Arts","a":"250 Lonsdale Avenue, North Vancouver, BC V7M 2G1","p":"604-770-2222","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31273,"lng":-123.0776,"campus":false},{"c":"dental","n":"Sunrise Village Dental","a":"2538 East Hastings Street, Vancouver, BC V5K 1Z3","p":"604-253-2433","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28118,"lng":-123.05253,"campus":false},{"c":"physio","n":"Seva Physiotherapy","a":"3649 West Broadway, Vancouver, BC V6R 2B8","p":"604-874-7382","d":"Max $75 initial assessment, $65 follow-ups","lat":49.26421,"lng":-123.18552,"campus":false,"w":"https://sevaphysiotherapy.janeapp.com/","b":1},{"c":"vision","n":"Specsavers","a":"908 Park Royal South, West Vancouver, BC V7T 1A1","p":"604-990-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.32685,"lng":-123.14689,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"2534 East Hastings Street, Vancouver, BC V5K 1Z2","p":"604-251-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.2813,"lng":-123.05202,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Cedar Cottage Dental","a":"3935 Knight St, Vancouver, BC V5N 3L8","p":"604-684-7717","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25022,"lng":-123.07599,"campus":false},{"c":"dental","n":"Alma Dental Centre","a":"265 - 2083 Alma Street, Vancouver, BC V6R 4N6","p":"604-222-8430","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.268,"lng":-123.18571,"campus":false},{"c":"dental","n":"Kits Family Dental Care","a":"2083 Alma St - 311, Vancouver, BC V6R 4N6","p":"604-222-1299","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.268,"lng":-123.18571,"campus":false},{"c":"dental","n":"Family Care Dental Clinic","a":"205 - 1200 Lonsdale Avenue, North Vancouver, BC V7M 2H6","p":"604-987-3545","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31998,"lng":-123.07255,"campus":false},{"c":"dental","n":"Lonsdale Place Dental","a":"302 - 1200 Lonsdale Avenue, North Vancouver, BC V7M 3H6","p":"604-770-3114","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31897,"lng":-123.07257,"campus":false},{"c":"physio","n":"Go! Physiotherapy Sports + Wellness Centre","a":"2 - 3657 West 16th Avenue, Vancouver, BC V6R 3C3","p":"604-568-4628","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25819,"lng":-123.18584,"campus":false,"w":"https://gophysio.janeapp.com/","b":1},{"c":"physio","n":"Physiolab Little Mountain","a":"181 East 41 Avenue, Vancouver, BC V5W 0E2","p":"604-585-2828","d":"Max $75 initial assessment, $65 follow-ups","lat":49.23755,"lng":-123.08468,"campus":false},{"c":"dental","n":"West Point Dental Clinic","a":"5403 West Boulevard, Vancouver, BC V6M 3W5","p":"604-267-1688","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23724,"lng":-123.15543,"campus":false},{"c":"dental","n":"604 Dental @ Main 41","a":"5733 Main Street, Vancouver, BC V5W 4C7","p":"604-322-7483","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23307,"lng":-123.10166,"campus":false},{"c":"prescription","n":"Rexall","a":"575 16th Street, West Vancouver, BC V7V 4Y1","p":"604-922-4174","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.32963,"lng":-123.15895,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"chiropractor","n":"Life Integrative","a":"4168 Dunbar Street, Vancouver, BC V6S 2E7","p":"604-742-0702","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2494,"lng":-123.1852,"campus":false,"w":"https://lifechiro.janeapp.com/","b":1},{"c":"chiropractor","n":"Backs in Action Rehab & Wellness","a":"2917 Hebb Ave, Vancouver, BC V5M 0C4","p":"604-876-9977","d":"Max $75 initial assessment, $45 follow-ups","lat":49.25747,"lng":-123.04196,"campus":false},{"c":"vision","n":"Specsavers","a":"2348 W 41st Ave, Vancouver, BC V6M 2A4","p":"778-373-7748","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23471,"lng":-123.16093,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"2029 Lonsdale Ave, North Vancouver, BC V7M 2K4","p":"604-227-8270","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.32726,"lng":-123.07239,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Fraser Dental Centre","a":"103 - 5990 Fraser Street, Vancouver, BC V5W 2Z7","p":"604-326-8411","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23095,"lng":-123.0908,"campus":false},{"c":"dental","n":"Bel Canto Dental","a":"1892 Marine Drive, West Vancouver, BC V7V 1J6","p":"604-926-7621","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.32883,"lng":-123.16438,"campus":false},{"c":"dental","n":"Aegis Dental","a":"204-5704 Balsam St, Vancouver, BC V6M 4B9","p":"604-261-2332","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23468,"lng":-123.16139,"campus":false},{"c":"dental","n":"Fraser Street Dental","a":"6192 Fraser St, Vancouver, BC V5W 3A1","p":"604-325-3414","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22828,"lng":-123.09085,"campus":false},{"c":"dental","n":"Imagine Dental Group","a":"6482 Main Street, Vancouver, BC V5W 2V4","p":"604-428-2880","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22654,"lng":-123.10159,"campus":false},{"c":"vision","n":"Specsavers","a":"3185 Grandview Hwy., Vancouver, BC V5M 2E9","p":"778-374-1609","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.25832,"lng":-123.03819,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"chiropractor","n":"East Van Medical Clinic","a":"5449 Victoria Drive, Vancouver, BC V5P 3V9","p":"604-876-1376","d":"Max $75 initial assessment, $45 follow-ups","lat":49.23485,"lng":-123.06547,"campus":false},{"c":"vision","n":"Point Grey Eyecare","a":"4466 West 10th Avenue, Vancouver, BC V6R 2H9","p":"604-224-3937","d":"$70 eye exam, $75 off select glasses","lat":49.26369,"lng":-123.20847,"campus":false,"w":"https://www.pointgreyeyecare.com/"},{"c":"dental","n":"Dr. Pako Cheung Inc.","a":"5583 Victoria Drive, Vancouver, BC V5P 3W3","p":"604-325-9339","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22387,"lng":-123.06789,"campus":false},{"c":"chiropractor","n":"Dr. Huan-Wei Chen","a":"5636 Victoria Drive, Vancouver, BC V5P 3W4","p":"604-323-8900","d":"Max $75 initial assessment, $45 follow-ups","lat":49.23271,"lng":-123.0657,"campus":false},{"c":"prescription","n":"Rexall","a":"6580 Fraser Street, Vancouver, BC V5X 3T4","p":"604-235-2115","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.22538,"lng":-123.09078,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Sasamat Dental","a":"202-4545 W 10 Avenue, Vancouver, BC V6R 4N2","p":"604-224-3288","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.264,"lng":-123.21046,"campus":false,"w":"https://sasamatdental.ca/"},{"c":"dental","n":"All Smiles Dental","a":"5775 Victoria Road, Vancouver, BC V5P 3W5","p":"604-325-1231","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2327,"lng":-123.0657,"campus":false},{"c":"chiropractor","n":"Healing Sense Chiropractic","a":"101 A - 3701 Hastings Street, Burnaby, BC V5C 2H6","p":"778-379-5086","d":"Max $75 initial assessment, $45 follow-ups","lat":49.28123,"lng":-123.0235,"campus":false},{"c":"dental","n":"Blooming Dental","a":"5505 Dunbar Street, Vancouver, BC V6N 1W5","p":"778-504-5555","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23635,"lng":-123.18525,"campus":false},{"c":"dental","n":"Norburn Dental Centre","a":"3976 E Hastings St., Burnaby, BC V5C 6C7","p":"604-336-4411","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28118,"lng":-123.01813,"campus":false},{"c":"dental","n":"Craft Dentistry","a":"3898 Rupert Street, Vancouver, BC V5R 6E4","p":"604-283-9575","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.24989,"lng":-123.03387,"campus":false},{"c":"dental","n":"Vancouver Grace Dental Clinic","a":"6441 Victoria Drive, Vancouver, BC V5P 3X5","p":"604-323-0773","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2254,"lng":-123.06585,"campus":false},{"c":"vision","n":"Specsavers","a":"333 Seymour Blvd., North Vancouver, BC V7J 2J4","p":"778-375-4896","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.30777,"lng":-123.02386,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"physio","n":"Ion Performance and Wellness Inc.","a":"106 - 3787 Canada Way, Burnaby, BC V5G 1G5","p":"604-683-3185","d":"Max $75 initial assessment, $65 follow-ups","lat":49.25473,"lng":-123.02113,"campus":false},{"c":"dental","n":"South Granville Dentistry","a":"7937 Granville Street, Vancouver, BC V6P 4Z3","p":"604-266-5300","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.21352,"lng":-123.1403,"campus":false},{"c":"dental","n":"Smiley Kids Dental","a":"200 - 4233 Hastings Street, Burnaby, BC V5C 2J5","p":"604-298-1966","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28107,"lng":-123.01078,"campus":false},{"c":"dental","n":"Love My Smile Dental","a":"8307 Oak Street, Vancouver, BC V6P 4A9","p":"604-647-6453","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.21063,"lng":-123.13017,"campus":false},{"c":"dental","n":"Joyce Station Dental Clinic","a":"5258 Joyce Street, Vancouver, BC V5R 6C9","p":"604-437-7073","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2371,"lng":-123.03288,"campus":false},{"c":"dental","n":"Marine Cambie Dental","a":"482 SW Marine Drive, Vancouver, BC V5X 0C4","p":"604-428-8078","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22273,"lng":-123.10177,"campus":false},{"c":"dental","n":"Marine Cambie Dental","a":"482 SW Marine Drive, Vancouver, BC V5X0C4","p":"604-482-8078","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22273,"lng":-123.10177,"campus":false},{"c":"dental","n":"Dr Francisca Valdes inc.","a":"5301 Joyce Street, Vancouver, BC V5R 4H3","p":"604-434-4412","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23638,"lng":-123.03371,"campus":false},{"c":"vision","n":"Specsavers","a":"350 S.E. Marine Dr, Vancouver, BC V5X 2S5","p":"236-826-4439","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.21062,"lng":-123.09918,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"3353 Kingsway, Vancouver, BC V5R 5K6","p":"604-438-6122","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23341,"lng":-123.03404,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Champlain Dental","a":"230 - 3150 East 54th Avenue, Vancouver, BC V5S 1Z1","p":"604-430-2178","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22017,"lng":-123.03955,"campus":false},{"c":"dental","n":"West Kits Dental","a":"3641 West Broadway, Vancouver, BC V6R 2B8","p":"604-734-2114","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26421,"lng":-123.18552,"campus":false},{"c":"physio","n":"Rebounce Physio","a":"3589 Kingsway, Vancouver, BC V5R 4P5","p":"604-696-7426","d":"Max $75 initial assessment, $65 follow-ups","lat":49.23381,"lng":-123.02589,"campus":false},{"c":"dental","n":"Happy Family Dental Centre","a":"3638 Kingsway, Vancouver, BC V5R 5M2","p":"604-336-2050","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23207,"lng":-123.0257,"campus":false},{"c":"dental","n":"Pacific Dental Centre","a":"104 - 2025 W. Broadway, Vancouver, BC V6J 1Z6","p":"604-336-9636","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26376,"lng":-123.15274,"campus":false},{"c":"vision","n":"Wesbrook Eyecare","a":"3339 Wesbrook Mall, Vancouver, BC V6S 0B1","p":"604-558-3937","d":"Eye exam max $60; $75 off glasses over $250 / 30% off under $250; up to 25% off contacts","lat":49.24869,"lng":-123.22497,"campus":true,"w":"https://www.wesbrookeyecare.com/"},{"c":"dental","n":"Wesbrook Village Dental Centre","a":"3328 Wesbrook Mall, Vancouver, BC V5N 0A8","p":"604-221-7600","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25779,"lng":-123.06744,"campus":true},{"c":"dental","n":"University Village Medical and Dental","a":"228 - 2155 Allison Road, Vancouver, BC V6T 1T5","p":"604-222-2273","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2664,"lng":-123.24183,"campus":true,"w":"https://www.universityvillageclinic.com/"},{"c":"dental","n":"University Village Dental","a":"5933 Birney Ave, Vancouver, BC V6T 1W5","p":"604-222-2273 ext. 1","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.25987,"lng":-123.2513,"campus":true,"w":"https://www.universityvillageclinic.com/dental/birney"},{"c":"dental","n":"Campus Dentist","a":"4 - 5958 Webber Lane, Vancouver, BC V6S 0J9","p":"604-559-5781","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2538,"lng":-123.23717,"campus":true,"w":"https://universitydentist.ca/"},{"c":"dental","n":"West 41st Dentistry at Yew","a":"5687 Yew St #210, Vancouver, BC V6M 3Y2","p":"604-266-4046","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.23547,"lng":-123.15768,"campus":false},{"c":"physio","n":"UBC Physical Therapy and Research Clinic","a":"244 - 2177 Wesbrook Mall, Vancouver, BC V6T 1Z3","p":"604-827-6959","d":"Max $70 initial assessment, $60 follow-ups","lat":49.25738,"lng":-123.2382,"campus":true,"w":"https://ubcphysioandresearchclinic.janeapp.com/","b":1},{"c":"dental","n":"Focal Dental","a":"105- 6111 University Blvd., Vancouver, BC V6T 2A1","p":"604-423-9383","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26442,"lng":-123.24426,"campus":true,"w":"https://focaluniversitydentist.ca/"},{"c":"chiropractor","n":"MSK Health & Performance Clinic","a":"700-4555 Kingsway, Burnaby, BC V5H 4T8","p":"604-438-6106","d":"Max $75 initial assessment, $45 follow-ups","lat":49.2298,"lng":-123.00346,"campus":false},{"c":"dental","n":"Orawell Dental","a":"501-4538 Kingsway, Burnaby, BC V5H 4T9","p":"604-430-2112","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.2297,"lng":-123.00319,"campus":false},{"c":"chiropractor","n":"Riverside Chiropractic Inc.","a":"3025 Anson Ave, UNIT 201, Coquitlam, BC V3B 2H6","p":"604-220-3394","d":"Max $75 initial assessment, $45 follow-ups","lat":49.27728,"lng":-122.7916,"campus":false},{"c":"prescription","n":"Rexall","a":"140-6200 McKay Ave, Burnaby, BC V5H 4L7","p":"604-438-9370","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.22791,"lng":-123.00442,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"vision","n":"Specsavers","a":"1105 Eaton Ctr 4700 Kingsway, Burnaby, BC V5H 4M1","p":"236-826-3119","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.22827,"lng":-122.99934,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Asthetic Dental Group","a":"4731 Kingsway, Burnaby, BC V5H 2C3","p":"604-433-0168","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22838,"lng":-122.99891,"campus":false},{"c":"dental","n":"The Dentists At Metrotown","a":"396 - 4800 Kingsway, Burnaby, BC V5H 4P1","p":"604-558-3636","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22737,"lng":-122.99595,"campus":false},{"c":"vision","n":"Specsavers","a":"4820 Kingsway, Burnaby, BC V5H 4P1","p":"604-630-2266","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.22737,"lng":-122.99595,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Fang's Dental Clinic","a":"6411 Nelson Ave, Burnaby, BC V5H 4H3","p":"604-416-5115","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22587,"lng":-122.9942,"campus":false},{"c":"dental","n":"Burnaby Gentle Dental","a":"4980 Kingsway #111, Burnaby, BC V5H 4K7","p":"604-434-3020","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22635,"lng":-122.99301,"campus":false},{"c":"dental","n":"Kensington Square Dental Centre","a":"6562 Hastings Street, Burnaby, BC V5B 1S2","p":"604-298-5595","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.28027,"lng":-122.96991,"campus":false},{"c":"dental","n":"Golden Smile Dental","a":"110 - 5021 Kingsway, Burnaby, BC V5H 4A5","p":"604-432-9291","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22659,"lng":-122.99345,"campus":false,"w":"https://www.goldensmiledental.ca/"},{"c":"dental","n":"Seymour Dental Centre","a":"200-3650 Mt. Seymour Pkwy, North Vancouver, BC V7H 2Y5","p":"604-924-8289","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.31602,"lng":-122.97058,"campus":false},{"c":"vision","n":"Specsavers","a":"4651 Number 3 Rd, Richmond, BC V6X 2C4","p":"236-266-0050","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.17966,"lng":-123.13686,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Chiu Shing Tse Inc","a":"170- 8291 Alexandra Road, Richmond, BC V6X 1C3","p":"604-821-1918","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17832,"lng":-123.13097,"campus":false},{"c":"dental","n":"Richmond Community Dentist","a":"#3652 - 9251 Alderbridge Way, Richmond, BC V6X0N1","p":"604-285-7770","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17382,"lng":-123.13667,"campus":false},{"c":"dental","n":"Alderbridge Dental Centre","a":"135 - 4940 no 3 Road, Richmond, BC V6X 3A5","p":"604-273-0797","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.17794,"lng":-123.13627,"campus":false},{"c":"dental","n":"Dentudio Dentists","a":"145 - 5555 Gilbert Road, Richmond, BC V7C 0B8","p":"604-370-1450","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.14674,"lng":-123.14785,"campus":false},{"c":"dental","n":"Richmond Central Dental Clinic","a":"110 - 6060 No.3 Road, Richmond, BC V6Y 2B3","p":"604-821-0886","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16986,"lng":-123.13634,"campus":false},{"c":"dental","n":"Dr. Edward Zhang","a":"130 - 8191 Saba Road, Richmond, BC V6Y 4B4","p":"604-304-1088","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16935,"lng":-123.1334,"campus":false},{"c":"dental","n":"Dr. Katherine Wong","a":"680 - 6091 Gilbert Road, Richmond, BC V7C 5L9","p":"604-273-9381","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16993,"lng":-123.14796,"campus":false},{"c":"dental","n":"Dr. Florence Co Uy Inc.","a":"Suite 100-6480 Buswell Street, Richmond, BC V6Y 2E9","p":"604-278-9877","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16665,"lng":-123.13374,"campus":false},{"c":"dental","n":"TUTH Dental","a":"180-8119 Park Rd, Richmond, BC V6Y0M5","p":"604-796-4888","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.15863,"lng":-123.12951,"campus":false},{"c":"vision","n":"Specsavers","a":"3675 Westminster Hwy, Richmond, BC V7C 5V2","p":"236-266-1078","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.17012,"lng":-123.18256,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Dr. Gloria K. Yan","a":"110 - 8033 Saba Road, Richmond, BC V6Y 4M8","p":"604-270-7504","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16934,"lng":-123.13618,"campus":false},{"c":"dental","n":"DTC Dental Treatment Center","a":"6011 No. 1 Road, Unit #120, Richmond, BC V7C 1T4","p":"604-238-6666","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.16284,"lng":-123.18092,"campus":false},{"c":"chiropractor","n":"Strength Through Motion","a":"150-2251 No 5 Rd, Richmond, BC V6X 2S8","p":"604-630-8815","d":"Max $75 initial assessment, $45 follow-ups","lat":49.19616,"lng":-123.09145,"campus":false},{"c":"dental","n":"Richmond Bonita Dental Centre","a":"6180 Blundell Road #240, Richmond, BC V7C 4W7","p":"604-271-1440","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.1556,"lng":-123.15123,"campus":false},{"c":"dental","n":"Simon Fraser Dental Center","a":"140 - 8960 University High Street, Burnaby, BC V5A 4X6","p":"604-267-3368","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.27912,"lng":-122.90713,"campus":false},{"c":"dental","n":"Dental on 6th","a":"7610 6th street, Burnaby, BC V3N 0G6","p":"604-553-4699","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.19868,"lng":-123.00381,"campus":false},{"c":"dental","n":"Dr. Alvin Choi Inc.","a":"130 - 3920 Francis Road, Richmond, BC V7C 1J7","p":"604-277-3533","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.14832,"lng":-123.185,"campus":false},{"c":"chiropractor","n":"LWC Health Inc. (Lougheed Wellness Centre)","a":"Tower West 9304 Salish Court, Burnaby, BC V3J 7J8","p":"604-559-9355","d":"Max $75 initial assessment, $45 follow-ups","lat":49.25261,"lng":-122.90393,"campus":false},{"c":"dental","n":"Royal Square Dental Centre","a":"14 - 800 McBride Boulevard, New Westminster, BC V3L 2B8","p":"604-526-1216","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22243,"lng":-122.912,"campus":false},{"c":"vision","n":"Specsavers","a":"9855 Austin Avenue, Burnaby, BC V3J 1N4","p":"604-220-3937","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.24911,"lng":-122.89563,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"vision","n":"Specsavers","a":"11700 Steveston Highway, Richmond, BC V7A 1N6","p":"778-234-0863","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.13327,"lng":-123.09719,"campus":false,"w":"https://www.specsavers.ca/student-offers"},{"c":"dental","n":"Columbia Square Dental","a":"111-1015 Columbia Street, New Westminster, BC V3M 6H6","p":"604-529-9393","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.20042,"lng":-122.91611,"campus":false},{"c":"vision","n":"The EyeSite Doctors of Optometry","a":"108 – 301 East Columbia Street, New Westminster, BC V3L 3W5","p":"604-553-3900","d":"$75 eye exam (+$20 contacts), $75 off select glasses","lat":49.22574,"lng":-122.89278,"campus":false,"w":"https://www.theeyesitenw.com/"},{"c":"dental","n":"NeWest Smile Dental","a":"293 Nelson's Court, New Westminster, BC V3L 0E3","p":"604-544-6544","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.22411,"lng":-122.89239,"campus":false},{"c":"physio","n":"Pure Motion Physiotherapy","a":"105-6033 London Rd, Richmond, BC V7E 0A7","p":"604-499-0778","d":"Max $75 initial assessment, $65 follow-ups","lat":49.11781,"lng":-123.15839,"campus":false},{"c":"physio","n":"Pure Motion Physiotherapy","a":"6033 London Rd Unit 105, Richmond, BC V7E 0A7","p":"604-285-5949","d":"Max $75 initial assessment, $65 follow-ups","lat":49.11781,"lng":-123.15839,"campus":false},{"c":"prescription","n":"Rexall","a":"108 1015 Austin Avenue, Coquitlam, BC V3K 3N9","p":"604-937-3122","d":"Rx top-up to 100% (max $40) + 25% off Rexall brands","lat":49.24917,"lng":-122.86932,"campus":false,"w":"https://www.rexall.ca/flu"},{"c":"dental","n":"Vitacare Dental Centre","a":"101 - 1655 Como Lake Ave, Coquitlam, BC V3J 0E9","p":"778-355-3535","d":"30% off preventive, 20% off basic, 20% off major restorative","lat":49.26348,"lng":-122.85599,"campus":false},{"c":"vision","n":"Specsavers","a":"1301 Lougheed Hwy., Coquitlam, BC V3K 6P9","p":"236-947-0674","d":"Specsavers student offers (codes SCONTACTS24, STUDENTSAVINGS24, P117682)","lat":49.23324,"lng":-122.85548,"campus":false,"w":"https://www.specsavers.ca/student-offers"}];
+const OTHER_CLINICS = [{"c":"doctor_visit","n":"Pure Medical Clinic Lelem","a":"130-2320 Acadia Road, Vancouver, BC V6T 1L5","p":"604-635-1819","lat":49.26559,"lng":-123.23778,"w":"https://www.khatsclinic.ca/locations/pure-medical-clinic-lelem/"},{"c":"doctor_visit","n":"Khatsahlano Medical Clinic","a":"2685 West Broadway, Vancouver, BC V6K 2G2","p":"604-731-9187","lat":49.26403,"lng":-123.16644,"w":"https://www.khatsclinic.ca/locations/khatsahlano-medical-clinic/"},{"c":"doctor_visit","n":"MD 4 ME","a":"103-2025 West Broadway, Vancouver, BC V6J 1Z6","p":"604-900-8494","lat":49.26376,"lng":-123.15274,"w":"https://md4me.cortico.ca/book/","b":1},{"c":"doctor_visit","n":"Choice Medical Clinic","a":"817 W Hastings Street, Vancouver, BC V6C 3N9","p":"604-969-8900","lat":49.28651,"lng":-123.11536,"w":"https://patient.medeohealth.com/booking/choice-medical-clinic","b":1},{"c":"doctor_visit","n":"Yaletown Medical Clinic","a":"1296 Pacific Boulevard, Vancouver, BC V6Z 2V1","p":"604-633-2474","lat":49.27333,"lng":-123.12331,"w":"http://yaletownmedicalclinic.ca/"},{"c":"doctor_visit","n":"Coal Harbour Health Centre","a":"622 Bute Street, Vancouver, BC V6E 3M1","p":"604-558-3313","lat":49.2888,"lng":-123.12279},{"c":"massage","n":"Kitsilano Massage Therapy & Health","a":"2085 West 4th Ave, Vancouver, BC V6J 1N3","p":"604-732-7272","lat":49.2683,"lng":-123.15261,"w":"https://kitsmassage.janeapp.com/","b":1},{"c":"massage","n":"Do Well Therapy Kitsilano","a":"2906 West 4th Ave, Vancouver, BC V6K 1R2","p":"604-249-4702","lat":49.26835,"lng":-123.16881,"w":"https://dowell.janeapp.com/locations/do-well-kitsilano/book","b":1},{"c":"massage","n":"West End Wellness","a":"#501-1033 Davie St, Vancouver, BC V6E 1M7","p":"604-428-9355","lat":49.2797,"lng":-123.12971,"w":"https://westendwellness.janeapp.com/","b":1},{"c":"massage","n":"Everest Therapeutics","a":"MZ2-970 Burrard Street, Vancouver, BC V6Z 2R4","p":"604-633-9593","lat":49.28194,"lng":-123.12509,"w":"https://www.everesttherapeutics.com/booking/","b":1},{"c":"massage","n":"RMT Corner","a":"#308-1160 Burrard Street, Vancouver, BC V6Z 2E8","p":"604-341-9060","lat":49.27963,"lng":-123.1283,"w":"https://rmtcorner.janeapp.com/","b":1},{"c":"counselling","n":"Jericho Counselling - West 4th","a":"3369 W 4th Ave, Vancouver, BC V6R 1N6","p":"604-537-4246","lat":49.26858,"lng":-123.17953,"w":"https://www.jerichocounselling.com/"},{"c":"counselling","n":"Haven Wellness Collective","a":"1892 W Broadway, Vancouver, BC V6J 1Y9","p":"778-819-8429","lat":49.26371,"lng":-123.14796,"w":"https://havenwellnesscollective.janeapp.com/locations/haven-wellness-counselling/book","b":1},{"c":"counselling","n":"ARC: Anxiety Relief Centre","a":"#922-470 Granville St, Vancouver, BC V6C 1V5","p":"604-828-9508","lat":49.28408,"lng":-123.11579,"w":"https://arccounselling.ca/booking/","b":1},{"c":"counselling","n":"Avery Therapy Centre","a":"Suite 303-700 West Pender St, Vancouver, BC V6C 1G8","p":"604-838-0327","lat":49.28458,"lng":-123.11491,"w":"https://www.averytherapy.com/"}];
 
 
 /* =========================================================================
@@ -2660,8 +2886,8 @@ const PARAMS = (() => { try { return new URLSearchParams(location.search); } cat
 const API_URL = (() => {
   const forced = PARAMS.get("api");
   if (forced) return forced === "mock" ? "" : forced;
-  // Served by the team's Flask server on this computer: ask that same server.
-  if (/^https?:$/.test(location.protocol) && location.pathname === "/" && location.port === "5000") return location.origin + "/ask";
+  // Served by the team's Flask server on this computer (any port): ask that same server.
+  if (/^https?:$/.test(location.protocol) && /^(localhost|127\.\d+\.\d+\.\d+|0\.0\.0\.0|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)$/.test(location.hostname)) return location.origin + "/ask";
   return LIVE_SERVER;
 })();
 const TODAY = (() => {
@@ -2712,14 +2938,9 @@ const LANGUAGES = [
   { code: "pa",      name: "ਪੰਜਾਬੀ",        locale: "pa-IN", speech: "pa-IN" },
   { code: "hi",      name: "हिन्दी",         locale: "hi-IN", speech: "hi-IN" },
   { code: "ko",      name: "한국어",         locale: "ko-KR", speech: "ko-KR" },
-  { code: "ja",      name: "日本語",         locale: "ja-JP", speech: "ja-JP" },
-  { code: "vi",      name: "Tiếng Việt",   locale: "vi-VN", speech: "vi-VN" },
-  { code: "tl",      name: "Tagalog",      locale: "en-CA", speech: "fil-PH" },
-  { code: "es",      name: "Español",      locale: "es-ES", speech: "es-ES" },
-  { code: "fr",      name: "Français",     locale: "fr-CA", speech: "fr-CA" },
-  { code: "fa",      name: "فارسی",        locale: "fa-IR", speech: "fa-IR" },
-  { code: "ar",      name: "العربية",      locale: "ar",    speech: "ar-SA" },
 ];
+/* Only languages the page itself is translated into are in the menu.
+   Students can still type or speak in any language: answers come back in it. */
 const langInfo = code => LANGUAGES.find(l => l.code === code) || LANGUAGES[1];
 
 /* =========================================================================
@@ -2729,7 +2950,7 @@ const langInfo = code => LANGUAGES.find(l => l.code === code) || LANGUAGES[1];
    Never saved anywhere: what the student types or says, their postal code.
    ========================================================================= */
 const CK_VALUES = { doctor: ["yes", "no", "booked"], dental: ["lt3", "3to6", "gt6", "unknown", "booked"], eye: ["this", "last", "longer", "unknown", "booked"], flu: ["yes", "no", "booked"] };
-const state = { remember: false, plan: PLAN, language: "auto", usageKnown: false, used: {}, eyeUsed: false, large: false, ck: {} };
+const state = { remember: false, plan: PLAN, language: "auto", usageKnown: false, used: {}, eyeUsed: false, large: false, ck: {}, bk: {} };
 let loc = { kind: "area", key: "ubc" };       // where to measure distance from (this visit only)
 let current = null;                            // { result, needIndex, q }
 let currentItem = null;                        // check-up item key on the item screen
@@ -2743,7 +2964,7 @@ function save() {
   if (!state.remember) return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ remember: true, plan: state.plan, language: state.language,
-      usageKnown: state.usageKnown, used: state.used, eyeUsed: state.eyeUsed, large: state.large, ck: state.ck }));
+      usageKnown: state.usageKnown, used: state.used, eyeUsed: state.eyeUsed, large: state.large, ck: state.ck, bk: state.bk }));
   } catch (e) {}
 }
 function forget() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
@@ -2773,6 +2994,10 @@ function load() {
     state.eyeUsed = s.eyeUsed === true;
     state.large = s.large === true;
     state.ck = {};
+    state.bk = {};
+    const okB = list => Array.isArray(list) ? list.filter(b => b && parseIso(b.at) && /^\d{4}-\d{2}$/.test(b.m)).map(b => ({ at: b.at, m: b.m })) : [];
+    if (s.bk && typeof s.bk === "object") for (const k of Object.keys(CK_VALUES)) { const l = okB(s.bk[k]); if (l.length) state.bk[k] = l; }
+    if (Array.isArray(s.dbk) && !state.bk.dental) state.bk.dental = okB(s.dbk);
     if (s.ck && typeof s.ck === "object") for (const [k, a] of Object.entries(s.ck)) { const c = cleanCk(k, a); if (c) state.ck[k] = c; }
   } catch (e) {}
 }
@@ -2834,6 +3059,7 @@ function applyI18n() {
   fillLanguageSelect($("lang-settings"), false);
   $("lang-current").textContent = state.language === "auto" ? t("top_language") : langInfo(state.language).name;
   $("sheet-close").setAttribute("aria-label", t("close"));
+  $("to-en").hidden = uiLang() === "en";
   updateSpeakButton();
   if (!busy) askBtn.textContent = t("ask_btn");
   renderPlan();
@@ -3117,13 +3343,13 @@ function dealShort(x) {
   return t("deal_generic");
 }
 function whereText(x) { return x.p.online ? t("online") : kmText(x.p.dist); }
-/* A booking website for a place, if it has one that books online. */
-function bookUrl(p, cat) {
+/* A place's website: { url, book } where book = we know it takes online bookings. */
+function webLink(p, cat) {
   const url = p.w || p.url;
   if (!url) return null;
-  if (/rexall\.ca/.test(url)) return cat === "vaccine" ? url : null;
-  if (/specsavers\.ca/.test(url) || p.n === STUDENT_HEALTH.n || /psyvitaliti/.test(url)) return url;
-  return null;
+  if (/rexall\.ca/.test(url)) return cat === "vaccine" ? { url, book: true } : null;
+  const book = p.b === 1 || /specsavers\.ca|janeapp\.com|psyvitaliti/.test(url) || p.n === STUDENT_HEALTH.n;
+  return { url, book };
 }
 /* Which check-up item a booking counts toward. */
 function bookKeyFor(cat, dentalType) {
@@ -3155,21 +3381,27 @@ function placeBlock(cat, opts) {
     if (!first) { wrap.hidden = true; return; }
     wrap.hidden = false;
     const bk = opts.bookKey || null;
-    const url = bookUrl(first.p, cat);
-    const label = url && cat !== "counselling" && cat !== "doctor_visit" ? t("book_online") + " · " + first.p.n : t("call_name", { name: first.p.n });
-    const href = url && cat !== "counselling" && cat !== "doctor_visit" ? url : telHref(first.p.p);
-    const big = el("a", { class: "big", href, target: href.startsWith("http") ? "_blank" : null, rel: href.startsWith("http") ? "noopener" : null, "data-book": bk }, label);
-    main.append(big, el("p", { class: "meta" }, [t("closest"), whereText(first), dealShort(first)].join(" · "), el("span", { class: "desk" }, " · " + first.p.p)));
+    // Big button: their website (booking page if we know one); calling is the smaller option.
+    const w = webLink(first.p, cat);
+    const big = w
+      ? el("a", { class: "big", href: w.url, target: "_blank", rel: "noopener", "data-book": bk }, w.book ? t("book_online_at", { name: first.p.n }) : t("visit_site", { name: first.p.n }))
+      : el("a", { class: "big", href: telHref(first.p.p), "data-book": bk }, t("call_name", { name: first.p.n }));
+    main.append(big, el("p", { class: "meta" }, [t("closest"), whereText(first), dealShort(first)].join(" · "), w ? null : el("span", { class: "desk" }, " · " + first.p.p)));
+    const more = el("div", { class: "links", style: "margin-top:0.25rem" });
+    if (w && first.p.p) more.append(el("a", { class: "link", href: telHref(first.p.p), "data-book": bk }, t("or_call", { phone: first.p.p })));
+    if (first.p.a) more.append(el("a", { class: "link", href: mapsHref(first.p), target: "_blank", rel: "noopener" }, t("res_directions")));
+    if (more.childNodes.length) main.append(more);
     const rest = list.slice(1, 3);
     alsoHead.replaceChildren(el("p", { class: "grey" }, t("also_near", { place: locLabel() })), changeBtn);
     rest.forEach(x => {
-      const u = bookUrl(x.p, cat);
-      const a = x.p.p && !(x.p.online && u)
-        ? el("a", { class: "pill-btn", href: telHref(x.p.p), "data-book": bk, "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("res_call"))
-        : el("a", { class: "pill-btn", href: u, target: "_blank", rel: "noopener", "data-book": bk }, t("website"));
+      const xw = webLink(x.p, cat);
+      const a = xw
+        ? el("a", { class: "pill-btn", href: xw.url, target: "_blank", rel: "noopener", "data-book": bk, "aria-label": (xw.book ? t("book_online") : t("website")) + ": " + x.p.n }, xw.book ? t("book_short") : t("website"))
+        : el("a", { class: "pill-btn", href: telHref(x.p.p), "data-book": bk, "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("res_call"));
+      const callLink = xw && x.p.p ? el("a", { href: telHref(x.p.p), "data-book": bk, style: "font-weight:600", "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("call_name", { name: x.p.p })) : null;
       alts.append(el("div", { class: "row place" },
         el("div", { class: "place-info" }, el("span", { class: "place-name" }, x.p.n),
-          el("span", { class: "row-sub" }, [whereText(x), dealShort(x)].join(" · "), el("span", { class: "desk" }, x.p.p ? " · " + x.p.p : ""))), a));
+          el("span", { class: "row-sub" }, [whereText(x), dealShort(x)].join(" · "), callLink ? null : el("span", { class: "desk" }, x.p.p ? " · " + x.p.p : ""), callLink ? " · " : null, callLink)), a));
     });
     alts.hidden = !rest.length;
   }
@@ -3265,13 +3497,18 @@ function refreshLanguage() {
 
 /* =========================================================================
    11. CHECK-UP PLAN
-   Dental cleanings: 2 a plan year (Sep 1 to Aug 31), 6 months apart.
-   Eye exam: every 2 years. Flu shot: every fall, free in BC.
-   Answers are rough on purpose (no exact dates). "Yes, booked" marks an item
-   done that day; Undo puts back whatever was there before.
+   Every item works the same way: a short checklist of what's done, what's
+   booked and what's next, a way to book the next one ahead, and Undo.
+   - Dental cleaning: 2 a plan year (Sep 1 to Aug 31), 6 months apart.
+   - Eye exam: once every 2 years.
+   - Flu shot: once a season (shots run October to March), free in BC.
+   - A regular doctor: one first visit with UBC Student Health.
+   "Already had one?" answers are rough on purpose, so dates are shown as a
+   window of months. "Yes, booked" asks which month; once that month has
+   passed we assume they went.
    ========================================================================= */
 const CK_ITEMS = {
-  dental: { title: "ck_dental", cat: "dental", q: "q_dental", bk: "bk_q_dental",
+  dental: { title: "ck_dental", cat: "dental", q: "q_dental", bk: "bk_q_dental_next",
     opts: [["lt3", "o_lt3"], ["3to6", "o_3to6"], ["gt6", "o_gt6"], ["unknown", "o_unknown"]] },
   eye: { title: "ck_eye", cat: "vision", q: "q_eye", bk: "bk_q_eye",
     opts: [["this", "o_this"], ["last", "o_last"], ["longer", "o_longer"], ["unknown", "o_unknown"]] },
@@ -3284,49 +3521,184 @@ const CK_ORDER = ["dental", "eye", "flu", "doctor"];
 function lateAugust() { return (planEnd(TODAY) - TODAY) / DAY <= 14; }
 function planYearIndex(d) { return planStart(d).getFullYear(); }
 
-/* -> { kind: "due"|"done"|"soon"|"none", label, text, canAsk } */
-function ckStatus(key) {
-  const a = state.ck[key];
-  const at = a ? parseIso(a.at) : null;
-  if (key === "doctor") {
-    if (a && (a.v === "yes" || a.v === "booked")) return { kind: "done", label: t("st_done"), text: t("ck_doctor_yes"), canAsk: true };
-    return { kind: "none", label: t("st_setup"), text: t("ck_doctor_text"), canAsk: true };
+function monthWin(m) { const [y, mo] = m.split("-").map(Number); return { lo: new Date(y, mo - 1, 1), hi: new Date(y, mo, 0) }; }
+function monthKey(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); }
+function sameMonth(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth(); }
+function shortMonth(d) { return d.toLocaleDateString(locale(), { month: "short" }); }
+function monthYear(d) { return d.toLocaleDateString(locale(), { month: "long", year: "numeric" }); }
+function far(d) { return (d - TODAY) / DAY > 300; }
+/* "February–May", or with years when it's far off: "August–November 2028". */
+function rangeText(lo, hi, short) {
+  if (!short && (far(lo) || lo.getFullYear() !== hi.getFullYear() && far(hi))) {
+    return sameMonth(lo, hi) ? monthYear(lo) : lo.getFullYear() === hi.getFullYear()
+      ? monthName(lo) + "–" + monthYear(hi) : monthYear(lo) + "–" + monthYear(hi);
   }
-  if (key === "dental") {
-    if (a && a.v === "unknown") return { kind: "due", label: t("st_due"), text: t("ck_unknown"), canAsk: true };
-    const ago = a ? { booked: 0, lt3: 45, "3to6": 135, gt6: 270 }[a.v] : null;
-    const last = ago != null ? addDays(at, -ago) : null;
-    const next = last ? addDays(last, 182) : null;
-    if (next && next > TODAY) return { kind: "done", label: t("st_done"), text: t("ck_dental_next", { month: monthName(next) }), canAsk: true };
-    if (lateAugust()) return { kind: "soon", label: t("pill_sep"), text: t("ck_dental_newyear"), canAsk: true };
-    const usedThisYear = last && last >= planStart(TODAY);
-    const second = addDays(TODAY, 182);
-    if (!usedThisYear && second <= planEnd(TODAY)) return { kind: "due", label: t("st_due"), text: t("ck_dental_two", { month: monthName(second) }), canAsk: true };
-    return { kind: "due", label: t("st_due"), text: t("ck_dental_one"), canAsk: true };
-  }
-  if (key === "eye") {
-    if (a && a.v === "unknown") return { kind: "due", label: t("st_due"), text: t("ck_unknown"), canAsk: true };
-    if (a && (a.v === "this" || a.v === "last" || a.v === "booked")) {
-      const yearsAgo = planYearIndex(TODAY) - planYearIndex(at) + (a.v === "last" ? 1 : 0);
-      if (yearsAgo === 0) return { kind: "done", label: t("st_done"), text: t("ck_eye_this"), canAsk: true };
-      if (yearsAgo === 1) return { kind: "done", label: t("st_done"), text: t("ck_eye_last"), canAsk: true };
-    }
-    return { kind: "due", label: t("st_due"), text: t("ck_eye_due"), canAsk: true };
-  }
-  // flu: season runs Sep to Aug; shots are given from October.
-  const m = TODAY.getMonth();
-  if (a && (a.v === "yes" || a.v === "booked") && planYearIndex(at) === planYearIndex(TODAY)) return { kind: "done", label: t("st_done"), text: t("ck_flu_done"), canAsk: true };
-  if (m === 8) return { kind: "soon", label: t("pill_october"), text: t("ck_flu_october"), canAsk: false };
-  if (m >= 3 && m <= 7) return { kind: "soon", label: t("pill_fall"), text: t("ck_flu_fall"), canAsk: false };
-  return { kind: "due", label: t("st_due"), text: t("ck_flu_due"), canAsk: true };
+  const f = short ? shortMonth : monthName;
+  return sameMonth(lo, hi) ? f(lo) : f(lo) + "–" + f(hi);
+}
+function bookings(key) { return (state.bk[key] || []).map((b, i) => { const w = monthWin(b.m); return { src: "booking", i, lo: w.lo, hi: w.hi, done: TODAY > w.hi }; }); }
+function answerOf(key) { const a = state.ck[key]; return a && parseIso(a.at) ? { v: a.v, at: parseIso(a.at) } : null; }
+
+/* A plan for one item:
+   { rows: [{ kind: "done"|"booked"|"open", label, sub, src, i, lo, hi, due }],
+     next: the first row that isn't done, label: the home-screen status,
+     lead: one sentence, book: { lo, hi } months they can book now (or null),
+     ask: show "Already had one?" } */
+function planFor(key) {
+  if (key === "dental") return dentalPlan();
+  if (key === "eye") return eyePlan();
+  if (key === "flu") return fluPlan();
+  return doctorPlan();
+}
+function statusLabel(next, fallbackDone) {
+  if (!next) return { kind: "done", label: fallbackDone };
+  if (next.kind === "booked") return { kind: "booked", label: t("st_booked", { when: shortMonth(next.lo) }) };
+  if (next.due) return { kind: "due", label: t("st_due") };
+  return { kind: "soon", label: t("st_next", { when: far(next.lo) ? String(next.lo.getFullYear()) : rangeText(next.lo, next.hi, true) }) };
+}
+function answerRow(key, label) {
+  const a = answerOf(key), opt = a && CK_ITEMS[key].opts.find(o => o[0] === a.v);
+  return { kind: "done", label, sub: opt ? t("slot_done_ans", { answer: t(opt[1]) }) : t("st_done"), src: "answer" };
+}
+function bookingRow(b, label) {
+  return b.done ? { kind: "done", label, sub: t("slot_done_month", { month: monthName(b.lo) }), src: "booking", i: b.i, lo: b.lo, hi: b.hi }
+    : { kind: "booked", label, sub: t("slot_booked", { month: monthName(b.lo) }), src: "booking", i: b.i, lo: b.lo, hi: b.hi };
+}
+function openRow(label, lo, hi) {
+  const due = hi <= TODAY;
+  return { kind: "open", label, lo, hi, due,
+    sub: due ? t("st_due") : sameMonth(lo, hi) ? t("from_month", { month: far(lo) ? monthYear(lo) : monthName(lo) }) : rangeText(lo, hi) };
 }
 
+/* Dental: two cleanings this plan year. */
+function dentalPlan() {
+  const PS = planStart(TODAY), PE = planEnd(TODAY);
+  const a = answerOf("dental");
+  if (a && a.v === "unknown") {
+    return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("ck_unknown") + " " + t("ck_dental_cost"), book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
+  }
+  const known = [];
+  if (a) {
+    const w = { lt3: [-90, 0], "3to6": [-182, -90], gt6: [null, -182], booked: [0, 0] }[a.v];
+    if (w) known.push({ src: "answer", lo: w[0] == null ? null : addDays(a.at, w[0]), hi: addDays(a.at, w[1]), done: true });
+  }
+  known.push(...bookings("dental"));
+  known.sort((x, y) => x.hi - y.hi);
+  const rows = [];
+  let last = null;
+  const n = () => t("slot_n", { n: rows.length + 1 });
+  for (const c of known) {
+    const mid = c.lo ? new Date((c.lo.getTime() + c.hi.getTime()) / 2) : c.hi;
+    if (c.done && mid >= PS) rows.push(c.src === "answer" ? answerRow("dental", n()) : bookingRow(c, n()));
+    else if (!c.done && c.lo <= PE) rows.push(bookingRow(c, n()));
+    last = c;
+  }
+  while (rows.length < 2) {
+    let lo = last && last.lo ? addDays(last.lo, 182) : null;
+    let hi = last ? addDays(last.hi, 182) : TODAY;
+    if (!lo || lo < TODAY) lo = new Date(TODAY);
+    if (hi < lo) hi = new Date(lo);
+    if (lo > PE) break;
+    if (hi > PE) hi = new Date(PE);
+    const r = openRow(n(), lo, hi);
+    rows.push(r); last = r;
+  }
+  rows.splice(2);
+  const next = rows.find(r => r.kind !== "done");
+  const open = rows.find(r => r.kind === "open");
+  const st = statusLabel(next, t("st_done_year"));
+  let lead = rows.length === 1 && next && next.kind === "open" ? t("ck_dental_one") : t("dental_lead", { n: rows.length });
+  if (!next) lead = t("dental_all_done"); else lead += " " + t("ck_dental_cost");
+  const answerShown = rows.some(r => r.src === "answer");
+  if (lateAugust() && (!next || next.kind === "open")) {
+    return { rows: [], next: null, kind: "soon", label: t("pill_sep"), lead: t("ck_dental_newyear"), book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: !answerShown };
+  }
+  return { rows, next, kind: st.kind, label: st.label, lead, book: open ? monthsFrom(open.lo, open.hi) : null, ask: !answerShown, aheadText: open && !open.due ? rangeText(open.lo, open.hi) : null };
+}
+
+/* Eye exam: once every 2 years. */
+function eyePlan() {
+  const a = answerOf("eye");
+  const lead = t("eye_lead");
+  if (a && a.v === "unknown") return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("ck_unknown") + " " + lead, book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
+  const known = [];
+  if (a) {
+    const ps = planStart(a.at);
+    const w = { this: [ps, a.at], last: [addDays(ps, -365), addDays(ps, -1)], longer: [null, addDays(ps, -731)], booked: [a.at, a.at] }[a.v];
+    if (w) known.push({ src: "answer", lo: w[0], hi: w[1], done: true });
+  }
+  known.push(...bookings("eye"));
+  known.sort((x, y) => x.hi - y.hi);
+  const done = known.filter(c => c.done), future = known.filter(c => !c.done);
+  const last = done[done.length - 1] || null;
+  const rows = [];
+  if (last && last.lo) rows.push(last.src === "answer" ? answerRow("eye", t("eye_last")) : bookingRow(last, t("eye_last")));
+  if (future.length) rows.push(bookingRow(future[0], t("eye_next")));
+  else {
+    let lo = last && last.lo ? addDays(last.lo, 730) : new Date(TODAY);
+    let hi = last ? addDays(last.hi, 730) : new Date(TODAY);
+    if (lo < TODAY) lo = new Date(TODAY);
+    if (hi < lo) hi = new Date(lo);
+    rows.push(openRow(t("eye_next"), lo, hi));
+  }
+  const next = rows.find(r => r.kind !== "done");
+  const st = statusLabel(next, t("st_done"));
+  const open = next && next.kind === "open" ? next : null;
+  const canBook = open && (open.lo - TODAY) / DAY <= 120;
+  return { rows: rows.length > 1 || !open || !open.due ? rows : [], next, kind: st.kind, label: st.label,
+    lead: open && open.due ? t("ck_eye_due") + " " + t("ck_eye_cost") : lead,
+    book: canBook ? monthsFrom(open.lo, open.hi) : null, ask: !rows.some(r => r.src === "answer"),
+    aheadText: canBook && !open.due ? rangeText(open.lo, open.hi) : null, nothingYet: !canBook && !!open };
+}
+
+/* Flu shot: once a season. Shots are given October to March. */
+function fluPlan() {
+  const PS = planStart(TODAY);
+  const sLo = new Date(PS.getFullYear(), 9, 1), sHi = new Date(PS.getFullYear() + 1, 2, 31);
+  const a = answerOf("flu");
+  const label = t("flu_season");
+  let row = null;
+  if (a && (a.v === "yes" || a.v === "booked") && planYearIndex(a.at) === planYearIndex(TODAY)) row = answerRow("flu", label);
+  const bs = bookings("flu").filter(b => b.lo >= PS);
+  if (!row && bs.length) row = bookingRow(bs[bs.length - 1], label);
+  if (row && row.kind === "done") return { rows: [row], next: null, kind: "done", label: t("st_next", { when: t("word_fall") }), lead: t("ck_flu_done"), book: null, ask: false };
+  if (row) { const st = statusLabel(row); return { rows: [row], next: row, kind: st.kind, label: st.label, lead: t("ck_flu_due"), book: null, ask: false }; }
+  if (TODAY > sHi) return { rows: [], next: null, kind: "soon", label: t("pill_fall"), lead: t("ck_flu_fall"), book: null, ask: false };
+  if (TODAY < sLo) return { rows: [], next: null, kind: "soon", label: t("pill_october"), lead: t("ck_flu_october") + " " + t("ck_flu_due"), book: null, ask: false };
+  return { rows: [], next: { kind: "open", due: true }, kind: "due", label: t("st_due"), lead: t("ck_flu_due"), book: monthsFrom(TODAY, sHi), ask: true };
+}
+
+/* A regular doctor: one first visit with UBC Student Health. */
+function doctorPlan() {
+  const a = answerOf("doctor");
+  const label = t("doc_first");
+  if (a && (a.v === "yes" || a.v === "booked")) return { rows: [answerRow("doctor", t("ck_doctor_short"))], next: null, kind: "done", label: t("st_done"), lead: t("ck_doctor_yes"), book: null, ask: false };
+  const bs = bookings("doctor");
+  if (bs.length) {
+    const row = bookingRow(bs[bs.length - 1], label);
+    if (row.kind === "done") return { rows: [row], next: null, kind: "done", label: t("st_done"), lead: t("ck_doctor_yes"), book: null, ask: false };
+    const st = statusLabel(row);
+    return { rows: [row], next: row, kind: st.kind, label: st.label, lead: t("ck_doctor_text"), book: null, ask: false };
+  }
+  return { rows: [], next: { kind: "open", due: true }, kind: "none", label: t("st_setup"), lead: t("ck_doctor_text"), book: monthsFrom(TODAY, addDays(TODAY, 60)), ask: true };
+}
+
+/* Months someone could pick for a booking: from lo (or this month) to hi, 3 to 4 choices. */
+function monthsFrom(lo, hi) {
+  const out = [];
+  let d = new Date(Math.max(lo, TODAY)); d = new Date(d.getFullYear(), d.getMonth(), 1);
+  const end = new Date(hi.getFullYear(), hi.getMonth(), 1);
+  while (out.length < 4 && (d <= end || out.length < 3)) { out.push(new Date(d)); d = new Date(d.getFullYear(), d.getMonth() + 1, 1); }
+  return out;
+}
+
+function ckStatus(key) { return planFor(key); }
 function openItem(key) { currentItem = key; show("item"); }
 
 function renderPlan() {
   const list = $("plan-list");
   list.replaceChildren(...CK_ORDER.map(key => {
-    const st = ckStatus(key);
+    const st = planFor(key);
     return on(el("button", { class: "row", type: "button" },
       el("span", { class: "row-name" }, t(CK_ITEMS[key].title)),
       el("span", { class: "row-st" + (st.kind === "due" ? " due" : "") }, st.label),
@@ -3337,19 +3709,8 @@ function renderPlan() {
     el("span", { class: "chev", "aria-hidden": "true" })), "click", () => openNeed({ category: "counselling" })));
 }
 
-function setCk(key, v) {
-  const prev = state.ck[key];
-  if (v === "booked") state.ck[key] = { v, at: isoDate(TODAY), prev: prev && prev.v !== "booked" ? { v: prev.v, at: prev.at } : undefined };
-  else state.ck[key] = { v, at: isoDate(TODAY) };
-  if (!state.ck[key].prev) delete state.ck[key].prev;
-  if (!state.remember) nudgeShown = true;
-  save();
-}
-function undoCk(key) {
-  const a = state.ck[key];
-  if (a && a.prev) state.ck[key] = a.prev; else delete state.ck[key];
-  save();
-}
+function markChanged() { if (!state.remember) nudgeShown = true; save(); }
+function setCk(key, v) { state.ck[key] = { v, at: isoDate(TODAY) }; markChanged(); }
 
 function askAlready(key) {
   const item = CK_ITEMS[key], a = state.ck[key];
@@ -3362,7 +3723,8 @@ function askAlready(key) {
   openSheet(t(item.q), body);
 }
 
-/* "Did you book?" after a Call or Book online tap, when they come back. */
+/* "Did you book?" after a Call or Book online tap, when they come back,
+   then "Which month?". */
 let pendingBook = null, pendingHidden = false, pendingTimer = null;
 on(document, "click", e => {
   const a = e.target.closest("[data-book]");
@@ -3380,11 +3742,21 @@ on(document, "visibilitychange", () => {
 function askBooked() {
   const key = pendingBook; pendingBook = null; clearTimeout(pendingTimer);
   if (!key || !$("sheet").hidden || !$("safety").hidden) return;
-  const st = ckStatus(key);
-  if (st.kind === "done") return;
-  const yes = on(el("button", { class: "opt primary", type: "button" }, t("bk_yes")), "click", () => { setCk(key, "booked"); closeSheet(); refreshAfterCk(key); });
+  const plan = planFor(key);
+  if (!plan.book || !plan.book.length) return;
+  const pick = () => {
+    const opts = el("div", { class: "opts" });
+    plan.book.forEach(m => opts.append(on(el("button", { class: "opt center", type: "button" }, monthName(m) + (m.getFullYear() !== TODAY.getFullYear() ? " " + m.getFullYear() : "")), "click", () => {
+      (state.bk[key] = state.bk[key] || []).push({ at: isoDate(TODAY), m: monthKey(m) });
+      markChanged(); closeSheet(); refreshAfterCk(key);
+    })));
+    $("sheet-title").textContent = t("which_month");
+    $("sheet-body").replaceChildren(opts);
+    opts.querySelector("button").focus();
+  };
+  const yes = on(el("button", { class: "opt primary", type: "button" }, t("bk_yes")), "click", pick);
   const no = on(el("button", { class: "opt center", type: "button" }, t("bk_no")), "click", closeSheet);
-  openSheet(t(CK_ITEMS[key].bk), [el("div", { class: "opts" }, yes, no), el("p", { class: "grey", style: "margin-top:1rem" }, t("bk_note"))]);
+  openSheet(t(CK_ITEMS[key].bk), [el("div", { class: "opts" }, yes, no)]);
 }
 function refreshAfterCk(key) {
   if (currentView === "item") { renderItem(); const h = $("item-title"); if (h) h.focus({ preventScroll: true }); }
@@ -3406,44 +3778,50 @@ function renderItem() {
   const key = currentItem, item = CK_ITEMS[key];
   const box = $("view-item");
   if (!item) { box.replaceChildren(); return; }
-  const st = ckStatus(key), a = state.ck[key];
-  const head = el("div", { class: "detail-head enter" }, el("h1", { class: "title", id: "item-title", tabindex: "-1" }, t(item.title)));
-  let lead = st.text;
-  if (st.kind === "due" && key === "dental") lead += " " + t("ck_dental_cost");
-  if (st.kind === "due" && key === "eye") lead += " " + t("ck_eye_cost");
-  head.append(el("p", { class: "lead" }, lead));
-  box.replaceChildren(head);
+  const plan = planFor(key);
+  box.replaceChildren(el("div", { class: "detail-head enter" },
+    el("h1", { class: "title", id: "item-title", tabindex: "-1" }, t(item.title)),
+    el("p", { class: "lead" }, plan.lead)));
 
-  if (st.kind === "done") {
-    const when = a && parseIso(a.at) ? shortDate(parseIso(a.at)) : "";
-    let card;
-    if (a && a.v === "booked") {
-      card = el("div", { class: "card rows done-card" }, el("div", { class: "row place" },
-        el("div", { class: "place-info" }, el("span", { class: "place-name" }, t("marked_done", { date: when })), el("span", { class: "row-sub" }, t("didnt_go"))),
-        on(el("button", { class: "pill-btn", type: "button" }, t("undo")), "click", () => { undoCk(key); refreshAfterCk(key); })));
-    } else {
-      const opt = item.opts.find(o => a && o[0] === a.v);
-      card = el("div", { class: "card rows done-card" }, el("div", { class: "row place" },
-        el("div", { class: "place-info" }, el("span", { class: "place-name" }, t("your_answer", { answer: opt ? t(opt[1]) : "" }))),
-        on(el("button", { class: "pill-btn", type: "button" }, t("change_answer")), "click", () => askAlready(key))));
-    }
+  // The checklist: done, booked, next.
+  if (plan.rows.length) {
+    const card = el("ul", { class: "card rows checklist", "aria-label": t(item.title) });
+    plan.rows.forEach(r => {
+      let btn = null;
+      if (r.src === "answer") btn = on(el("button", { class: "pill-btn", type: "button" }, t("change_answer")), "click", () => askAlready(key));
+      else if (r.src === "booking") btn = on(el("button", { class: "pill-btn", type: "button" }, t("undo")), "click", () => { state.bk[key].splice(r.i, 1); save(); refreshAfterCk(key); });
+      card.append(el("li", { class: "row place" },
+        el("span", { class: "mark " + r.kind, "aria-hidden": "true" }, r.kind === "open" ? null : icon(r.kind === "done" ? "check" : "clock")),
+        el("div", { class: "place-info" }, el("span", { class: "place-name" }, r.label), el("span", { class: "row-sub" }, r.sub)),
+        btn));
+    });
     box.append(card);
-  } else if (key === "flu") {
-    if (st.kind === "due") {
-      box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
-        el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
-    }
-  } else if (key === "doctor") {
-    const p = STUDENT_HEALTH;
-    box.append(el("a", { class: "big", href: telHref(p.p), "data-book": "doctor" }, t("call_name", { name: p.n })),
-      el("p", { class: "meta" }, [kmText(km(locPoint(), p)), t("free_msp")].join(" · "), el("span", { class: "desk" }, " · " + p.p)),
-      el("div", { class: "links" }, el("a", { class: "link", href: mapsHref(p), target: "_blank", rel: "noopener" }, t("res_directions"))));
-  } else {
-    box.append(placeBlock(item.cat === "vision" ? "vision" : "dental", { bookKey: key }));
   }
-  const links = el("div", { class: "links" });
-  if (st.canAsk && st.kind !== "done") links.append(on(el("button", { class: "link", type: "button" }, key === "doctor" ? t("already_doc") : t("already_had")), "click", () => askAlready(key)));
-  if (links.childNodes.length) box.append(links);
+
+  // How to book the next one.
+  if (plan.book) {
+    if (plan.aheadText) box.append(el("p", { class: "grey", style: "margin:1.25rem 0 0.75rem" }, t("slot_ask_" + key, { range: plan.aheadText })));
+    else box.append(el("div", { style: "height:1.25rem" }));
+    if (key === "dental" || key === "eye") box.append(placeBlock(item.cat, { bookKey: key }));
+    else if (key === "flu") box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
+      el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
+    else {
+      const p = STUDENT_HEALTH;
+      box.append(el("a", { class: "big", href: p.w, target: "_blank", rel: "noopener", "data-book": "doctor" }, t("book_online_at", { name: p.n })),
+        el("p", { class: "meta" }, [kmText(km(locPoint(), p)), t("free_msp")].join(" · "), el("span", { class: "desk" }, " · " + p.p)),
+        el("div", { class: "links", style: "margin-top:0.25rem" },
+          el("a", { class: "link", href: telHref(p.p), "data-book": "doctor" }, t("or_call", { phone: p.p })),
+          el("a", { class: "link", href: mapsHref(p), target: "_blank", rel: "noopener" }, t("res_directions"))));
+    }
+    if (plan.aheadText) box.append(el("p", { class: "tiny fine" }, t("slot_note")));
+  } else if (plan.nothingYet) {
+    box.append(el("p", { class: "grey", style: "margin-top:1.25rem" }, t("nothing_yet")));
+  }
+
+  if (plan.ask) {
+    const label = state.ck[key] ? t("update_answer") : key === "doctor" ? t("already_doc") : t("already_had");
+    box.append(el("div", { class: "links" }, on(el("button", { class: "link", type: "button" }, label), "click", () => askAlready(key))));
+  }
   const n = nudgeEl(); if (n) box.append(n);
 }
 
@@ -3626,6 +4004,12 @@ function renderReminder() {
   if (!items.length) { box.append(el("p", { class: "grey", style: "margin-top:0.75rem" }, t("rem_all"))); return; }
   box.append(el("ul", { class: "unused" }, ...items.map(([a, b]) => el("li", {}, el("span", {}, a), el("span", { style: "font-weight:700" }, b)))));
 }
+function covSummary(cat) {
+  const c = COVERAGE[cat];
+  if (hasNum(c.per_visit)) return t("pay_visit", { amt: money(c.per_visit), max: money(c.annual_max) });
+  return { counselling: t("pay_counsel"), dental: t("cov_dental"), vision: t("pay_vision"), prescription: t("pay_rx"),
+    vaccine: t("pay_vaccine"), doctor_visit: t("cov_doctor"), medical_equipment: t("cov_equip"), hearing: t("pay_hearing") }[cat] || "";
+}
 function covKey(cat) {
   const c = COVERAGE[cat];
   if (c.free) return "$0";
@@ -3664,9 +4048,9 @@ function renderCoverage() {
       on(cb, "change", () => { state.eyeUsed = cb.checked; state.usageKnown = true; save(); renderReminder(); });
       body.push(el("label", { class: "check", style: "margin-top:0.5rem" }, cb, el("span", {}, t("cov_had_one"))));
     }
-    list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", {}, tc(cat, "title")), el("span", { class: "cov-key" }, covKey(cat))), el("div", { class: "row-body" }, ...body)));
+    list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", { class: "cov-sum" }, el("span", { class: "place-name" }, tc(cat, "title")), el("span", { class: "row-sub" }, covSummary(cat)))), el("div", { class: "row-body" }, ...body)));
   }
-  list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", {}, t("travel_title"))), el("div", { class: "row-body" }, el("p", {}, t("travel_text")))));
+  list.append(el("details", { class: "row-d" }, el("summary", {}, el("span", { class: "cov-sum" }, el("span", { class: "place-name" }, t("travel_title")), el("span", { class: "row-sub" }, t("cov_travel")))), el("div", { class: "row-body" }, el("p", {}, t("travel_text")))));
 }
 
 /* =========================================================================
@@ -3681,6 +4065,7 @@ document.querySelectorAll('input[name="textsize"]').forEach(r => on(r, "change",
 function applyLarge() { document.documentElement.classList.toggle("large", state.large); }
 on($("remember"), "change", e => { state.remember = e.target.checked; if (state.remember) save(); else forget(); });
 for (const id of ["lang-header", "lang-settings"]) on($(id), "change", e => { state.language = e.target.value; save(); refreshLanguage(); });
+on($("to-en"), "click", () => { state.language = "en"; save(); refreshLanguage(); $("lang-header").focus(); });
 function renderPrivacy() {
   const icons = ["lock", "share", "info", "check", "pin", "check", "phone"];
   $("priv-list").replaceChildren(...[1, 2, 3, 4, 5, 6, 7].map((i, k) => el("li", {}, icon(icons[k]), el("p", {}, t("priv_" + i)))));
