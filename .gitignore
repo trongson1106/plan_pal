@@ -34,4 +34,4 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-specs
+specs/
