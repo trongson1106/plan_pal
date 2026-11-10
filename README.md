@@ -1,4 +1,4 @@
-# [PlanPal](https://ubc-coverage-server.onrender.com/)
+# [PlanPal](https://planpalubc.netlify.app/)
 
 > **Find the right care. Know what your plan covers.**
 
