@@ -8,6 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="format-detection" content="telephone=no">
 <title>PlanPal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='24' fill='%230F5C47'/%3E%3Crect x='22' y='24' width='52' height='40' rx='12' fill='%23FFFFFF'/%3E%3Cpath d='M34 60 L30 76 L46 62 Z' fill='%23FFFFFF'/%3E%3Crect x='40' y='41' width='16' height='6' rx='1' fill='%230F5C47'/%3E%3Crect x='45' y='36' width='6' height='16' rx='1' fill='%230F5C47'/%3E%3C/svg%3E">
 <meta name="description" content="Tell us what's going on. We'll tell you who to see, what your UBC AMS/GSS health plan pays, and where to go.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,8 +24,8 @@
      - rem units everywhere so "Larger" text scales the whole page.
      ===================================================================== */
   :root {
-    --bg: #F6F5F1; --card: #FFFFFF; --text: #13201C; --muted: #56625E;
-    --line: #E6E3DD; --row: #ECE9E3; --border: #D6D2CA;
+    --bg: #F6F5F1; --card: #FFFFFF; --text: #13201C; --muted: #4A5450;
+    --line: #E6E3DD; --row: #ECE9E3; --border: #D6D2CA; --chip-border: #9BA5A1;
     --btn: #0B5D4B; --btn-text: #FFFFFF; --btn-press: #084537; --link: #0B5D4B;
     --soft: #E3F1EB; --soft-text: #0A4F40; --warn-bg: #FFF1CC; --warn-text: #5E4500;
     --scrim: rgba(19,32,28,0.45); --safety: #B00020; --err: #8C0016;
@@ -33,7 +34,7 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #111614; --card: #1B2220; --text: #EEF2EF; --muted: #A7B2AE;
-      --line: #27302D; --row: #2A3330; --border: #3A4642;
+      --line: #27302D; --row: #2A3330; --border: #3A4642; --chip-border: #5A6460;
       --btn: #5CC9A7; --btn-text: #062019; --btn-press: #4AB494; --link: #74D6B7;
       --soft: #1F3A32; --soft-text: #BFEBDD; --warn-bg: #3A3018; --warn-text: #F3DFA6;
       --scrim: rgba(0,0,0,0.6); --err: #FF9AA8;
@@ -42,7 +43,7 @@
   html { font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 5rem; }
   html.large { font-size: 125%; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1.0625rem; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 1rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
   [hidden] { display: none !important; }
   h1, h2, h3, p { margin: 0; }
   ul { margin: 0; padding: 0; list-style: none; }
@@ -73,11 +74,11 @@
   .wrap { max-width: 30rem; margin: 0 auto; padding: 1.5rem max(1.25rem, env(safe-area-inset-right)) calc(2rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left)); }
 
   /* ---------- Shared pieces ---------- */
-  .title { font-size: 1.875rem; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; outline: none; }
-  .h2 { font-size: 1.375rem; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
-  .grey { font-size: 0.9375rem; color: var(--muted); }
+  .title { font-size: 2rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; outline: none; }
+  .h2 { font-size: 1.125rem; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+  .grey { font-size: 0.875rem; color: var(--muted); }
   .tiny { font-size: 0.8125rem; color: var(--muted); }
-  .lead { font-size: 1.0625rem; line-height: 1.45; margin-top: 0.5rem; }
+  .lead { font-size: 1rem; line-height: 1.5; margin-top: 0.5rem; }
   .card { background: var(--card); border-radius: 1.25rem; }
   .big { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; min-height: 3.75rem; padding: 0.625rem 1.25rem; border: 0; border-radius: 1.125rem; background: var(--btn); color: var(--btn-text); font-size: 1.0625rem; font-weight: 700; line-height: 1.3; text-align: center; text-decoration: none; transition: transform 150ms var(--ease), background-color 150ms; }
   .big:active { transform: scale(0.985); background: var(--btn-press); }
@@ -87,6 +88,7 @@
   .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 1.5rem; margin-top: 1rem; }
   .pill-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0 1.125rem; border-radius: 999px; border: 1.5px solid var(--btn); background: transparent; color: var(--link); font-size: 0.9375rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
   .chip, .area { min-height: 2rem; padding: 0 0.75rem; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.8125rem; font-weight: 600; }
+  .chip { font-size: 0.9375rem; border-color: var(--chip-border); }
   .area[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
   .spinner { width: 1.125rem; height: 1.125rem; border-radius: 50%; border: 2.5px solid currentColor; border-top-color: transparent; animation: spin 0.8s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -102,8 +104,8 @@
   .row { display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; padding: 0.5rem 0; border-top: 1px solid var(--row); color: var(--text); text-decoration: none; width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; }
   .rows > :first-child { border-top: 0; }
   .row-name { flex: 1; min-width: 0; font-weight: 600; }
-  .row-st { font-size: 0.9375rem; color: var(--muted); white-space: nowrap; }
-  .row-st.due { color: var(--text); font-weight: 600; }
+  .row-st { font-size: 0.875rem; color: var(--muted); white-space: nowrap; }
+  .row-st.due { display: inline-flex; align-items: center; padding: 0.1875rem 0.625rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn-text); font-size: 0.8125rem; font-weight: 700; white-space: nowrap; }
   .chev { width: 0.5rem; height: 0.5rem; flex-shrink: 0; margin: 0 0.25rem 0 0.125rem; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(-45deg); }
   .row-sub { display: block; font-size: 0.875rem; color: var(--muted); font-weight: 400; margin-top: 0.125rem; }
 
@@ -119,7 +121,7 @@
   #ask:disabled { opacity: 0.45; cursor: not-allowed; }
   .ask-status { margin-top: 0.625rem; }
   .ask-error { margin-top: 0.625rem; color: var(--err); font-weight: 600; font-size: 0.9375rem; }
-  .chips { display: flex; flex-wrap: nowrap; gap: 0.5rem; margin-top: 0.875rem; overflow-x: auto; }
+  .chips { display: flex; flex-wrap: nowrap; gap: 0.5rem; overflow-x: auto; padding-bottom: 2px; }
   .recent { margin-top: 1.25rem; }
   .recent .row-name { font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .plan-sec { margin-top: 2rem; }
@@ -127,7 +129,7 @@
   .foot { display: flex; flex-direction: column; align-items: center; margin-top: 1.5rem; }
   .privacy-note { display: flex; gap: 0.5rem; align-items: flex-start; margin-top: 1rem; font-size: 0.875rem; line-height: 1.45; color: var(--muted); }
   .privacy-note .icon { width: 1rem; height: 1rem; margin-top: 0.125rem; color: var(--link); }
-  .privacy-note strong { color: var(--text); }
+  .privacy-note strong { color: var(--muted); font-weight: 400; }
   .privacy-note button { display: inline; padding: 0; border: 0; background: none; color: var(--link); font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
   .private { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.75rem; padding: 0 0.75rem; background: none; border: 0; color: var(--muted); font-size: 0.875rem; font-weight: 600; }
   .private .icon { width: 0.9375rem; height: 0.9375rem; }
@@ -158,7 +160,7 @@
   .loc-msg.err { color: var(--err); font-weight: 600; }
   .done-card { margin-top: 1.5rem; }
   .checklist { margin-top: 0.25rem; }
-  .mark { width: 1.75rem; height: 1.75rem; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--border); }
+  .mark { width: 1.75rem; height: 1.75rem; border-radius: 0.3125rem; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--border); }
   .mark .icon { width: 1rem; height: 1rem; }
   .mark.done { background: var(--btn); border-color: var(--btn); color: var(--btn-text); }
   .mark.booked { border-color: var(--btn); color: var(--link); }
@@ -233,16 +235,26 @@
   .priv li:first-child { border-top: 0; }
   .priv .icon { color: var(--link); margin-top: 0.125rem; }
 
-  /* ---------- Desktop ---------- */
-  @media (min-width: 900px) {
-    .topbar-in { max-width: 64rem; padding: 0 2rem; }
+  /* ---------- Desktop (1024px+) ---------- */
+  @media (min-width: 1024px) {
+    .topbar-in { max-width: 75rem; padding: 0 2.5rem; }
     .top-link { display: inline-flex; align-items: center; }
-    .wrap { max-width: 64rem; padding: 2.5rem 2rem 3rem; }
-    .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
-    .plan-sec { margin-top: 0; }
+    .wrap { max-width: 75rem; padding: 2.5rem 2.5rem 3rem; }
+    .home-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 4rem; align-items: center; height: calc(100vh - 9.25rem); }
+    .home-main-wrap { height: 100%; display: flex; flex-direction: column; justify-content: center; }
+    .plan-sec { margin-top: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; }
+    .foot { display: none; }
     .foot-links { display: none; }
-    #view-answer, #view-item, #view-coverage, #view-settings, #view-privacy { max-width: 34rem; margin: 0 auto; }
-    .title { font-size: 2.25rem; }
+    #view-coverage, #view-settings, #view-privacy { max-width: 42rem; margin: 0 auto; }
+    .title { font-size: 2.75rem; }
+    .h2 { font-size: 1.25rem; }
+    .sum-card { font-size: 1.375rem; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+    .result-aside { position: sticky; top: 6rem; }
+    .breadcrumb { display: flex; }
+    .lang-code { display: inline; }
+    #lang-current { display: none; }
+    .desk { display: inline; }
   }
   .home-grid > * { min-width: 0; }
 
@@ -250,10 +262,10 @@
   .urgency-badge { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding: 0.375rem 0.75rem; border-radius: 999px; font-weight: 700; font-size: 0.9375rem; }
   .urgency-today { background: var(--warn-bg); color: var(--warn-text); }
   .urgency-week  { background: var(--soft);    color: var(--soft-text); }
-  .urgency-care  { background: var(--card);    color: var(--muted); border: 1px solid var(--border); }
+  .urgency-care  { background: transparent; color: var(--muted); border: none; }
   .why-line { margin-top: 0.5rem; font-size: 0.9375rem; color: var(--muted); }
   .fallback-banner { margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 1rem; background: var(--warn-bg); color: var(--warn-text); font-size: 0.9375rem; font-weight: 600; }
-  .er-card { margin-top: 1.25rem; border-radius: 1.125rem; background: var(--card); overflow: hidden; }
+  .er-card { margin-top: 1.25rem; border-radius: 1.125rem; background: var(--card); overflow: hidden; border: 1.5px solid var(--warn-bg); }
   .er-card summary { list-style: none; display: flex; align-items: center; gap: 0.75rem; min-height: 3.5rem; padding: 0 1.125rem; cursor: pointer; font-weight: 700; font-size: 0.9375rem; justify-content: space-between; }
   .er-card summary::-webkit-details-marker { display: none; }
   .er-card summary::after { content: ""; width: 0.5rem; height: 0.5rem; flex-shrink: 0; border-right: 1.75px solid var(--muted); border-bottom: 1.75px solid var(--muted); transform: rotate(45deg) translateY(-2px); }
@@ -262,6 +274,61 @@
   .er-card ul { padding: 0.25rem 1.125rem 0.75rem 2.5rem; list-style: disc; }
   .er-card li { padding: 0.2rem 0; font-size: 0.9375rem; }
   .er-911 { margin: 0.75rem 1.125rem 1.125rem; }
+
+  /* ---------- New spec styles ---------- */
+  /* Plan row icons */
+  .plan-icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--soft); color: var(--soft-text); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .plan-icon svg { width: 1.125rem; height: 1.125rem; }
+  /* Already paid for pill */
+  .paid-pill { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.1875rem 0.625rem; border-radius: 999px; background: var(--soft); color: var(--soft-text); font-size: 0.8125rem; font-weight: 700; white-space: nowrap; vertical-align: middle; }
+  /* Summary card for cost / coverage lines */
+  .sum-card { padding: 1rem 1.25rem; border-radius: 1rem; background: var(--soft); color: var(--soft-text); font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin-top: 0.75rem; }
+  .sum-card b { font-weight: 700; }
+  /* Result two-column grid (block on mobile, grid on desktop via media query) */
+  .result-grid { display: block; }
+  /* Map container */
+  .map-box { border-radius: 1rem; overflow: hidden; height: 20rem; margin-top: 1.5rem; }
+  .map-box iframe { width: 100%; height: 100%; border: 0; display: block; }
+  @media (max-width: 1023px) { .map-box { display: none; } }
+  /* Place row redesign */
+  .place-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin-top: 0.25rem; }
+  .dist-chip { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); font-size: 0.8125rem; color: var(--text); white-space: nowrap; }
+  .student-tag { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 999px; background: var(--soft); color: var(--soft-text); font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+  .place-addr { font-size: 0.8125rem; color: var(--muted); display: block; margin-top: 0.1875rem; }
+  .place-phone-txt { font-size: 0.875rem; color: var(--text); display: block; margin-top: 0.1875rem; }
+  /* Breadcrumb */
+  .breadcrumb { display: none; align-items: center; gap: 0.375rem; font-size: 0.875rem; color: var(--muted); margin-bottom: 1.25rem; }
+  .breadcrumb-link { background: none; border: 0; padding: 0; color: var(--link); font-size: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .breadcrumb-sep { color: var(--border); }
+  /* Language code label (desktop only) */
+  .lang-code { display: none; font-size: 0.875rem; font-weight: 700; }
+  /* Chips row with Try: label */
+  .chips-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem; }
+  .try-label { font-size: 0.875rem; font-weight: 600; color: var(--muted); flex-shrink: 0; }
+  /* Row hover on desktop */
+  @media (hover: hover) and (pointer: fine) { button.row:hover, a.row:hover { background: var(--row); } }
+  /* Future checklist row (muted, not yet actionable) */
+  .row-future .place-name { color: var(--muted); }
+  .row-future .mark { opacity: 0.6; }
+  /* Done row strikethrough */
+  .row-done .place-name { text-decoration: line-through; color: var(--muted); }
+
+  /* ---------- Icon-only nav buttons ---------- */
+  .brand-mark { background: none; overflow: hidden; }
+  .brand-mark svg { width: 100%; height: 100%; border-radius: 0.5rem; }
+  #top-settings-btn { display: inline-flex; align-items: center; padding: 0 0.5rem; }
+  .lang-icon { display: inline-flex; align-items: center; }
+  #lang-current, .lang-code { display: none !important; }
+
+  /* ---------- Splash / welcome screen ---------- */
+  #splash { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 500ms ease; }
+  #splash.splash-out { opacity: 0; pointer-events: none; }
+  .splash-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .splash-icon { width: 5.5rem; height: 5.5rem; display: block; animation: splash-rise 600ms var(--ease) both; }
+  .splash-name { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin-top: 0.875rem; animation: splash-rise 600ms var(--ease) 150ms both; }
+  .splash-name span { color: var(--btn); }
+  .splash-tagline { margin-top: 0.75rem; color: var(--muted); font-size: 1rem; max-width: 18rem; line-height: 1.5; animation: splash-rise 600ms var(--ease) 350ms both; }
+  @keyframes splash-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
   /* ---------- High contrast ---------- */
   @media (forced-colors: active) {
@@ -287,17 +354,20 @@
   <header class="topbar">
     <div class="topbar-in">
       <button class="brand" type="button" id="brand" data-go="ask" aria-label="PlanPal">
-        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>PlanPal
+        <span class="brand-mark"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="96" height="96" rx="24" fill="#0F5C47"/><rect x="22" y="24" width="52" height="40" rx="12" fill="#FFFFFF"/><path d="M34 60 L30 76 L46 62 Z" fill="#FFFFFF"/><rect x="40" y="41" width="16" height="6" rx="1" fill="#0F5C47"/><rect x="45" y="36" width="6" height="16" rx="1" fill="#0F5C47"/></svg></span>PlanPal
       </button>
       <button class="back" type="button" id="back" data-go="back" hidden>
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
         <span id="back-label"></span>
       </button>
       <div class="top-right">
-        <button class="top-link" type="button" data-go="coverage" data-i18n="tab_coverage"></button>
-        <button class="top-link" type="button" data-go="settings" data-i18n="top_settings"></button>
+        <button class="top-link" type="button" data-go="settings" id="top-settings-btn" data-i18n-aria="tip_settings">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
         <button class="to-en" type="button" id="to-en" lang="en" hidden>English</button>
-        <span class="lang">
+        <span class="lang" id="lang-btn">
+          <span class="lang-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+          <span class="lang-code" id="lang-code-label" aria-hidden="true"></span>
           <span id="lang-current" aria-hidden="true"></span>
           <label class="sr-only" for="lang-header" data-i18n="top_language"></label>
           <select id="lang-header"></select>
@@ -310,6 +380,7 @@
     <!-- ================= HOME ================= -->
     <main id="view-ask">
       <div class="home-grid">
+        <div class="home-main-wrap">
         <section aria-labelledby="ask-title">
           <h1 class="title" id="ask-title" tabindex="-1" data-i18n="ask_title"></h1>
           <div class="composer">
@@ -324,10 +395,13 @@
           </div>
           <p class="grey ask-status" id="ask-status" aria-live="polite" hidden></p>
           <p class="ask-error" id="ask-error" role="alert" hidden></p>
-          <div class="chips" role="group" data-i18n-aria="ask_try">
-            <button class="chip" type="button" data-chip="chip_ankle" data-example="ex_ankle"></button>
-            <button class="chip" type="button" data-chip="chip_stress" data-example="ex_stress"></button>
-            <button class="chip" type="button" data-chip="chip_asthma" data-example="ex_asthma"></button>
+          <div class="chips-row">
+            <span class="try-label" aria-hidden="true" data-i18n="try_label"></span>
+            <div class="chips" role="group" data-i18n-aria="ask_try">
+              <button class="chip" type="button" data-chip="chip_ankle" data-example="ex_ankle"></button>
+              <button class="chip" type="button" data-chip="chip_stress" data-example="ex_stress"></button>
+              <button class="chip" type="button" data-chip="chip_asthma" data-example="ex_asthma"></button>
+            </div>
           </div>
           <p class="privacy-note">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -338,18 +412,22 @@
             <div class="card rows" id="recent-list" style="margin-top:0.5rem"></div>
           </section>
         </section>
+        </div><!-- /.home-main-wrap -->
 
         <section class="plan-sec" aria-labelledby="plan-title">
-          <h2 class="h2" id="plan-title" data-i18n="plan_title"></h2>
-          <p class="grey" style="margin-top:0.25rem" data-i18n="plan_sub2"></p>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem">
+            <h2 class="h2" id="plan-title" data-i18n="plan_title"></h2>
+            <span class="paid-pill">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:0.875rem;height:0.875rem"><path d="M20 6 9 17l-5-5"/></svg>
+              <span data-i18n="already_paid"></span>
+            </span>
+          </div>
           <div class="card rows" id="plan-list"></div>
+          <button class="big" type="button" data-go="coverage" style="margin-top:1.25rem">View &amp; Edit my Coverage</button>
         </section>
       </div>
       <div class="foot">
-        <nav class="foot-links">
-          <button type="button" data-go="coverage" data-i18n="tab_coverage"></button>
-          <button type="button" data-go="settings" data-i18n="top_settings"></button>
-        </nav>
+        <nav class="foot-links"></nav>
       </div>
     </main>
 
@@ -397,6 +475,20 @@
       <h1 class="title" id="priv-title" tabindex="-1" data-i18n="priv_title"></h1>
       <section class="card rows sec priv"><ul id="priv-list"></ul></section>
     </main>
+  </div>
+</div>
+
+<div id="splash" role="presentation" aria-hidden="true">
+  <div class="splash-content">
+    <svg class="splash-icon" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="96" height="96" rx="24" fill="#0F5C47"/>
+      <rect x="22" y="24" width="52" height="40" rx="12" fill="#FFFFFF"/>
+      <path d="M34 60 L30 76 L46 62 Z" fill="#FFFFFF"/>
+      <rect x="40" y="41" width="16" height="6" rx="1" fill="#0F5C47"/>
+      <rect x="45" y="36" width="6" height="16" rx="1" fill="#0F5C47"/>
+    </svg>
+    <p class="splash-name">Plan<span>Pal</span></p>
+    <p class="splash-tagline">Find the right care. Know what your plans cover.</p>
   </div>
 </div>
 
@@ -615,6 +707,10 @@ function applyI18n() {
   fillLanguageSelect($("lang-header"), true);
   fillLanguageSelect($("lang-settings"), false);
   $("lang-current").textContent = state.language === "auto" ? t("top_language") : langInfo(state.language).name;
+  const lc = $("lang-code-label"); if (lc) lc.textContent = uiLang().split("-")[0].toUpperCase().slice(0, 2);
+  const langBtn = $("lang-btn"); if (langBtn) langBtn.title = t("tip_language");
+  const covBtn = $("top-coverage-btn"); if (covBtn) covBtn.title = t("tab_coverage");
+  const setBtn = $("top-settings-btn"); if (setBtn) setBtn.title = t("tip_settings");
   $("sheet-close").setAttribute("aria-label", t("close"));
   $("to-en").hidden = uiLang() === "en";
   updateSpeakButton();
@@ -796,6 +892,12 @@ const ICONS = {
   calendar: ["M8 2v4", "M16 2v4", "M3 10h18", "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"],
   home: ["M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z", "M9 22V12h6v10"],
   speaker: ["M11 5 6 9H2v6h4l5 4V5Z", "M15.54 8.46a5 5 0 0 1 0 7.07", "M19.07 4.93a10 10 0 0 1 0 14.14"],
+  tooth: ["M9 3C7 3 6 4.5 6 6c0 1.5.5 2.5 1 3.5L8.5 15c.3 1 .7 2 1.5 2.5.3.3.7.5 1 .5s.7-.2 1-.5c.8-.5 1.2-1.5 1.5-2.5L15 9.5C15.5 8.5 16 7.5 16 6c0-1.5-1-3-3-3-1 0-1.5.5-2 .5S10 3 9 3Z"],
+  eye_icon: ["M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z", "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"],
+  syringe_icon: ["m2 22 2.5-2.5", "M4.5 19.5l11-11", "M15.5 8.5l1 1", "M12 5l2 2", "M19 2l3 3", "M18 5l-6 6"],
+  stethoscope_icon: ["M5 4h4a1 1 0 0 1 1 1v6a4 4 0 0 0 8 0v-2", "M18 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z", "M9 11v3"],
+  chat_icon: ["M7.9 20A9 9 0 1 0 4 16.1L2 22Z"],
+  alert_icon: ["M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z", "M12 9v4", "M12 17h.01"],
 };
 function icon(name) {
   const ns = "http://www.w3.org/2000/svg";
@@ -919,14 +1021,39 @@ function bookKeyFor(cat, dentalType) {
   return null;
 }
 
-/* Big button + "Also near X" list, redrawn in place when the area changes. */
+/* Extract the street name from an address for disambiguation (e.g. "2929 Wesbrook Mall" → "Wesbrook Mall"). */
+function streetLabel(addr) {
+  if (!addr) return "";
+  return addr.split(",")[0].trim().replace(/^\d+[-–]?\d*\s*/, "").trim();
+}
+
+/* Build/update a Google Maps iframe inside a container div. */
+function setMapEmbed(container, p) {
+  container.replaceChildren();
+  if (p && p.lat && p.lng) {
+    const iframe = document.createElement("iframe");
+    iframe.src = "https://www.google.com/maps?q=" + p.lat + "," + p.lng + "&z=15&output=embed";
+    iframe.setAttribute("loading", "lazy");
+    iframe.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+    iframe.setAttribute("title", p.n || "Map");
+    iframe.setAttribute("aria-label", p.n || "Map");
+    iframe.setAttribute("allowfullscreen", "");
+    container.append(iframe);
+    container.hidden = false;
+  } else {
+    container.hidden = true;
+  }
+}
+
+/* Primary card + "Also near X" list + map. Redrawn when area changes. */
 function placeBlock(cat, opts) {
   opts = opts || {};
-  const wrap = el("div");
-  const main = el("div");
+  const wrap = el("div", { class: "place-block" });
+  const primary = el("div", { class: "place-primary" });
   const alsoHead = el("div", { class: "also" });
   const pickerBox = el("div", { hidden: true });
   const alts = el("div", { class: "card rows also-card" });
+  const mapBox = el("div", { class: "map-box", hidden: true });
   const changeBtn = el("button", { class: "link", type: "button", "aria-expanded": "false" }, t("change_area"));
   on(changeBtn, "click", () => {
     pickerBox.hidden = !pickerBox.hidden;
@@ -936,37 +1063,70 @@ function placeBlock(cat, opts) {
   });
   function draw() {
     const list = placesFor(cat, opts.seeToday);
-    main.replaceChildren(); alts.replaceChildren();
+    primary.replaceChildren(); alts.replaceChildren();
     const first = list[0];
     if (!first) { wrap.hidden = true; return; }
     wrap.hidden = false;
     const bk = opts.bookKey || null;
-    // Big button: their website (booking page if we know one); calling is the smaller option.
+    // Detect duplicate names across all results
+    const nameCounts = {};
+    list.forEach(x => { nameCounts[x.p.n] = (nameCounts[x.p.n] || 0) + 1; });
+    const displayName = x => nameCounts[x.p.n] > 1 && x.p.a ? x.p.n + " – " + streetLabel(x.p.a) : x.p.n;
+
+    // Primary place
     const w = webLink(first.p, cat);
     const big = w
       ? el("a", { class: "big", href: w.url, target: "_blank", rel: "noopener", "data-book": bk }, w.book ? t("book_online_at", { name: first.p.n }) : t("visit_site", { name: first.p.n }))
       : el("a", { class: "big", href: telHref(first.p.p), "data-book": bk }, t("call_name", { name: first.p.n }));
-    main.append(big, el("p", { class: "meta" }, [t("closest"), whereText(first), dealShort(first)].join(" · "), w ? null : el("span", { class: "desk" }, " · " + first.p.p)));
+    primary.append(big);
+    // Dist + tag row
+    const metaRow = el("div", { class: "place-meta-row" });
+    if (!first.p.online && first.dist != null) metaRow.append(el("span", { class: "dist-chip" }, kmText(first.dist)));
+    if (first.kind !== "other") metaRow.append(el("span", { class: "student-tag" }, dealShort(first)));
+    if (metaRow.childNodes.length) primary.append(metaRow);
+    if (first.p.a) primary.append(el("p", { class: "place-addr" }, first.p.a));
+    if (first.p.p && !w) primary.append(el("p", { class: "place-phone-txt" }, first.p.p));
     const more = el("div", { class: "links", style: "margin-top:0.25rem" });
     if (w && first.p.p) more.append(el("a", { class: "link", href: telHref(first.p.p), "data-book": bk }, t("or_call", { phone: first.p.p })));
     if (first.p.a) more.append(el("a", { class: "link", href: mapsHref(first.p), target: "_blank", rel: "noopener" }, t("res_directions")));
-    if (more.childNodes.length) main.append(more);
+    if (more.childNodes.length) primary.append(more);
+
+    // Map: show primary place
+    setMapEmbed(mapBox, first.p);
+
+    // Alt rows (up to 2)
     const rest = list.slice(1, 3);
     alsoHead.replaceChildren(el("p", { class: "grey" }, t("also_near", { place: locLabel() })), changeBtn);
     rest.forEach(x => {
+      const name = displayName(x);
       const xw = webLink(x.p, cat);
-      const a = xw
-        ? el("a", { class: "pill-btn", href: xw.url, target: "_blank", rel: "noopener", "data-book": bk, "aria-label": (xw.book ? t("book_online") : t("website")) + ": " + x.p.n }, xw.book ? t("book_short") : t("website"))
-        : el("a", { class: "pill-btn", href: telHref(x.p.p), "data-book": bk, "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("res_call"));
-      const callLink = xw && x.p.p ? el("a", { href: telHref(x.p.p), "data-book": bk, style: "font-weight:600", "aria-label": t("call_name", { name: x.p.n }) + ", " + x.p.p }, t("call_name", { name: x.p.p })) : null;
-      alts.append(el("div", { class: "row place" },
-        el("div", { class: "place-info" }, el("span", { class: "place-name" }, x.p.n),
-          el("span", { class: "row-sub" }, [whereText(x), dealShort(x)].join(" · "), callLink ? null : el("span", { class: "desk" }, x.p.p ? " · " + x.p.p : ""), callLink ? " · " : null, callLink)), a));
+      const pill = xw
+        ? el("a", { class: "pill-btn", href: xw.url, target: "_blank", rel: "noopener", "data-book": bk, "aria-label": (xw.book ? t("book_online") : t("website")) + ": " + name }, xw.book ? t("book_short") : t("website"))
+        : el("a", { class: "pill-btn", href: telHref(x.p.p), "data-book": bk, "aria-label": t("call_name", { name }) + ", " + x.p.p }, t("res_call"));
+      const altMeta = el("div", { class: "place-meta-row" });
+      if (!x.p.online && x.dist != null) altMeta.append(el("span", { class: "dist-chip" }, kmText(x.dist)));
+      if (x.kind !== "other") altMeta.append(el("span", { class: "student-tag" }, dealShort(x)));
+      const info = el("div", { class: "place-info" },
+        el("span", { class: "place-name" }, name));
+      if (altMeta.childNodes.length) info.append(altMeta);
+      if (x.p.a) info.append(el("p", { class: "place-addr" }, x.p.a));
+      if (x.p.p) info.append(el("span", { class: "place-phone-txt" }, x.p.p));
+      const row = el("div", { class: "row place" });
+      row.append(info, pill);
+      on(row, "click", e => {
+        if (!e.target.closest(".pill-btn")) {
+          setMapEmbed(mapBox, x.p);
+          alts.querySelectorAll(".row.place").forEach(r => r.classList.remove("selected"));
+          row.classList.add("selected");
+        }
+      });
+      alts.append(row);
     });
     alts.hidden = !rest.length;
+    alsoHead.hidden = !rest.length;
   }
   draw();
-  wrap.append(main, alsoHead, pickerBox, alts);
+  wrap.append(primary, alsoHead, pickerBox, alts, mapBox);
   return wrap;
 }
 
@@ -1014,7 +1174,7 @@ function updateBack() {
   const back = $("back");
   back.hidden = currentView === "ask";
   $("brand").hidden = currentView !== "ask";
-  $("back-label").textContent = currentView === "answer" ? t("back_ask") : t("back_home");
+  $("back-label").textContent = t("back_home");
 }
 function show(view, push, extra) {
   if (view === "answer" && !current) view = "ask";
@@ -1255,15 +1415,30 @@ function monthsFrom(lo, hi) {
 function ckStatus(key) { return planFor(key); }
 function openItem(key) { currentItem = key; show("item"); }
 
+function makeBreadcrumb(currentLabel) {
+  const bc = el("nav", { class: "breadcrumb", "aria-label": "Breadcrumb" });
+  bc.append(on(el("button", { class: "breadcrumb-link", type: "button" }, t("back_home")), "click", () => show("ask")));
+  if (currentLabel) {
+    bc.append(el("span", { class: "breadcrumb-sep", "aria-hidden": "true" }, "›"));
+    bc.append(el("span", {}, currentLabel));
+  }
+  return bc;
+}
+
+const PLAN_ICONS = { dental: "tooth", eye: "eye_icon", flu: "syringe_icon", doctor: "stethoscope_icon" };
+
 function renderPlan() {
   const list = $("plan-list");
   list.replaceChildren(...CK_ORDER.map(key => {
     const st = planFor(key);
+    const iconEl = el("span", { class: "plan-icon", "aria-hidden": "true" }); iconEl.append(icon(PLAN_ICONS[key] || "info"));
     return on(el("button", { class: "row", type: "button" },
+      iconEl,
       el("span", { class: "row-name" }, t(CK_ITEMS[key].title)),
       el("span", { class: "row-st" + (st.kind === "due" ? " due" : "") }, st.label),
       el("span", { class: "chev", "aria-hidden": "true" })), "click", () => openItem(key));
   }), on(el("button", { class: "row", type: "button" },
+    el("span", { class: "plan-icon", "aria-hidden": "true" }, icon("chat_icon")),
     el("span", { class: "row-name" }, t("ck_counsel")),
     el("span", { class: "row-st" }, t("st_anytime")),
     el("span", { class: "chev", "aria-hidden": "true" })), "click", () => openNeed({ category: "counselling" })));
@@ -1382,50 +1557,84 @@ function renderItem() {
   const box = $("view-item");
   if (!item) { box.replaceChildren(); return; }
   const plan = planFor(key);
-  box.replaceChildren(el("div", { class: "detail-head enter" },
-    el("h1", { class: "title", id: "item-title", tabindex: "-1" }, t(item.title)),
-    el("p", { class: "lead" }, plan.lead)));
 
-  // The checklist: done, booked, next.
+  // Desktop two-column grid
+  const grid = el("div", { class: "result-grid" });
+  const main = el("div", { class: "result-main" });
+  grid.append(main);
+  box.replaceChildren(grid);
+
+  const head = el("div", { class: "detail-head enter" });
+  head.append(makeBreadcrumb(t(item.title)));
+  head.append(el("h1", { class: "title", id: "item-title", tabindex: "-1" }, t(item.title)));
+  // Cost summary card — same pattern as renderAnswer
+  const sumCard = el("div", { class: "sum-card" });
+  plan.lead.split(/(\d+%|\$\d+(?:,\d+)?|\d+\s*covered)/).forEach((part, i) =>
+    sumCard.append(i % 2 === 0 ? part : el("b", {}, part))
+  );
+  head.append(sumCard);
+  main.append(head);
+
+  // Checklist
   if (plan.rows.length) {
     const card = el("ul", { class: "card rows checklist", "aria-label": t(item.title) });
     plan.rows.forEach(r => {
+      const isFuture = r.kind === "open" && r.lo && r.lo > TODAY;
+      const isDone = r.kind === "done";
+      const rowCls = ["row", "place", isDone ? "row-done" : isFuture ? "row-future" : ""].filter(Boolean).join(" ");
+      // Sub text: rename "From X" → "Available from X" handled via i18n (from_month key)
+      const markIcon = isDone ? icon("check") : r.kind === "booked" ? icon("clock") : isFuture ? icon("calendar") : null;
+      const nameEl = el("span", { class: "place-name" + (isDone ? " done-label" : "") }, r.label);
+      const infoEl = el("div", { class: "place-info" }, nameEl, el("span", { class: "row-sub" }, r.sub));
       let btn = null;
-      if (r.src === "answer") btn = on(el("button", { class: "pill-btn", type: "button" }, t("change_answer")), "click", () => askAlready(key));
-      else if (r.src === "booking") btn = on(el("button", { class: "pill-btn", type: "button" }, t("undo")), "click", () => { state.bk[key].splice(r.i, 1); save(); refreshAfterCk(key); });
-      card.append(el("li", { class: "row place" },
-        el("span", { class: "mark " + r.kind, "aria-hidden": "true" }, r.kind === "open" ? null : icon(r.kind === "done" ? "check" : "clock")),
-        el("div", { class: "place-info" }, el("span", { class: "place-name" }, r.label), el("span", { class: "row-sub" }, r.sub)),
-        btn));
+      if (r.src === "answer") {
+        btn = on(el("button", { class: "pill-btn", type: "button" }, t("change_answer")), "click", () => askAlready(key));
+      } else if (r.src === "booking") {
+        btn = on(el("button", { class: "pill-btn", type: "button" }, t("undo")), "click", () => { state.bk[key].splice(r.i, 1); save(); refreshAfterCk(key); });
+      } else if (r.kind === "open" && !isFuture) {
+        // Actionable open slot: "Mark as done" replaces floating "Already had one?"
+        btn = on(el("button", { class: "pill-btn", type: "button" }, t("mark_done_btn")), "click", () => askAlready(key));
+      }
+      card.append(el("li", { class: rowCls },
+        el("span", { class: "mark " + r.kind, "aria-hidden": "true" }, markIcon),
+        infoEl, btn));
     });
-    box.append(card);
+    main.append(card);
   }
 
-  // How to book the next one.
+  // Booking section (left column)
   if (plan.book) {
-    if (plan.aheadText) box.append(el("p", { class: "grey", style: "margin:1.25rem 0 0.75rem" }, t("slot_ask_" + key, { range: plan.aheadText })));
-    else box.append(el("div", { style: "height:1.25rem" }));
-    if (key === "dental" || key === "eye") box.append(placeBlock(item.cat, { bookKey: key }));
-    else if (key === "flu") box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
-      el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
-    else {
+    if (plan.aheadText) main.append(el("p", { class: "grey", style: "margin:1.25rem 0 0.75rem" }, t("slot_ask_" + key, { range: plan.aheadText })));
+    // Flu/doctor go inline; dental/eye go in aside
+    if (key === "flu") {
+      main.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
+        el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
+    } else if (key === "doctor") {
       const p = STUDENT_HEALTH;
-      box.append(el("a", { class: "big", href: p.w, target: "_blank", rel: "noopener", "data-book": "doctor" }, t("book_online_at", { name: p.n })),
+      main.append(el("a", { class: "big", href: p.w, target: "_blank", rel: "noopener", "data-book": "doctor" }, t("book_online_at", { name: p.n })),
         el("p", { class: "meta" }, [kmText(km(locPoint(), p)), t("free_msp")].join(" · "), el("span", { class: "desk" }, " · " + p.p)),
         el("div", { class: "links", style: "margin-top:0.25rem" },
           el("a", { class: "link", href: telHref(p.p), "data-book": "doctor" }, t("or_call", { phone: p.p })),
           el("a", { class: "link", href: mapsHref(p), target: "_blank", rel: "noopener" }, t("res_directions"))));
     }
-    if (plan.aheadText) box.append(el("p", { class: "tiny fine" }, t("slot_note")));
+    if (plan.aheadText) main.append(el("p", { class: "tiny fine" }, t("slot_note")));
   } else if (plan.nothingYet) {
-    box.append(el("p", { class: "grey", style: "margin-top:1.25rem" }, t("nothing_yet")));
+    main.append(el("p", { class: "grey", style: "margin-top:1.25rem" }, t("nothing_yet")));
   }
 
-  if (plan.ask) {
+  // "Update answer" link only shown if no open rows with mark-done button
+  if (plan.ask && !plan.rows.some(r => r.kind === "open" && (!r.lo || r.lo <= TODAY))) {
     const label = state.ck[key] ? t("update_answer") : key === "doctor" ? t("already_doc") : t("already_had");
-    box.append(el("div", { class: "links" }, on(el("button", { class: "link", type: "button" }, label), "click", () => askAlready(key))));
+    main.append(el("div", { class: "links" }, on(el("button", { class: "link", type: "button" }, label), "click", () => askAlready(key))));
   }
-  const n = nudgeEl(); if (n) box.append(n);
+  const nudge = nudgeEl(); if (nudge) main.append(nudge);
+
+  // Right aside: place block (dental/eye only) + map
+  if ((key === "dental" || key === "eye") && plan.book) {
+    const aside = el("div", { class: "result-aside" });
+    aside.append(placeBlock(item.cat, { bookKey: key }));
+    grid.append(aside);
+  }
 }
 
 /* =========================================================================
@@ -1492,38 +1701,59 @@ function renderAnswer() {
   stopReading();
   const n = r.needs.length ? r.needs[Math.min(current.needIndex, r.needs.length - 1)] : null;
 
+  // Desktop two-column grid: left = main content, right = place card + map
+  const grid = el("div", { class: "result-grid" });
+  const main = el("div", { class: "result-main" });
+  grid.append(main);
+  box.append(grid);
+
+  // Tabs (multi-need)
   if (r.needs.length > 1) {
     const tabs = el("div", { class: "tabs", role: "tablist", "aria-label": t("needs_label") });
     r.needs.forEach((x, i) => tabs.append(on(el("button", { class: "tab", type: "button", role: "tab", "aria-selected": String(i === current.needIndex) }, needShort(x)), "click", () => {
       current.needIndex = i; renderAnswer(); $("answer-title").focus({ preventScroll: true });
     })));
-    box.append(tabs);
+    main.append(tabs);
   }
 
   const head = el("div", { class: "detail-head enter" });
   if (current.q) head.append(el("p", { class: "asked", dir: "auto" }, current.q));
-  if (r.fallback) box.append(el("div", { class: "fallback-banner" }, t("fallback_msg")));
-  box.append(head);
+  if (r.fallback) main.append(el("div", { class: "fallback-banner" }, t("fallback_msg")));
+  main.append(head);
+  // Breadcrumb (desktop only via CSS)
+  head.prepend(makeBreadcrumb(n ? needShort(n) : null));
 
-  // Not about health: say so, offer examples, keep 811 as a safety net.
+  // Not about health
   if (n && isOffTopic(n)) {
     head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, t("off_title")), el("p", { class: "lead" }, t("off_text")));
     const chips = el("div", { class: "chips" });
     ["ankle", "stress", "asthma"].forEach(k => chips.append(on(el("button", { class: "chip", type: "button" }, t("chip_" + k)), "click", () => {
       show("ask"); input.value = t("ex_" + k); askBtn.disabled = busy;
     })));
-    box.append(chips, el("div", { class: "links" }, el("a", { class: "link", href: "tel:811" }, t("off_811"))));
+    main.append(chips, el("div", { class: "links" }, el("a", { class: "link", href: "tel:811" }, t("off_811"))));
     return;
   }
-  // Nothing specific came back: the nurse line is the next step.
+  // No result → nurse line
   if (!n) {
     head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, t("res_nurse_title")));
-    box.append(...nurseBlock(), el("p", { class: "tiny fine" }, t("not_med")));
+    main.append(...nurseBlock(), el("p", { class: "tiny fine" }, t("not_med")));
     return;
   }
 
   const cat = n.category;
-  head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, needHeadline(n)), el("p", { class: "lead" }, paySentence(n)));
+  head.append(el("h1", { class: "title", id: "answer-title", tabindex: "-1" }, needHeadline(n)));
+
+  // Cost summary card (highlighted, 20/22px semibold)
+  const sumCard = el("div", { class: "sum-card" });
+  const rawSentence = paySentence(n);
+  // Bold key figures: percentages and dollar amounts
+  const frag = document.createDocumentFragment();
+  rawSentence.split(/(\d+%|\$\d+(?:,\d+)?)/).forEach((part, i) =>
+    frag.append(i % 2 === 0 ? part : el("b", {}, part))
+  );
+  sumCard.append(frag);
+  head.append(sumCard);
+
   if (n.see_today) head.append(el("p", { class: "today" }, icon("clock"), t("see_today")));
   const cond = conditionBox(n); if (cond) head.append(cond);
   const urgMap = { today: ["clock", "urgency-today", "urgency_today"], this_week: ["calendar", "urgency-week", "urgency_this_week"], self_care: ["home", "urgency-care", "urgency_self_care"] };
@@ -1531,21 +1761,44 @@ function renderAnswer() {
   head.append(el("div", { class: "urgency-badge " + ugCls }, icon(ugIcon), t(ugKey)));
   if (r.why) head.append(el("p", { class: "why-line" }, r.why));
 
+  // ER card — placed directly after cost card (spec: visible without scrolling on desktop)
+  const erSigns = n.er_signs || [];
+  if (erSigns.length) {
+    const expanded = r.urgency !== "self_care";
+    const erCard = el("details", { class: "er-card" });
+    if (expanded) erCard.setAttribute("open", "");
+    const sumEl = el("summary", {});
+    sumEl.append(icon("alert_icon"), el("span", {}, t("er_card_title")));
+    erCard.append(sumEl);
+    if (n.condition === "asthma" && n.category === "prescription") {
+      erCard.append(el("p", { class: "er-asthma" }, t("asthma_inhaler_warn")));
+    }
+    const erList = el("ul", {});
+    erSigns.forEach(s => erList.append(el("li", {}, s)));
+    erCard.append(erList, el("a", { class: "big er-911", href: "tel:911" }, t("er_call_911")));
+    main.append(erCard);
+  }
+
+  // Place block: right column on desktop, stacks below on mobile
+  const hasPlaces = placesFor(cat).length;
+  const aside = el("div", { class: "result-aside" });
+
   if (r.nurse && (cat === "doctor_visit" || cat === "other")) {
-    box.append(...nurseBlock());
+    main.append(...nurseBlock());
   } else if (cat === "vaccine") {
-    box.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
+    main.append(el("a", { class: "big", href: GET_VACCINATED.url, target: "_blank", rel: "noopener", "data-book": "flu" }, t("next_vacc_btn")),
       el("p", { class: "meta" }, ...tn("next_vacc_line", { phone: el("a", { href: telHref(GET_VACCINATED.p), style: "font-weight:600" }, GET_VACCINATED.p) })));
   } else if (cat === "medical_equipment") {
-    box.append(el("p", { class: "next-text" }, t("next_equip")),
+    main.append(el("p", { class: "next-text" }, t("next_equip")),
       el("a", { class: "big", href: telHref(STUDENT_HEALTH.p), style: "margin-top:0.75rem" }, t("call_name", { name: STUDENT_HEALTH.n })),
       el("p", { class: "meta" }, t("free_msp"), el("span", { class: "desk" }, " · " + STUDENT_HEALTH.p)));
-  } else if (placesFor(cat).length) {
-    box.append(placeBlock(cat, { seeToday: n.see_today, bookKey: bookKeyFor(cat, n.dental_type) }));
+  } else if (hasPlaces) {
+    aside.append(placeBlock(cat, { seeToday: n.see_today, bookKey: bookKeyFor(cat, n.dental_type) }));
+    grid.append(aside);
   } else {
     let who = n.practitioner || tc(cat, "who");
     if (uiLang() === "en") who = who.toLowerCase();
-    box.append(el("p", { class: "next-text" }, t("next_find", { who })));
+    main.append(el("p", { class: "next-text" }, t("next_find", { who })));
   }
 
   const links = el("div", { class: "links" });
@@ -1558,31 +1811,18 @@ function renderAnswer() {
   if (window.speechSynthesis) {
     const rb = el("button", { class: "link", type: "button" }, icon("speaker"), el("span", {}, t("read_aloud")));
     on(rb, "click", () => {
-      const parts = [needHeadline(n), paySentence(n)];
+      const parts = [needHeadline(n), rawSentence];
       const big = box.querySelector(".big"); if (big) parts.push(big.textContent);
       readAloud(rb, parts.join(". "), langInfo(uiLang()).speech || "en-CA");
     });
     links.append(rb);
   }
-  box.append(links);
-  if (cat === "counselling") box.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:988" }, t("backup_988"))));
+  main.append(links);
+  if (cat === "counselling") main.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:988" }, t("backup_988"))));
   else if (!(r.nurse && (cat === "doctor_visit" || cat === "other")) && !["vision", "vaccine", "prescription", "hearing"].includes(cat) && !(cat === "dental" && n.dental_type === "preventive")) {
-    box.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:811" }, t("backup_811"))));
+    main.append(el("div", { class: "links", style: "margin-top:0" }, el("a", { class: "link", href: "tel:811" }, t("backup_811"))));
   }
-  const erSigns = n.er_signs || [];
-  if (erSigns.length) {
-    const expanded = r.urgency !== "self_care";
-    const erCard = el("details", { class: "er-card", open: expanded });
-    erCard.append(el("summary", {}, t("er_card_title")));
-    if (n.condition === "asthma" && n.category === "prescription") {
-      erCard.append(el("p", { class: "er-asthma" }, t("asthma_inhaler_warn")));
-    }
-    const erList = el("ul", {});
-    erSigns.forEach(s => erList.append(el("li", {}, s)));
-    erCard.append(erList, el("a", { class: "big er-911", href: "tel:911" }, t("er_call_911")));
-    box.append(erCard);
-  }
-  box.append(el("p", { class: "tiny fine" }, t("not_med")));
+  main.append(el("p", { class: "tiny fine" }, t("not_med")));
 }
 
 async function copyText(text) {
@@ -1824,6 +2064,15 @@ applyLarge();
 applyI18n();
 try { history.replaceState({ view: "ask" }, ""); } catch (e) {}
 show("ask", false);
+
+(function() {
+  var splashEl = document.getElementById("splash");
+  if (!splashEl) return;
+  setTimeout(function() {
+    splashEl.classList.add("splash-out");
+    setTimeout(function() { splashEl.hidden = true; }, 500);
+  }, 3500);
+})();
 </script>
 </body>
 </html>
